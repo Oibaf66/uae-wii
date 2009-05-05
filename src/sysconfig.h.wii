@@ -5,13 +5,16 @@
 #define HAVE_ALARM 1
 
 /* Define to 1 if you have the 'bswap_16' function. */
-#define HAVE_BSWAP_16 1
+/*#define HAVE_BSWAP_16 1 */
+#undef HAVE_BSWAP_16
 
 /* Define to 1 if you have the 'bswap_32' function. */
-#define HAVE_BSWAP_32 1
+/*#define HAVE_BSWAP_32 1*/
+#undef HAVE_BSWAP_32
 
 /* Define to 1 if you have the <byteswap.h> header file. */
-#define HAVE_BYTESWAP_H 1
+/*#define HAVE_BYTESWAP_H 1*/
+#undef HAVE_BYTESWAP_H
 
 /* Define to 1 if you have the <caps/capsimage.h> header file. */
 /* #undef HAVE_CAPS_CAPSIMAGE_H */
@@ -198,7 +201,8 @@
 #define HAVE_SYS_MMAN_H 1
 
 /* Define to 1 if you have the <sys/mount.h> header file. */
-#define HAVE_SYS_MOUNT_H 1
+/*#define HAVE_SYS_MOUNT_H 1 */
+#undef HAVE_SYS_MOUNT_H
 
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
@@ -214,10 +218,12 @@
 #define HAVE_SYS_SOUNDCARD_H 1
 
 /* Define to 1 if you have the <sys/statfs.h> header file. */
-#define HAVE_SYS_STATFS_H 1
+/*#define HAVE_SYS_STATFS_H 1*/
+#undef HAVE_SYS_STATFS_H
 
 /* Define to 1 if you have the <sys/statvfs.h> header file. */
-#define HAVE_SYS_STATVFS_H 1
+/*#define HAVE_SYS_STATVFS_H 1*/
+#undef HAVE_SYS_STATVFS_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -232,7 +238,8 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/vfs.h> header file. */
-#define HAVE_SYS_VFS_H 1
+/* #define HAVE_SYS_VFS_H 1 */
+#undef HAVE_SYS_VFS_H
 
 /* Define to 1 if you have the `tcgetattr' function. */
 #define HAVE_TCGETATTR 1
@@ -335,7 +342,8 @@
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_bsize.
    (4.3BSD, SunOS 4, HP-UX, AIX PS/2) */
-#define STAT_STATFS2_BSIZE 1
+/*#define STAT_STATFS2_BSIZE 1*/
+#undef STAT_STATFS2_BSIZE
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_fsize.
    (4.4BSD, NetBSD) */
