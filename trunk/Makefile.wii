@@ -20,7 +20,13 @@ INCLUDE_DIR		:= include
 PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
 
 # Source files.
-SRCS	:= $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfx-sdl/*.c (SRC_DIR)/jd-sdl/*.c (SRC_DIR)/sd-sdl/*.c (SRC_DIR)/td-none/*.c (SRC_DIR)/gui-none/*.c)
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfx-sdl/*.c $(SRC_DIR)/jd-sdl/*.c $(SRC_DIR)/sd-sdl/*.c \
+	$(SRC_DIR)/td-none/*.c $(SRC_DIR)/gui-none/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c )
+
+SRCS := $(filter-out src/compemu_raw_x86.c src/svgancui.c src/build68k.c src/catweasel.c \
+	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c \
+	src/genblitter.c src/gencomp.c src/gencpu.c src/genlinetoscr.c src/missing.c \
+	src/readcpu.c src/writelog.c src/tui.c src/scsiemul.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
 OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
