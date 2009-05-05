@@ -1,0 +1,103 @@
+#---------------------------------------------------------------------------------
+# Clear the implicit built in rules
+#---------------------------------------------------------------------------------
+.SUFFIXES:
+#---------------------------------------------------------------------------------
+ifeq ($(strip $(DEVKITPPC)),)
+$(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
+endif
+
+include $(DEVKITPPC)/wii_rules
+
+# Directories.
+OBJ_DIR			:= obj
+LIB_DIR			:= lib
+BIN_DIR			:= .
+SRC_DIR			:= src
+INCLUDE_DIR		:= include
+
+# Tools.
+PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
+
+# Source files.
+SRCS	:= $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfx-sdl/*.c (SRC_DIR)/jd-sdl/*.c (SRC_DIR)/sd-sdl/*.c (SRC_DIR)/td-none/*.c (SRC_DIR)/gui-none/*.c)
+
+# Library object files.
+OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
+
+# Test source files.
+# It can be useful to switch this variable around to select individual tests which are problematic.
+TEST_SRCS	:= $(TEST_SRC_DIR)/showfont.c
+
+# What's a full build?
+all: uae.elf
+
+# How to delete the intermediate files.
+clean:
+	@echo Cleaning $(OBJ_DIR)
+	@rm -f $(OBJS)
+
+$(OBJ_DIR):
+	install -d $@
+
+src/sysconfig.h: src/sysconfig.h.wii
+	cp $< $@
+
+src/machdep:
+	cd src && ln -s md-generic machdep
+
+src/gfxdep:
+	cd src && ln -s gfx-sdl gfxdep
+
+src/osdep:
+	cd src && ln -s od-generic osdep
+
+src/guidep:
+	cd src && ln -s gui-none guidep
+
+src/joydep:
+	cd src && ln -s jd-sdl joydep
+
+src/threaddep:
+	cd src && ln -s td-sdl threaddep
+
+src/target.h:
+	cd src && ln -s targets/t-unix.h target.h
+
+# How to build a library.
+$(LIB_DIR)/libSDL_ttf.a: $(OBJS)
+	@echo Archiving $@
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-ar crs $@ $(OBJS)
+	@echo ----
+
+# How to build a DOL.
+$(BIN_DIR)/%.dol: %.elf
+	@echo Creating DOL $@
+	@-mkdir -p $(dir $@)
+	#powerpc-gekko-objcopy -O binary $< $@
+	elf2dol $< $@
+	@echo ----
+
+# Compilation flags.
+COMMON_FLAGS	:= -g -O2 -mrvl -Wall $(MACHDEP)
+INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
+DEFINES		:= -DGEKKO -DDEBUG_ERROR -DDEBUG_TIMERS -DDEBUG_THREADS -DDEBUG_BUILD -DDEBUG_CONVERT
+CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
+
+# Test link flags.
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
+
+# How to link an ELF.
+uae.elf: src/target.h src/machdep src/osdep src/guidep src/threaddep src/joydep src/gfxdep src/osdep src/sysconfig.h $(OBJS)
+	@echo Linking $@
+	@-mkdir -p $(dir $@)
+	powerpc-gekko-g++ -o $@ $< $(OBJS) $(LDFLAGS)
+	#keep elf for debugging
+	#cp $@ /tmp/elf
+
+# How to compile C file (SDL library).
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo Compiling $<
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
