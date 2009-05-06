@@ -37,7 +37,7 @@ OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
 TEST_SRCS	:= $(TEST_SRC_DIR)/showfont.c
 
 # What's a full build?
-all: uae.elf
+all: uae.dol
 
 # How to delete the intermediate files.
 clean:
