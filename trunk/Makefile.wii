@@ -20,13 +20,14 @@ INCLUDE_DIR		:= include
 PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
 
 # Source files.
-SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfx-sdl/*.c $(SRC_DIR)/jd-sdl/*.c $(SRC_DIR)/sd-sdl/*.c \
-	$(SRC_DIR)/td-none/*.c $(SRC_DIR)/gui-none/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c )
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(SRC_DIR)/sounddep/*.c \
+	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/machdep/*.c \
+	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c)
 
-SRCS := $(filter-out src/compemu_raw_x86.c src/svgancui.c src/build68k.c src/catweasel.c \
-	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c \
-	src/genblitter.c src/gencomp.c src/gencpu.c src/genlinetoscr.c src/missing.c \
-	src/readcpu.c src/writelog.c src/tui.c src/scsiemul.c src/linetoscr.c, $(SRCS))
+SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
+	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
+	src/genblitter.c src/gencomp.c src/gencpu.c src/genlinetoscr.c src/fsusage.c src/compemu.c src/compstbl.c \
+	src/readdisk.c src/gengenblitter.c src/tui.c src/scsiemul.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
 OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
@@ -49,26 +50,11 @@ $(OBJ_DIR):
 src/sysconfig.h: src/sysconfig.h.wii
 	cp $< $@
 
-src/machdep:
-	cd src && ln -s md-generic machdep
+%.h: %.h.wii
+	cp $< $@
 
-src/gfxdep:
-	cd src && ln -s gfx-sdl gfxdep
-
-src/osdep:
-	cd src && ln -s od-generic osdep
-
-src/guidep:
-	cd src && ln -s gui-none guidep
-
-src/joydep:
-	cd src && ln -s jd-sdl joydep
-
-src/threaddep:
-	cd src && ln -s td-sdl threaddep
-
-src/target.h:
-	cd src && ln -s targets/t-unix.h target.h
+%.c: %.c.wii
+	cp $< $@
 
 # How to build a library.
 $(LIB_DIR)/libSDL_ttf.a: $(OBJS)
@@ -88,17 +74,17 @@ $(BIN_DIR)/%.dol: %.elf
 # Compilation flags.
 COMMON_FLAGS	:= -g -O2 -mrvl -Wall $(MACHDEP)
 INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
-DEFINES		:= -DGEKKO -DDEBUG_ERROR -DDEBUG_TIMERS -DDEBUG_THREADS -DDEBUG_BUILD -DDEBUG_CONVERT
+DEFINES		:= -DGEKKO -DDEBUG_ERROR -DDEBUG_TIMERS -DDEBUG_THREADS -DDEBUG_BUILD -DDEBUG_CONVERT -DFPUEMU
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 # Test link flags.
-LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
 
 # How to link an ELF.
-uae.elf: src/target.h src/machdep src/osdep src/guidep src/threaddep src/joydep src/gfxdep src/osdep src/sysconfig.h $(OBJS)
+uae.elf: src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
-	powerpc-gekko-g++ -o $@ $< $(OBJS) $(LDFLAGS)
+	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)
 	#keep elf for debugging
 	#cp $@ /tmp/elf
 
