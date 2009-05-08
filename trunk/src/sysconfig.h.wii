@@ -106,7 +106,7 @@
 #define HAVE_READDIR_R 1
 
 /* Define to 1 if you have the `rmdir' function. */
-#define HAVE_RMDIR 1
+#undef HAVE_RMDIR
 
 /* Define to 1 if you have the `select' function. */
 #define HAVE_SELECT 1
@@ -115,7 +115,7 @@
 #define HAVE_SETITIMER 1
 
 /* Define to 1 if you have the `sigaction' function. */
-#define HAVE_SIGACTION 1
+#undef HAVE_SIGACTION
 
 /* Define to 1 if you have the `sleep' function. */
 #define HAVE_SLEEP 1
@@ -246,7 +246,7 @@
 #define HAVE_TCGETATTR 1
 
 /* Define to 1 if you have the `timegm' function. */
-#define HAVE_TIMEGM 1
+#undef HAVE_TIMEGM
 
 /* Define if you have the 'uintmax_t' type in <stdint.h> or <inttypes.h>. */
 #define HAVE_UINTMAX_T 1

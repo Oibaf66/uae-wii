@@ -15,6 +15,7 @@
 #include "sounddep/sound.h"
 #include "threaddep/thread.h"
 #include <SDL_audio.h>
+#include <SDL.h>
 
 static int have_sound = 0;
 

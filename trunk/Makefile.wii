@@ -26,8 +26,8 @@ SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(
 
 SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
-	src/genblitter.c src/gencomp.c src/gencpu.c src/genlinetoscr.c src/fsusage.c src/compemu.c src/compstbl.c \
-	src/readdisk.c src/gengenblitter.c src/tui.c src/scsiemul.c src/linetoscr.c, $(SRCS))
+	src/genblitter.c src/gencomp.c src/gencpu.c src/genlinetoscr.c src/compemu.c src/compstbl.c \
+	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
 OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
@@ -73,8 +73,10 @@ $(BIN_DIR)/%.dol: %.elf
 
 # Compilation flags.
 COMMON_FLAGS	:= -g -O2 -mrvl -Wall $(MACHDEP)
-INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
-DEFINES		:= -DGEKKO -DDEBUG_ERROR -DDEBUG_TIMERS -DDEBUG_THREADS -DDEBUG_BUILD -DDEBUG_CONVERT -DFPUEMU
+INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
+DEFINES		:= -DGEKKO -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
+		   -DAUTOCONFIG -DFILESYS -DSUPPORT_THREADS -DUSE_SDL -DFDI2RAW -DDEBUGGER -DSAVESTATE \
+                   -DENFORCER -DACTION_REPLAY
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 # Test link flags.
