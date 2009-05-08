@@ -219,8 +219,7 @@
 #define HAVE_SYS_SOUNDCARD_H 1
 
 /* Define to 1 if you have the <sys/statfs.h> header file. */
-/*#define HAVE_SYS_STATFS_H 1*/
-#undef HAVE_SYS_STATFS_H
+#define HAVE_SYS_STATFS_H 1
 
 /* Define to 1 if you have the <sys/statvfs.h> header file. */
 /*#define HAVE_SYS_STATVFS_H 1*/
@@ -343,8 +342,7 @@
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_bsize.
    (4.3BSD, SunOS 4, HP-UX, AIX PS/2) */
-/*#define STAT_STATFS2_BSIZE 1*/
-#undef STAT_STATFS2_BSIZE
+#define STAT_STATFS2_BSIZE 1
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_fsize.
    (4.4BSD, NetBSD) */
@@ -377,7 +375,8 @@
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
-#define WORDS_BIGENDIAN 1
+/*#define WORDS_BIGENDIAN 1*/
+#undef WORDS_BIGENDIAN
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */

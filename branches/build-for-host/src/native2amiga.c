@@ -8,7 +8,6 @@
   * Uses the EXTER interrupt that is setup in filesys.c
   * and needs thread support.
   */
-
 #include "sysconfig.h"
 #include "sysdeps.h"
 
