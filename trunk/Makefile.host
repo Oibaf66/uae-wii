@@ -16,8 +16,8 @@ PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
 
 # Source files.
 SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(SRC_DIR)/sounddep/*.c \
-	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/machdep/*.c \
-	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c)
+	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c \
+	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c) $(SRC_DIR)/machdep/support.c
 
 SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
