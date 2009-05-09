@@ -43,13 +43,17 @@ all: uae.dol
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) src/machdep
 
 $(OBJ_DIR):
 	install -d $@
 
 src/sysconfig.h: src/sysconfig.h.wii
 	cp $< $@
+
+src/machdep:
+	rm -f $@
+	cd src && ln -s md-ppc-gcc machdep
 
 %.h: %.h.wii
 	cp $< $@
@@ -84,7 +88,7 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
 
 # How to link an ELF.
-uae.elf: src/sysconfig.h $(OBJS)
+uae.elf: src/machdep src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)

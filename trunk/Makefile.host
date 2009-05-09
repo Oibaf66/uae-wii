@@ -38,7 +38,7 @@ all: uae-host.elf
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) src/machdep
 
 $(OBJ_DIR):
 	install -d $@
