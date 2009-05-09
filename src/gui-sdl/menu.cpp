@@ -54,11 +54,11 @@ typedef struct
 static TTF_Font *menu_font;
 static TTF_Font *menu_font64;
 #if defined(GEKKO)
-#define FONT_PATH "/apps/frodo/FreeMono.ttf"
-#define FONT64_PATH "/apps/frodo/C64.ttf"
+#define FONT_PATH "/apps/uae/FreeMono.ttf"
+#define FONT_ALT_PATH "/apps/uae/Smaller.ttf"
 #else
 #define FONT_PATH "FreeMono.ttf"
-#define FONT64_PATH "C64.ttf"
+#define FONT_ALT_PATH "Smaller.ttf"
 #endif
 
 int fh, fw;
@@ -1069,5 +1069,5 @@ void menu_init()
 	Uint8 *data64 = (Uint8*)malloc(1 * 1024*1024);
 
 	menu_font = read_font(FONT_PATH);
-	menu_font64 = read_font(FONT64_PATH);
+	menu_font64 = read_font(FONT_ALT_PATH);
 }
