@@ -35,7 +35,7 @@ static RETSIGTYPE sigbrkhandler (int foo)
 
 void setup_brkhandler (void)
 {
-#if defined(__unix) && !defined(__NeXT__)
+#if defined(__unix) && !defined(__NeXT__) && !defined(GEKKO)
     struct sigaction sa;
     sa.sa_handler = sigbrkhandler;
     sa.sa_flags = 0;

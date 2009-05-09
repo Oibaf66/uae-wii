@@ -795,7 +795,9 @@ void real_main (int argc, char **argv)
 {
     show_version ();
 
+#if defined(FILESYS)
     currprefs.mountinfo = changed_prefs.mountinfo = &options_mountinfo;
+#endif
     restart_program = 1;
 #ifdef _WIN32
     sprintf (restart_config, "%sConfigurations\\", start_path);
