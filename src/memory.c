@@ -1610,10 +1610,10 @@ void memory_reset (void)
     if (a3000memory != 0)
 	map_banks (&a3000mem_bank, a3000mem_start >> 16, allocated_a3000mem >> 16,
 		   allocated_a3000mem);
+#endif
 
     /* Map UAE 'boot rom' at 0xF00000 - 0xF0FFFF. */
     map_banks (&rtarea_bank, RTAREA_BASE >> 16, 1, 0);
-#endif
 
     /* Map primary Kickstart at 0xF80000 - 0xFFFFFF. */
     map_banks (&kickmem_bank, 0xF8, 8, 0);
