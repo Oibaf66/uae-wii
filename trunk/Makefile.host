@@ -72,7 +72,7 @@ $(BIN_DIR)/%.dol: %.elf
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O2 -Wall $(MACHDEP)
+COMMON_FLAGS	:= -g -Wall $(MACHDEP)
 INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I/usr/include/SDL
 DEFINES		:= -DGEKKO -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
 		   -DSUPPORT_THREADS -DUSE_SDL -DFDI2RAW -DDEBUGGER -DSAVESTATE \
