@@ -244,5 +244,5 @@ int machdep_parse_option (struct uae_prefs *p, const char *option, const char *v
 
 void machdep_default_options (struct uae_prefs *p)
 {
-    p->use_processor_clock = 1;
+    p->use_processor_clock = 0;
 }
