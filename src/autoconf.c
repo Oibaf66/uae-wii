@@ -184,7 +184,7 @@ static uae_u32 REGPARAM2 uae_puts (TrapContext *context)
 
 static void rtarea_init_mem (void)
 {
-    rtarea = mapped_malloc (0x10000, "rtarea");
+    rtarea = mapped_malloc (0x100000, "rtarea");
     if (!rtarea) {
 	write_log ("virtual memory exhausted (rtarea)!\n");
 	abort ();
