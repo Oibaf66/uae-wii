@@ -135,10 +135,19 @@ char *fsdb_create_unique_nname (a_inode *base, const char *suggestion)
     for (;;) {
 	int i;
 	char *p = build_nname (base->nname, tmp);
+#if !defined(GEKKOb)
 	if (access (p, R_OK) < 0 && errno == ENOENT) {
 	    printf ("unique name: %s\n", p);
 	    return p;
 	}
+#else
+	struct stat st;
+
+	if (stat(p, &st) < 0) {
+		printf ("unique name: %s\n", p);
+		return p;
+	}
+#endif
 	free (p);
 
 	/* tmpnam isn't reentrant and I don't really want to hack configure

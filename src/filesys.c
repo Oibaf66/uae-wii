@@ -59,6 +59,20 @@
 #define DUMPLOCK(u,x)
 #endif
 
+#if defined(GEKKOb)
+#define R_OK 1
+static int wii_access (const char *pathname, int mode)
+{
+	struct stat st;
+
+	if (stat(pathname, &st) < 0)
+		return -1;
+	if (mode == R_OK && !S_ISDIR(st))
+		return 0;
+	return -1;
+}
+#define access wii_access
+#endif
 
 static void aino_test (a_inode *aino)
 {
