@@ -568,8 +568,8 @@ static int do_preinit_machine (int argc, char **argv)
     init_shm ();
 #endif
 
-#ifdef FILESYS
     rtarea_init ();
+#ifdef FILESYS
     hardfile_install ();
 #endif
 
