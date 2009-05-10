@@ -56,7 +56,7 @@
 #endif
 
 static SDL_Surface *display;
-static SDL_Surface *screen;
+SDL_Surface *screen;
 
 /* Standard P96 screen modes */
 #define MAX_SCREEN_MODES 12
