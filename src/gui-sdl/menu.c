@@ -263,8 +263,7 @@ static const char **get_file_list(const char *base_dir)
 	de = readdir(d))
 	{
 		char buf[255];
-		const char *exts[] = {".d64", ".D64", ".prg", ".PRG",
-				".p00", ".P00", ".s00", ".S00",
+		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ",
 				".t64", ".T64", ".sav", ".SAV", NULL};
 		struct stat st;
 
