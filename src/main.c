@@ -939,7 +939,7 @@ void real_main (int argc, char **argv)
 #ifdef USE_SDL
 int init_sdl (void)
 {
-    int result = (SDL_Init (SDL_INIT_TIMER /*| SDL_INIT_AUDIO*/) == 0);
+    int result = (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER /*| SDL_INIT_AUDIO*/) == 0);
     if (result)
         atexit (SDL_Quit);
 
@@ -952,11 +952,14 @@ int init_sdl (void)
 #ifndef NO_MAIN_IN_MAIN_C
 int main (int argc, char **argv)
 {
+	fprintf(stderr, "main started\n");
 #if defined(GEKKO)
 	fatInitDefault();
 #endif
     init_sdl ();
+	fprintf(stderr, "sdl inited\n");
     gui_init (argc, argv);
+	fprintf(stderr, "Starting real main\n");
     real_main (argc, argv);
     return 0;
 }
