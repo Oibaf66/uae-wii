@@ -93,19 +93,19 @@ void gui_handle_events (void)
 }
 
 static const char *main_menu_messages[] = {
-		/*02*/		"Floppy",
-		/*03*/		"^|df0|df1|df2|df3",
-		/*04*/		"States",
-		/*05*/		"^|Load|Save|Delete",
-		/*06*/		"Keyboard",
-		/*07*/		"^|Type|Macro|Bind",
-		/*08*/		"#1-------------------------------------",
-		/*09*/		"Reset the C=64",
-		/*10*/		"Networking",
-		/*11*/		"Options",
-		/*12*/		"Advanced Options",
-		/*13*/		"Help",
-		/*15*/		"Quit",
+		/*00*/		"Floppy",
+		/*01*/		"^|df0|df1|df2|df3",
+		/*02*/		"States",
+		/*03*/		"^|Load|Save|Delete",
+		/*04*/		"Keyboard",
+		/*05*/		"^|Type|Macro|Bind",
+		/*06*/		"#1-------------------------------------",
+		/*07*/		"Reset UAE",
+		/*08*/		"Networking",
+		/*09*/		"Options",
+		/*10*/		"Advanced Options",
+		/*11*/		"Help",
+		/*12*/		"Quit",
 		NULL
 };
 
@@ -125,8 +125,17 @@ void gui_display(int shortcut)
 		is_inited = 1;
 	}
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
-	if (opt == 12)
+	switch(opt)
+	{
+	case 7:
+		uae_reset(1);
+		break;
+	case 12:
 		uae_quit();
+		break;
+	default:
+		break;
+	}
 }
 
 void gui_message (const char *format,...)
