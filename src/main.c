@@ -12,6 +12,10 @@
 #include "sysdeps.h"
 #include <assert.h>
 
+#if defined(GEKKO)
+# include <fat.h>
+#endif
+
 #include "options.h"
 #include "threaddep/thread.h"
 #include "uae.h"
@@ -46,10 +50,6 @@
 
 #ifdef USE_SDL
 #include "SDL.h"
-#endif
-
-#if defined(GEKKO)
-# include <fat.h>
 #endif
 
 #ifdef WIN32
