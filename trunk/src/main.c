@@ -939,7 +939,7 @@ void real_main (int argc, char **argv)
 #ifdef USE_SDL
 int init_sdl (void)
 {
-    int result = (SDL_Init (SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE /*| SDL_INIT_AUDIO*/) == 0);
+    int result = (SDL_Init (SDL_INIT_TIMER /*| SDL_INIT_AUDIO*/) == 0);
     if (result)
         atexit (SDL_Quit);
 
