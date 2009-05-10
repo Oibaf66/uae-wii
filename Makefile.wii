@@ -92,6 +92,23 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 # Test link flags.
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
 
+dist: uae.dol
+
+dist: uae.dol
+	install -d $@/apps/uae
+	install -d $@/uae
+	install -d $@/uae/floppies
+	install -d $@/uae/roms
+	install -d $@/uae/harddisks
+	install -d $@/uae/saves
+	cp $< $@/apps/uae/boot.dol
+	cp meta.xml $@/apps/uae/
+	cp icon.png $@/apps/uae/
+	cp FreeMono.ttf $@/apps/uae/
+	cp Smaller.ttf $@/apps/uae/
+	cp uaerc.wii $@/uae/uaerc
+	cd $@ && tar -czf ../uae-bin.tar.gz *
+
 # How to link an ELF.
 uae.elf: src/machdep src/target.h src/sysconfig.h $(OBJS)
 	@echo Linking $@

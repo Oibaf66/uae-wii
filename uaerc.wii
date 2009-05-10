@@ -1,0 +1,5 @@
+kickstart_rom_file=/uae/roms/kick.rom
+floppy0=/uae/floppies/budbrain.adz
+cpu_speed=real
+cpu_type=68000
+sound_frequency=32000
