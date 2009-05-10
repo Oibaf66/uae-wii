@@ -8,13 +8,13 @@
 
 #define TARGET_NAME "wii"
 
-#define TARGET_ROM_PATH         "/apps/uae/roms"
-#define TARGET_FLOPPY_PATH      "/apps/uae/floppies"
-#define TARGET_HARDFILE_PATH    "/apps/uae/harddisks"
-#define TARGET_SAVESTATE_PATH   "/apps/uae/saves"
+#define TARGET_ROM_PATH         "/uae/roms"
+#define TARGET_FLOPPY_PATH      "/uae/floppies"
+#define TARGET_HARDFILE_PATH    "/uae/harddisks"
+#define TARGET_SAVESTATE_PATH   "/uae/saves"
 
 #ifndef OPTIONSFILENAME
-# define OPTIONSFILENAME "/apps/uae/uaerc"
+# define OPTIONSFILENAME "/uae/uaerc"
 #endif
 #undef OPTIONS_IN_HOME
 
