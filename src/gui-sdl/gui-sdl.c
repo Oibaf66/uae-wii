@@ -11,6 +11,9 @@
 
 #include "options.h"
 #include "gui.h"
+#include "menu.h"
+
+extern SDL_Surface *screen;
 
 
 void gui_init (int argc, char **argv)
@@ -28,6 +31,7 @@ void gui_notify_state (int state)
 
 int gui_update (void)
 {
+	printf("Al-mibb: Gui is updejted!\n");
     return 0;
 }
 
@@ -88,14 +92,47 @@ void gui_handle_events (void)
 {
 }
 
+static const char *main_menu_messages[] = {
+		/*02*/		"File", 
+		/*03*/		"^|Insert|Start", 
+		/*04*/		"States",     
+		/*05*/		"^|Load|Save|Delete",     
+		/*06*/		"Keyboard", 
+		/*07*/		"^|Type|Macro|Bind",
+		/*08*/		"#1-------------------------------------",
+		/*09*/		"Reset the C=64",           
+		/*10*/  	"Networking",
+		/*11*/  	"Options",
+		/*12*/		"Advanced Options", 
+		/*13*/		"Help",                
+		/*15*/		"Quit",                
+		NULL
+};
+
+
 void gui_display(int shortcut)
 {
+	static int is_inited = 0;
+	int submenus[3];
+	int opt;
+
+	printf("Initing gui with %p\n", screen);
+	printf("Al-mibb: Gui is display!\n");
+	
+	if (!is_inited)
+	{
+		menu_init(screen);
+		is_inited = 1;
+	}
+	opt = menu_select_title("Main menu", main_menu_messages, submenus);
 }
 
 void gui_message (const char *format,...)
-{   
+{
        char msg[2048];
        va_list parms;
+
+       printf("Al-mibb: Gui is al-message!\n");
 
        va_start (parms,format);
        vsprintf ( msg, format, parms);

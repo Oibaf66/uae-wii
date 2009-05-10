@@ -11,15 +11,16 @@
 ********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
 
-#if defined(GEKKO)
-#include <wiiuse/wpad.h>
-#endif
-
-#include "sysdeps.h"
-#include "Display.h"
+#include "sysconfig.h"
 #include "menu.h"
-#include "menutexts.h"
+
+#define FULL_DISPLAY_X 640
+#define FULL_DISPLAY_Y 480
 
 typedef struct
 {
@@ -27,7 +28,6 @@ typedef struct
 	int index;
 	int sel;
 } submenu_t;
-
 
 typedef struct
 {
@@ -47,13 +47,15 @@ typedef struct
 	int        n_entries;
 } menu_t;
 
+static SDL_Surface *real_screen;
+
 #define IS_SUBMENU(p_msg) ( (p_msg)[0] == '^' )
 #define IS_TEXT(p_msg) ( (p_msg)[0] == '#' || (p_msg)[0] == ' ' )
 #define IS_MARKER(p_msg) ( (p_msg)[0] == '@' )
 
 static TTF_Font *menu_font;
 static TTF_Font *menu_font64;
-#if defined(GEKKO)
+#if defined(GEKKO_)
 #define FONT_PATH "/apps/uae/FreeMono.ttf"
 #define FONT_ALT_PATH "/apps/uae/Smaller.ttf"
 #else
@@ -115,12 +117,12 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	return 1;
 }
 
-bool msgKill(SDL_Rect *rc)
+int msgKill(SDL_Rect *rc)
 {
 	SDL_UpdateRect(real_screen, rc->x, rc->y, rc->w,rc->h);
 }
 
-bool msgYesNo(char *text, bool default_opt, int x, int y)
+int msgYesNo(char *text, int default_opt, int x, int y)
 {
 	int len = strlen(text);
 	int X, Y, wX, wY;
@@ -128,7 +130,7 @@ bool msgYesNo(char *text, bool default_opt, int x, int y)
 	SDL_Rect rc;
 	SDL_Rect brc;
 	uint32_t key;
-	bool old;
+	int old;
 
 	old = default_opt;
 
@@ -188,7 +190,7 @@ bool msgYesNo(char *text, bool default_opt, int x, int y)
 		}
 		else if (key & KEY_ESCAPE)
 		{
-			return false;
+			return 0;
 		}
 		else if (key & KEY_LEFT)
 		{
@@ -217,26 +219,28 @@ static int cmpstringp(const void *p1, const void *p2)
 }
 
 /* Return true if name ends with ext (for filenames) */
-static bool ext_matches(const char *name, const char *ext)
+static int ext_matches(const char *name, const char *ext)
 {
 	int len = strlen(name);
 	int ext_len = strlen(ext);
 
 	if (len <= ext_len)
-		return false;
+		return 0;
 	return (strcmp(name + len - ext_len, ext) == 0);
 	
 }
 
-static bool ext_matches_list(const char *name, const char **exts)
+static int ext_matches_list(const char *name, const char **exts)
 {
-	for (const char **p = exts; *p; p++)
+	const char **p;
+
+	for (p = exts; *p; p++)
 	{
 		if (ext_matches(name, *p))
-			return true;
+			return 1;
 	}
 
-	return false;
+	return 0;
 }
 
 static const char **get_file_list(const char *base_dir)
@@ -588,7 +592,8 @@ static int is_submenu_title(menu_t *p_menu, int n)
 }
 
 
-static void menu_init(menu_t *p_menu, const char *title, TTF_Font *p_font, const char **pp_msgs,
+static void menu_init_internal(menu_t *p_menu, const char *title,
+		TTF_Font *p_font, const char **pp_msgs,
 		int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
 	int submenu;
@@ -670,57 +675,6 @@ uint32_t menu_wait_key_press(void)
 
 	while (1)
 	{
-#if defined(GEKKO)
-		Uint32 remote_keys, classic_keys;
-		WPADData *wpad, *wpad_other;
-
-		WPAD_ScanPads();
-		wpad = WPAD_Data(WPAD_CHAN_0);
-		wpad_other = WPAD_Data(WPAD_CHAN_1);
-
-		if (!wpad && !wpad_other)
-			return 0;
-
-		remote_keys = wpad->btns_d | wpad_other->btns_d;
-		classic_keys = 0;
-
-		/* Check classic controllers as well */
-		if (wpad->exp.type == WPAD_EXP_CLASSIC ||
-				wpad_other->exp.type == WPAD_EXP_CLASSIC)
-		{
-			static bool classic_keys_changed;
-			static Uint32 classic_last;
-
-			classic_keys = wpad->exp.classic.btns | wpad_other->exp.classic.btns;
-
-			classic_keys_changed = classic_keys != classic_last;
-			classic_last = classic_keys;
-
-			/* No repeat, thank you */
-			if (!classic_keys_changed)
-				classic_keys = 0;
-		}
-
-		if (remote_keys & WPAD_BUTTON_B)
-			keys |= KEY_HELP;
-		if ( (remote_keys & WPAD_BUTTON_DOWN) || (classic_keys & CLASSIC_CTRL_BUTTON_RIGHT) )
-			keys |= KEY_RIGHT;
-		if ( (remote_keys & WPAD_BUTTON_UP) || (classic_keys & CLASSIC_CTRL_BUTTON_LEFT) )
-			keys |= KEY_LEFT;
-		if ( (remote_keys & WPAD_BUTTON_LEFT) || (classic_keys & CLASSIC_CTRL_BUTTON_DOWN) )
-			keys |= KEY_DOWN;
-		if ( (remote_keys & WPAD_BUTTON_RIGHT) || (classic_keys & CLASSIC_CTRL_BUTTON_UP) )
-			keys |= KEY_UP;
-		if ( (remote_keys & WPAD_BUTTON_PLUS) || (classic_keys & CLASSIC_CTRL_BUTTON_PLUS) )
-			keys |= KEY_PAGEUP;
-		if ( (remote_keys & WPAD_BUTTON_MINUS) || (classic_keys & CLASSIC_CTRL_BUTTON_MINUS) )
-			keys |= KEY_PAGEDOWN;
-		if ( (remote_keys & (WPAD_BUTTON_A | WPAD_BUTTON_2) ) || (classic_keys & (CLASSIC_CTRL_BUTTON_A | CLASSIC_CTRL_BUTTON_X)) )
-			keys |= KEY_SELECT;
-		if ( (remote_keys & (WPAD_BUTTON_1 | WPAD_BUTTON_HOME) ) || (classic_keys & (CLASSIC_CTRL_BUTTON_B | CLASSIC_CTRL_BUTTON_Y)) )
-			keys |= KEY_ESCAPE;
-
-#endif
 		if (SDL_PollEvent(&ev))
 		{
 			switch(ev.type)
@@ -783,12 +737,13 @@ extern char curdir[256];
 
 static int menu_select_internal(SDL_Surface *screen,
 		menu_t *p_menu, int *p_submenus, int sel,
-		void (*select_next_cb)(menu_t *p, void *data) = NULL,
-		void *select_next_cb_data = NULL)
+		void (*select_next_cb)(menu_t *p, void *data),
+		void *select_next_cb_data)
 {
 	int ret = -1;
+	int i;
 
-	for (int i = 0; i < p_menu->n_submenus; i++)
+	for (i = 0; i < p_menu->n_submenus; i++)
 		p_menu->p_submenus[i].sel = p_submenus[i];
 
 	while(1)
@@ -840,21 +795,21 @@ static int menu_select_internal(SDL_Surface *screen,
 
 int menu_select_sized(const char *title, const char **msgs, int *submenus, int sel,
 		int x, int y, int x2, int y2,
-		void (*select_next_cb)(menu_t *p, void *data) = NULL,
-		void *select_next_cb_data = NULL)
+		void (*select_next_cb)(menu_t *p, void *data),
+		void *select_next_cb_data)
 
 {
 	menu_t menu;
 	int out;
-	bool info;
+	int info;
 
 	if (!strcmp(title, "Folder") || !strcmp(title, "Single File") ||
 			!strcmp(title, "C-64 Disc") || !strcmp(title, "C-64 Tape") || sel < 0)
-		info = false;
+		info = 0;
 	else
-		info = true;
+		info = 1;
 
-	menu_init(&menu, title, menu_font, msgs,
+	menu_init_internal(&menu, title, menu_font, msgs,
 			x, y, x2, y2);
 
 	if (sel >= 0)
@@ -867,94 +822,16 @@ int menu_select_sized(const char *title, const char **msgs, int *submenus, int s
 	return out;
 }
 
-int menu_select(const char *title, const char **msgs, int *submenus)
+int menu_select_title(const char *title, const char **msgs, int *submenus)
 {
 	return menu_select_sized(title, msgs, submenus, 0,
-			32, 32, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-64);
+			32, 32, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-64,
+			NULL, NULL);
 }
 
 int menu_select(const char **msgs, int *submenus)
 {
-	return menu_select("", msgs, submenus);
-}
-
-extern "C" const char **DirD64(const char *FileName);
-
-static void d64_list_cb(menu_t *p, void *data)
-{
-	const char *dp = (const char*)data;
-	const char *exts[] = {".d64", ".D64", NULL};
-	const char *name = p->pp_msgs[p->cur_sel];
-	SDL_Rect r = {FULL_DISPLAY_X / 2, 32,
-			FULL_DISPLAY_X / 2 - 32, FULL_DISPLAY_Y - 64};
-
-	SDL_FillRect(real_screen, &r, SDL_MapRGB(real_screen->format, 0x00, 0x90, 0x90));
-	if (ext_matches_list(name, exts))
-	{
-		char buf[255];
-		const char **dir;
-		menu_t menu;
-
-		snprintf(buf, 255, "%s/%s", dp, name);
-		dir = DirD64(buf);
-		if (!dir)
-			return;
-
-		menu_init(&menu, "D64 contents", menu_font, dir,
-				FULL_DISPLAY_X / 2, 32,
-				FULL_DISPLAY_X / 2 - 32, FULL_DISPLAY_Y - 64);
-		menu_draw(real_screen, &menu, 0);
-		menu_fini(&menu);
-
-		/* Cleanup dir list */
-	        for ( int i = 0; dir[i]; i++ )
-	        	free((void*)dir[i]);
-	        free(dir);
-	}
-}
-
-static const char *get_d64_file(const char *name)
-{
-	const char **dir;
-	char *out = NULL;
-
-	dir = DirD64(name);
-	if (!dir)
-		return NULL;
-
-	int which = menu_select("Select D64 file", dir, NULL);
-
-	if (which >= 0)
-	{
-		char *p = (char*)dir[which];
-
-		for (int i = 0; i < strlen(p); i++)
-		{
-			if (*p == '\"')
-				break;
-			p++;
-		}
-		p++;
-		for (int i = 0; i < strlen(p); i++)
-		{
-			if (p[i] == '\"')
-			{
-				p[i] = '\0';
-				break;
-			}
-		}
-		/* Copy and uppercase */
-		out = strdup(p);
-		for (int i = 0; i < strlen(out); i++)
-			out[i] = toupper(out[i]);
-	}
-
-	/* Cleanup dir list */
-        for ( int i = 0; dir[i]; i++ )
-        	free((void*)dir[i]);
-        free(dir);
-
-        return out;
+	return menu_select_title("", msgs, submenus);
 }
 
 static const char *menu_select_file_internal(const char *dir_path,
@@ -964,20 +841,21 @@ static const char *menu_select_file_internal(const char *dir_path,
 	char *sel;
 	char *out;
 	int opt;
+	int i;
 
 	if (file_list == NULL)
 		return NULL;
 
 	opt = menu_select_sized("Select file", file_list, NULL, 0,
 			x, y, x2, y2,
-			d64_list_cb, (void*)dir_path);
+			NULL, NULL);
 
 	if (opt < 0)
 		return NULL;
 	sel = strdup(file_list[opt]);
 
 	/* Cleanup everything - file_list is NULL-terminated */
-        for ( int i = 0; file_list[i]; i++ )
+        for ( i = 0; file_list[i]; i++ )
         	free((void*)file_list[i]);
         free(file_list);
 
@@ -989,7 +867,6 @@ static const char *menu_select_file_internal(const char *dir_path,
         	char buf[255];
         	int len = strlen(sel);
         	int s;
-        	const char *p;
 
         	/* Remove trailing ] */
         	sel[len-1] = '\0';
@@ -1015,12 +892,9 @@ const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 {
 	const char *file = menu_select_file_internal(dir_path,
 			32, 32, FULL_DISPLAY_X/2, FULL_DISPLAY_Y - 32);
-	const char *exts[] = {".d64", ".D64", NULL};
 
 	if (!file)
 		return NULL;
-	if (ext_matches_list(file, exts))
-		*d64_name = get_d64_file(file);
 
 	return file;
 }
@@ -1057,17 +931,19 @@ static TTF_Font *read_font(const char *path)
 	if (!out)
 	{
 		fprintf(stderr, "Unable to open font %s\n", path);
-		exit(1);		
+		exit(1);
 	}
 	fclose(fp);
 
 	return out;
 }
 
-void menu_init()
+void menu_init(SDL_Surface *screen)
 {
-	Uint8 *data64 = (Uint8*)malloc(1 * 1024*1024);
+	TTF_Init();
 
 	menu_font = read_font(FONT_PATH);
 	menu_font64 = read_font(FONT_ALT_PATH);
+
+	real_screen = screen;
 }

@@ -30,21 +30,18 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b, int x, int y, con
 void menu_print_font64(SDL_Surface *screen, int r, int g, int b, int x, int y, const char *msg);
 
 /* Various option selects */
-int menu_select(const char *title, const char **pp_msgs, int *p_submenus);
+int menu_select_title(const char *title, const char **pp_msgs, int *p_submenus);
 int menu_select(const char **pp_msgs, int *p_submenus);
-int menu_select_sized(char *title, const char **msgs, int *submenus,
-		int x, int y, int w, int h);
 const char *menu_select_file(const char *dir_path);
 const char *menu_select_file_start(const char *dir_path, const char **d64_name);
 
 uint32_t menu_wait_key_press(void);
 
-extern bool msgKill(SDL_Rect *rc);
+extern int msgKill(SDL_Rect *rc);
 extern int msgInfo(char *text, int duration, SDL_Rect *rc);
 
-extern bool msgYesNo(char *text, bool def,int x, int y);
+extern int msgYesNo(char *text, int def,int x, int y);
 
-
-void menu_init();
+void menu_init(SDL_Surface *screen);
 
 #endif /* !__MENU_H__ */
