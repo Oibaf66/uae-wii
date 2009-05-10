@@ -21,13 +21,14 @@ PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
 
 # Source files.
 SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(SRC_DIR)/sounddep/*.c \
-	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/machdep/*.c \
+	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c \
 	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c) $(SRC_DIR)/machdep/support.c
 
 SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
 	src/filesys.c src/fsdb.c src/fsdb_unix.c src/hardfile_unix.c src/genblitter.c src/gencomp.c src/gencpu.c \
-	src/hardfile.c src/genlinetoscr.c src/compemu.c src/compstbl.c \
+	src/hardfile.c src/genlinetoscr.c src/compemu.c src/compstbl.c src/fsusage.c src/filesys_unix.c \
+	src/enforcer.c src/ar.c \
 	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
@@ -43,7 +44,7 @@ all: uae.dol
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -f $(OBJS) src/machdep
+	@rm -f $(OBJS) src/machdep src/target.h
 
 $(OBJ_DIR):
 	install -d $@
@@ -83,9 +84,8 @@ $(BIN_DIR)/%.dol: %.elf
 # Compilation flags.
 COMMON_FLAGS	:= -g -O2 -mrvl -Wall $(MACHDEP)
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
-DEFINES		:= -DGEKKO -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
-		   -DAUTOCONFIG -DFILESYS -DSUPPORT_THREADS -DUSE_SDL -DFDI2RAW -DDEBUGGER -DSAVESTATE \
-                   -DENFORCER -DACTION_REPLAY -UFILESYS
+DEFINES		:= -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
+		   -DSUPPORT_THREADS -DUSE_SDL -DFDI2RAW -DDEBUGGER -DSAVESTATE
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 # Test link flags.
