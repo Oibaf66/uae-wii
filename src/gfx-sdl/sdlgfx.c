@@ -1404,6 +1404,7 @@ int debuggable (void)
 
 int mousehack_allowed (void)
 {
+	return 0;
     return mousehack;
 }
 
