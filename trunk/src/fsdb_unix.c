@@ -135,7 +135,7 @@ char *fsdb_create_unique_nname (a_inode *base, const char *suggestion)
     for (;;) {
 	int i;
 	char *p = build_nname (base->nname, tmp);
-#if !defined(GEKKOb)
+#if !defined(GEKKO)
 	if (access (p, R_OK) < 0 && errno == ENOENT) {
 	    printf ("unique name: %s\n", p);
 	    return p;

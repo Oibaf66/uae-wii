@@ -59,7 +59,7 @@
 #define DUMPLOCK(u,x)
 #endif
 
-#if defined(GEKKOb)
+#if defined(GEKKO)
 #define R_OK 1
 static int wii_access (const char *pathname, int mode)
 {
