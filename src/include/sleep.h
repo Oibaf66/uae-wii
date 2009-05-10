@@ -52,6 +52,8 @@
 #   else
 #    define uae_msleep(msecs) Delay (msecs <= 20 ? 1 : msecs/20);
 #   endif
+#  elif defined(GEKKO)
+#      define uae_msleep(msecs) SDL_Delay (msecs)
 #  else
 #   ifdef HAVE_NANOSLEEP
 #    define uae_msleep(msecs) \
