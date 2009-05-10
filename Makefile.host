@@ -50,6 +50,10 @@ src/machdep:
 	rm -f $@
 	cd src && ln -s md-i386-gcc machdep
 
+src/target.h:
+	rm -f $@
+	cd src && ln -s targets/t-unix.h target.h
+
 %.h: %.h.wii
 	cp $< $@
 
@@ -83,7 +87,7 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -lz -lSDL_ttf -lSDL -lfreetype -lm
 
 # How to link an ELF.
-uae-host.elf: src/machdep src/sysconfig.h $(OBJS)
+uae-host.elf: src/machdep src/target.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	g++ -o $@ $(OBJS) $(LDFLAGS)

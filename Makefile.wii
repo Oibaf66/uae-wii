@@ -55,6 +55,10 @@ src/machdep:
 	rm -f $@
 	cd src && ln -s md-ppc-gcc machdep
 
+src/target.h:
+	rm -f $@
+	cd src && ln -s targets/t-wii.h target.h
+
 %.h: %.h.wii
 	cp $< $@
 
@@ -88,7 +92,7 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
 
 # How to link an ELF.
-uae.elf: src/machdep src/sysconfig.h $(OBJS)
+uae.elf: src/machdep src/target.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)

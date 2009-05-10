@@ -48,6 +48,10 @@
 #include "SDL.h"
 #endif
 
+#if defined(GEKKO)
+# include <fat.h>
+#endif
+
 #ifdef WIN32
 //FIXME: This shouldn't be necessary
 #include "windows.h"
@@ -948,6 +952,9 @@ int init_sdl (void)
 #ifndef NO_MAIN_IN_MAIN_C
 int main (int argc, char **argv)
 {
+#if defined(GEKKO)
+	fatInitDefault();
+#endif
     init_sdl ();
     gui_init (argc, argv);
     real_main (argc, argv);
