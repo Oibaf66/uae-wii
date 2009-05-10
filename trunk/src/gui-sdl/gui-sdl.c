@@ -93,19 +93,19 @@ void gui_handle_events (void)
 }
 
 static const char *main_menu_messages[] = {
-		/*02*/		"File", 
-		/*03*/		"^|Insert|Start", 
-		/*04*/		"States",     
-		/*05*/		"^|Load|Save|Delete",     
-		/*06*/		"Keyboard", 
+		/*02*/		"Floppy",
+		/*03*/		"^|df0|df1|df2|df3",
+		/*04*/		"States",
+		/*05*/		"^|Load|Save|Delete",
+		/*06*/		"Keyboard",
 		/*07*/		"^|Type|Macro|Bind",
 		/*08*/		"#1-------------------------------------",
-		/*09*/		"Reset the C=64",           
-		/*10*/  	"Networking",
-		/*11*/  	"Options",
-		/*12*/		"Advanced Options", 
-		/*13*/		"Help",                
-		/*15*/		"Quit",                
+		/*09*/		"Reset the C=64",
+		/*10*/		"Networking",
+		/*11*/		"Options",
+		/*12*/		"Advanced Options",
+		/*13*/		"Help",
+		/*15*/		"Quit",
 		NULL
 };
 
@@ -116,15 +116,17 @@ void gui_display(int shortcut)
 	int submenus[3];
 	int opt;
 
-	printf("Initing gui with %p\n", screen);
+	printf("Initing gui with %d\n", shortcut);
 	printf("Al-mibb: Gui is display!\n");
-	
+
 	if (!is_inited)
 	{
 		menu_init(screen);
 		is_inited = 1;
 	}
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
+	if (opt == 12)
+		uae_quit();
 }
 
 void gui_message (const char *format,...)
