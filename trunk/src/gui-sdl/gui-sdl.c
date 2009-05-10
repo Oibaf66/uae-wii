@@ -11,9 +11,27 @@
 
 #include "options.h"
 #include "gui.h"
+#include "uae.h"
 #include "menu.h"
 
 extern SDL_Surface *screen;
+
+static const char *main_menu_messages[] = {
+		/*00*/		"Floppy",
+		/*01*/		"^|df0|df1|df2|df3",
+		/*02*/		"States",
+		/*03*/		"^|Load|Save|Delete",
+		/*04*/		"Keyboard",
+		/*05*/		"^|Type|Macro|Bind",
+		/*06*/		"#1-------------------------------------",
+		/*07*/		"Reset UAE",
+		/*08*/		"Networking",
+		/*09*/		"Options",
+		/*10*/		"Advanced Options",
+		/*11*/		"Help",
+		/*12*/		"Quit",
+		NULL
+};
 
 
 void gui_init (int argc, char **argv)
@@ -92,23 +110,13 @@ void gui_handle_events (void)
 {
 }
 
-static const char *main_menu_messages[] = {
-		/*00*/		"Floppy",
-		/*01*/		"^|df0|df1|df2|df3",
-		/*02*/		"States",
-		/*03*/		"^|Load|Save|Delete",
-		/*04*/		"Keyboard",
-		/*05*/		"^|Type|Macro|Bind",
-		/*06*/		"#1-------------------------------------",
-		/*07*/		"Reset UAE",
-		/*08*/		"Networking",
-		/*09*/		"Options",
-		/*10*/		"Advanced Options",
-		/*11*/		"Help",
-		/*12*/		"Quit",
-		NULL
-};
+static void insert_floppy(int which)
+{
+	const char *name = menu_select_file(prefs_get_attr("floppy_path"));
 
+	if (name != NULL)
+		strcpy (changed_prefs.df[which], name);
+}
 
 void gui_display(int shortcut)
 {
@@ -116,6 +124,7 @@ void gui_display(int shortcut)
 	int submenus[3];
 	int opt;
 
+	memset(submenus, 0, sizeof(submenus));
 	printf("Initing gui with %d\n", shortcut);
 	printf("Al-mibb: Gui is display!\n");
 
@@ -127,6 +136,10 @@ void gui_display(int shortcut)
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
 	switch(opt)
 	{
+	case 0:
+		/* Insert floppy */
+		insert_floppy(submenus[0]);
+		break;
 	case 7:
 		uae_reset(1);
 		break;
