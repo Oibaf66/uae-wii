@@ -14,10 +14,15 @@ INCLUDE_DIR		:= include
 # Tools.
 PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
 
+SYMLINKS=src/machdep src/osdep src/gfxdep src/joydep src/guidep src/sounddep src/threaddep
+
+
 # Source files.
-SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(SRC_DIR)/sounddep/*.c \
-	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c \
-	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c) $(SRC_DIR)/machdep/support.c
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/keymap/*.c) \
+	$(SRC_DIR)/machdep/support.c $(SRC_DIR)/gfxdep/rawkeys.c  $(SRC_DIR)/guidep/gui-sdl.c $(SRC_DIR)/sounddep/sound.c \
+	$(SRC_DIR)/gfxdep/sdlgfx.c $(SRC_DIR)/guidep/menu.c $(SRC_DIR)/osdep/main.c $(SRC_DIR)/threaddep/thread.c \
+	$(SRC_DIR)/gfxdep/sdlkeys.c $(SRC_DIR)/joydep/joystick.c $(SRC_DIR)/osdep/memory.c
+
 
 SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
@@ -39,7 +44,7 @@ all: uae-host.elf
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -f $(OBJS) src/machdep src/target.h
+	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h $(SYMLINKS)
 
 $(OBJ_DIR):
 	install -d $@
@@ -50,6 +55,30 @@ src/sysconfig.h: src/sysconfig.h.host
 src/machdep:
 	rm -f $@
 	cd src && ln -s md-i386-gcc machdep
+
+src/osdep:
+	rm -f $@
+	cd src && ln -s od-generic osdep
+
+src/gfxdep:
+	rm -f $@
+	cd src && ln -s gfx-sdl gfxdep
+
+src/joydep:
+	rm -f $@
+	cd src && ln -s jd-sdl joydep
+
+src/guidep:
+	rm -f $@
+	cd src && ln -s gui-sdl guidep
+
+src/sounddep:
+	rm -f $@
+	cd src && ln -s sd-sdl sounddep
+
+src/threaddep:
+	rm -f $@
+	cd src && ln -s td-sdl threaddep
 
 src/target.h:
 	rm -f $@
@@ -88,7 +117,7 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -lz -lSDL_ttf -lSDL -lfreetype -lm
 
 # How to link an ELF.
-uae-host.elf: src/machdep src/target.h src/sysconfig.h $(OBJS)
+uae-host.elf: $(SYMLINKS) src/target.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	g++ -o $@ $(OBJS) $(LDFLAGS)
