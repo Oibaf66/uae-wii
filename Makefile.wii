@@ -23,11 +23,9 @@ SYMLINKS=src/machdep src/osdep src/gfxdep src/joydep src/guidep src/sounddep src
 
 
 # Source files.
-SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/gfxdep/*.c $(SRC_DIR)/joydep/*.c $(SRC_DIR)/sounddep/*.c \
-	$(SRC_DIR)/threaddep/*.c $(SRC_DIR)/guidep/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c \
-	$(SRC_DIR)/osdep/*.c $(SRC_DIR)/keymap/*.c) \
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/keymap/*.c) \
 	$(SRC_DIR)/machdep/support.c $(SRC_DIR)/gfxdep/rawkeys.c  $(SRC_DIR)/guidep/gui-sdl.c $(SRC_DIR)/sounddep/sound.c \
-	$(SRC_DIR)/gfxdep/sdlgfx.c $(SRC_DIR)/guidep/menu.c $(SRC_DIR)/osdep/main.c $(SRC_DIR)/threaddep/thread.c
+	$(SRC_DIR)/gfxdep/sdlgfx.c $(SRC_DIR)/guidep/menu.c $(SRC_DIR)/osdep/main.c $(SRC_DIR)/threaddep/thread.c \
 	$(SRC_DIR)/gfxdep/sdlkeys.c $(SRC_DIR)/joydep/joystick.c $(SRC_DIR)/osdep/memory.c
 
 
@@ -51,7 +49,7 @@ all: uae.dol
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -f $(OBJS) src/machdep src/target.h $(SYMLINKS)
+	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h $(SYMLINKS)
 
 $(OBJ_DIR):
 	install -d $@
