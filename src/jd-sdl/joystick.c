@@ -29,7 +29,7 @@ static struct joyinfo joys[MAX_INPUT_DEVICES];
 
 static void read_joy (unsigned int nr)
 {
-    unsigned int num, i, axes, axis;
+    unsigned int num, i, axes, axis, hats;
     SDL_Joystick *joy;
 
     if (currprefs.input_selected_setting == 0) {
@@ -41,6 +41,25 @@ static void read_joy (unsigned int nr)
     for (i = 0; i < axes; i++) {
 	axis = SDL_JoystickGetAxis (joy, i);
 	setjoystickstate (nr, i, axis, 32767);
+    }
+
+    /* Handle hat - used e.g., for the Wii */
+    hats = SDL_JoystickNumHats (joy); 
+    for (i = 0; i < hats; i++) {
+    	Uint8 v = SDL_JoystickGetHat (joy, i);
+    	int x = 0, y = 0;
+
+    	if (v & SDL_HAT_UP)
+    		y = -1;
+    	if (v & SDL_HAT_DOWN)
+    		y = 1;
+    	if (v & SDL_HAT_LEFT)
+    		x = -1;
+    	if (v & SDL_HAT_RIGHT)
+    		x = 1;
+
+        setjoystickstate (nr, 0, x, 1);
+        setjoystickstate (nr, 1, y, 1);
     }
 
     num = SDL_JoystickNumButtons (joy);
