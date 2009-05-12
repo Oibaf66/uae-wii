@@ -49,7 +49,7 @@ all: uae.dol
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h $(SYMLINKS)
+	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h $(SYMLINKS)
 
 $(OBJ_DIR):
 	install -d $@
@@ -88,6 +88,10 @@ src/threaddep:
 src/target.h:
 	rm -f $@
 	cd src && ln -s targets/t-wii.h target.h
+
+src/md-fpp.h:
+	rm -f $@
+	cd src && ln -s include/fpp-ieee.h md-fpp.h
 
 %.h: %.h.wii
 	cp $< $@
@@ -139,7 +143,7 @@ dist: uae.dol
 	cd $@ && tar -czf ../uae-bin.tar.gz *
 
 # How to link an ELF.
-uae.elf: $(SYMLINKS) src/target.h src/sysconfig.h $(OBJS)
+uae.elf: $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)
