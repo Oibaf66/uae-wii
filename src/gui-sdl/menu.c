@@ -676,6 +676,8 @@ uint32_t menu_wait_key_press(void)
 	{
 		int i, hats, nr;
 		SDL_Joystick *joy;
+		static int joy_keys_changed;
+		static int joy_keys_last;
 
 		/* Wii-specific, sorry */
 		for (nr = 0; nr < SDL_NumJoysticks(); nr++) {
@@ -713,6 +715,10 @@ uint32_t menu_wait_key_press(void)
 					SDL_JoystickGetButton(joy, 17) != 0)   /* C+ */
 				keys |= KEY_PAGEDOWN;
 		}
+		joy_keys_changed = keys != joy_keys_last;
+		joy_keys_last = keys;
+		if (!joy_keys_changed)
+			keys = 0;
 
 		if (SDL_PollEvent(&ev))
 		{
@@ -760,9 +766,10 @@ uint32_t menu_wait_key_press(void)
 			}
 			break;
 		}
-		SDL_Delay(100);
+
 		if (keys != 0)
-			return keys;
+			break;
+		SDL_Delay(100);
 	}
 	return keys;
 }
