@@ -89,9 +89,6 @@ static int kc_decode (int keysym)
 	case SDLK_F9: 		return AK_F9;
 	case SDLK_F10: 		return AK_F10;
 
-	/* For Nintendo Wii/SDL menu: We don't want multi-key sequences */
-	case SDLK_F12:		return AKS_ENTERGUI;
-
 	case SDLK_BACKSPACE: 	return AK_BS;
 	case SDLK_DELETE: 	return AK_DEL;
 	case SDLK_LCTRL: 	return AK_CTRL;
