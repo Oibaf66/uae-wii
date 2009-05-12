@@ -3,3 +3,33 @@ floppy0=/uae/floppies/budbrain.adz
 cpu_speed=real
 cpu_type=68000
 sound_frequency=32000
+
+sdl.map_raw_keys=true
+input.config=1
+
+# Keyboard setup
+input.1.keyboard.0.button.96=SPC_ENTERGUI
+
+# Mouse
+input.1.mouse.0.disabled=0
+input.1.mouse.0.axis.0=MOUSE1_HORIZ
+input.1.mouse.0.axis.1=MOUSE1_VERT
+input.1.mouse.0.axis.2=MOUSE1_WHEEL
+input.1.mouse.0.button.0=JOY1_FIRE_BUTTON
+input.1.mouse.0.button.1=JOY1_2ND_BUTTON
+input.1.mouse.0.button.2=JOY1_3RD_BUTTON
+
+# Joystick
+input.1.joystick.0.disabled=0
+input.1.joystick.0.axis.0=JOY1_HORIZ
+input.1.joystick.0.axis.1=JOY1_VERT
+input.1.joystick.0.button.9=JOY1_FIRE_BUTTON
+input.1.joystick.0.button.10=JOY1_FIRE_BUTTON
+input.1.joystick.0.button.6=SPC_ENTERGUI
+
+input.1.joystick.1.disabled=0
+input.1.joystick.1.axis.0=JOY2_HORIZ
+input.1.joystick.1.axis.1=JOY2_VERT
+input.1.joystick.1.button.9=JOY2_FIRE_BUTTON
+input.1.joystick.1.button.10=JOY2_FIRE_BUTTON
+input.1.joystick.1.button.6=SPC_ENTERGUI
