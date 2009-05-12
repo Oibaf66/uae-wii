@@ -56,7 +56,9 @@
 #endif
 
 static SDL_Surface *display;
-SDL_Surface *screen;
+static SDL_Surface *screen;
+extern void menu_init(SDL_Surface *screen);
+
 
 /* Standard P96 screen modes */
 #define MAX_SCREEN_MODES 12
@@ -939,6 +941,7 @@ static int graphics_subinit (void)
 	gui_message ("Unable to set video mode: %s\n", SDL_GetError ());
 	return 0;
     } else {
+	menu_init(screen);
 	/* Just in case we didn't get exactly what we asked for . . . */
 	fullscreen   = ((screen->flags & SDL_FULLSCREEN) == SDL_FULLSCREEN);
 	is_hwsurface = ((screen->flags & SDL_HWSURFACE)  == SDL_HWSURFACE);
