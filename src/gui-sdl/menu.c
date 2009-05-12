@@ -55,7 +55,7 @@ static SDL_Surface *real_screen;
 
 static TTF_Font *menu_font;
 static TTF_Font *menu_font64;
-#if defined(GEKKO_)
+#if defined(GEKKO)
 #define FONT_PATH "/apps/uae/FreeMono.ttf"
 #define FONT_ALT_PATH "/apps/uae/Smaller.ttf"
 #else
