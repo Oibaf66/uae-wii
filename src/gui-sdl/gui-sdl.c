@@ -14,8 +14,6 @@
 #include "uae.h"
 #include "menu.h"
 
-extern SDL_Surface *screen;
-
 static const char *main_menu_messages[] = {
 		/*00*/		"Floppy",
 		/*01*/		"^|df0|df1|df2|df3",
@@ -120,19 +118,12 @@ static void insert_floppy(int which)
 
 void gui_display(int shortcut)
 {
-	static int is_inited = 0;
 	int submenus[3];
 	int opt;
 
 	memset(submenus, 0, sizeof(submenus));
-	printf("Initing gui with %d\n", shortcut);
-	printf("Al-mibb: Gui is display!\n");
+	printf("gui_display: %d\n", shortcut);
 
-	if (!is_inited)
-	{
-		menu_init(screen);
-		is_inited = 1;
-	}
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
 	switch(opt)
 	{
@@ -156,7 +147,7 @@ void gui_message (const char *format,...)
        char msg[2048];
        va_list parms;
 
-       printf("Al-mibb: Gui is al-message!\n");
+       printf("Al-mibb: Gui message!\n");
 
        va_start (parms,format);
        vsprintf ( msg, format, parms);
