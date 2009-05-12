@@ -23,11 +23,10 @@ static const char *main_menu_messages[] = {
 		/*05*/		"^|Type|Macro|Bind",
 		/*06*/		"#1-------------------------------------",
 		/*07*/		"Reset UAE",
-		/*08*/		"Networking",
-		/*09*/		"Options",
-		/*10*/		"Advanced Options",
-		/*11*/		"Help",
-		/*12*/		"Quit",
+		/*08*/		"Options",
+		/*09*/		"Advanced Options",
+		/*10*/		"Help",
+		/*11*/		"Quit",
 		NULL
 };
 
@@ -131,10 +130,30 @@ void gui_display(int shortcut)
 		/* Insert floppy */
 		insert_floppy(submenus[0]);
 		break;
+	case 2:
+		/* States */
+		if (0)
+		{
+			const char *dir = prefs_get_attr("savestate_path");
+			switch(submenus[1])
+			{
+			case 0: /* Load state */
+				break;
+			case 1: /* Save state */
+				save_state(prefs_get_attr("floppy0"), "Descr");
+				break;
+			case 2: /* Delete state */
+				break;
+			default:
+					break;
+			}
+		}
+		msgYesNo("This is not implemented", 0, 320, 200);
+		break;
 	case 7:
 		uae_reset(1);
 		break;
-	case 12:
+	case 11:
 		uae_quit();
 		break;
 	default:
@@ -152,6 +171,7 @@ void gui_message (const char *format,...)
        va_start (parms,format);
        vsprintf ( msg, format, parms);
        va_end (parms);
+       msgYesNo(msg, 0, 24, 24);
 
        write_log (msg);
 }
