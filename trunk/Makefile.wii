@@ -123,7 +123,7 @@ DEFINES		:= -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 # Test link flags.
-LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard
 
 dist: uae.dol
 
