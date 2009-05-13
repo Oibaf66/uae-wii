@@ -19,13 +19,13 @@ static const char *main_menu_messages[] = {
 		/*01*/		"^|df0|df1|df2|df3",
 		/*02*/		"States",
 		/*03*/		"^|Load|Save|Delete",
-		/*05*/		"#1-------------------------------------",
-		/*06*/		"Reset UAE",
-		/*07*/		"Memory options",
-		/*08*/		"CPU/Chipset options",
-		/*09*/		"Game port options",
-		/*10*/		"Help",
-		/*11*/		"Quit",
+		/*04*/		"#1-------------------------------------",
+		/*05*/		"Reset UAE",
+		/*06*/		"Memory options",
+		/*07*/		"CPU/Chipset options",
+		/*08*/		"Other options",
+		/*09*/		"Help",
+		/*10*/		"Quit",
 		NULL
 };
 
@@ -36,7 +36,6 @@ static const char *memory_messages[] = {
 		/*03*/		"^|512K|1M|1.8M",
 		/*04*/		"Fast mem",
 		/*05*/		"^|None|1M|2M|4M|8M",
-		/*06*/		"Change ROM file",
 		NULL
 };
 
@@ -154,24 +153,111 @@ static void insert_floppy(int which)
 
 static void memory_options(void)
 {
-	int submenus[3];
+	int submenus[3], opt;
 	memset(submenus, 0, sizeof(submenus));
+
+	switch(currprefs.chipmem_size)
+	{
+	case 1 * 1024 * 1024:
+		submenus[0] = 1; break;
+	case 2 * 1024 * 1024:
+		submenus[0] = 2; break;
+	case 4 * 1024 * 1024:
+		submenus[0] = 3; break;
+	case 8 * 1024 * 1024:
+		submenus[0] = 4; break;
+	case 512 * 1024:
+	default:
+		submenus[0] = 0; break;
+	}
+	switch(currprefs.fastmem_size)
+	{
+	case 1 * 1024 * 1024:
+		submenus[2] = 1; break;
+	case 2 * 1024 * 1024:
+		submenus[2] = 2; break;
+	case 4 * 1024 * 1024:
+		submenus[2] = 3; break;
+	case 8 * 1024 * 1024:
+		submenus[2] = 4; break;
+	case 0:
+	default:
+		submenus[2] = 0; break;
+	}
+	
+	opt = menu_select_title("Memory options menu",
+			memory_messages, submenus);
+	if (opt < 0)
+		return;
+	prefs_has_changed = 1;
 }
 
 static void cpu_options(void)
 {
-	int submenus[5];
+	int submenus[5], opt;
 	memset(submenus, 0, sizeof(submenus));
 
 	submenus[0] = currprefs.cpu_level;
 	submenus[1] = currprefs.cpu_cycle_exact;
 	submenus[2] = currprefs.m68k_speed;
-	submenus[3] = currprefs.chipset_mask;
+//	submenus[3] = currprefs.chipset_mask; // FIXME!
+	submenus[4] = currprefs.chipset_refreshrate == 50;
+
+	opt = menu_select_title("CPU options menu",
+			cpu_messages, submenus);
+	if (opt < 0)
+		return;
+
+	currprefs.cpu_level = submenus[0];
+	currprefs.cpu_cycle_exact = submenus[1];
+	currprefs.m68k_speed = submenus[2];
+	/* FIXME! Chipset mask */
+	currprefs.chipset_refreshrate = submenus[4] == 1 ? 60 : 50;
+	prefs_has_changed = 1;
 }
 
-static void gameport_options(void)
+static void other_options(void)
 {
 }
+
+static void save_load_state(int which)
+{
+	const char *dir = prefs_get_attr("savestate_path");
+	const char *floppy0 = prefs_get_attr("floppy0");
+	char db[256];
+	char fb[81];
+
+	/* Name (for saves) */
+	if (floppy0 && strrchr(floppy0, '/'))
+		strncpy(fb, strrchr(floppy0, '/') + 1, 80);
+	else
+		strcpy(fb, "unknown");
+
+	switch(which)
+	{
+	case 2:
+	case 0: /* Load state */
+	{
+		const char *name = menu_select_file(dir);
+
+		if (!name)
+			return;
+		snprintf(db, 255, "%s/%s", dir, name);
+
+		if (which == 0)
+			restore_state(db);
+		else
+			unlink(db);
+	} break;
+	case 1: /* Save state */
+		snprintf(db, 255, "%s/%s.sav", dir, fb);
+		save_state(db, floppy0);
+		break;
+	default:
+		break;
+	}
+}
+
 
 void gui_display(int shortcut)
 {
@@ -191,37 +277,21 @@ void gui_display(int shortcut)
 		break;
 	case 2:
 		/* States */
-		if (0)
-		{
-			const char *dir = prefs_get_attr("savestate_path");
-			switch(submenus[1])
-			{
-			case 0: /* Load state */
-				break;
-			case 1: /* Save state */
-				save_state(prefs_get_attr("floppy0"), "Descr");
-				break;
-			case 2: /* Delete state */
-				break;
-			default:
-					break;
-			}
-		}
-		msgYesNo("This is not implemented", 0, 320, 200);
+		save_load_state(submenus[1]);
 		break;
-	case 6:
+	case 5:
 		uae_reset(1);
 		break;
-	case 7:
+	case 6:
 		memory_options();
 		break;
-	case 8:
+	case 7:
 		cpu_options();
 		break;
-	case 9:
-		gameport_options();
+	case 8:
+		other_options();
 		break;
-	case 11:
+	case 9:
 		uae_quit();
 		break;
 	default:
