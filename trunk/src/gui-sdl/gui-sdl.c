@@ -15,24 +15,59 @@
 #include "menu.h"
 
 static const char *main_menu_messages[] = {
-		/*00*/		"Floppy",
+		/*00*/		"Insert floppy",
 		/*01*/		"^|df0|df1|df2|df3",
 		/*02*/		"States",
 		/*03*/		"^|Load|Save|Delete",
-		/*04*/		"Keyboard",
-		/*05*/		"^|Type|Macro|Bind",
-		/*06*/		"#1-------------------------------------",
-		/*07*/		"Reset UAE",
-		/*08*/		"Options",
-		/*09*/		"Advanced Options",
+		/*05*/		"#1-------------------------------------",
+		/*06*/		"Reset UAE",
+		/*07*/		"Memory options",
+		/*08*/		"CPU/Chipset options",
+		/*09*/		"Game port options",
 		/*10*/		"Help",
 		/*11*/		"Quit",
 		NULL
 };
 
+static const char *memory_messages[] = {
+		/*00*/		"Chip mem",
+		/*01*/		"^|512K|1M|2M|4M|8M",
+		/*02*/		"Slow mem",
+		/*03*/		"^|512K|1M|1.8M",
+		/*04*/		"Fast mem",
+		/*05*/		"^|None|1M|2M|4M|8M",
+		/*06*/		"Change ROM file",
+		NULL
+};
+
+static const char *cpu_messages[] = {
+		/*00*/		"Model",
+		/*01*/		"^|68000|68010|68020|68030|68040",
+		/*02*/		"Accuracy",
+		/*03*/		"^|Normal|Compatible|Cycle exact",
+		/*04*/		"Speed",
+		/*05*/		"^|Approx 1-1|Maximum",
+		/*06*/		"Chipset",
+		/*07*/		"^|OCS|ECS Agnus|Full ECS|AGA",
+		/*08*/		"TV mode (emulation)",
+		/*09*/		"^|NTSC|PAL",
+		NULL
+};
+
+static const char *other_messages[] = {
+		NULL	
+};
+
+
+static void exit_fn(void)
+{
+	sleep(3);
+}
 
 void gui_init (int argc, char **argv)
 {
+	printf("Init gui\n");
+	atexit(exit_fn);
 }
 
 int gui_open (void)
@@ -107,12 +142,35 @@ void gui_handle_events (void)
 {
 }
 
+static int prefs_has_changed;
+
 static void insert_floppy(int which)
 {
 	const char *name = menu_select_file(prefs_get_attr("floppy_path"));
 
 	if (name != NULL)
 		strcpy (changed_prefs.df[which], name);
+}
+
+static void memory_options(void)
+{
+	int submenus[3];
+	memset(submenus, 0, sizeof(submenus));
+}
+
+static void cpu_options(void)
+{
+	int submenus[5];
+	memset(submenus, 0, sizeof(submenus));
+
+	submenus[0] = currprefs.cpu_level;
+	submenus[1] = currprefs.cpu_cycle_exact;
+	submenus[2] = currprefs.m68k_speed;
+	submenus[3] = currprefs.chipset_mask;
+}
+
+static void gameport_options(void)
+{
 }
 
 void gui_display(int shortcut)
@@ -122,6 +180,7 @@ void gui_display(int shortcut)
 
 	memset(submenus, 0, sizeof(submenus));
 	printf("gui_display: %d\n", shortcut);
+	prefs_has_changed = 0;
 
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
 	switch(opt)
@@ -150,8 +209,17 @@ void gui_display(int shortcut)
 		}
 		msgYesNo("This is not implemented", 0, 320, 200);
 		break;
-	case 7:
+	case 6:
 		uae_reset(1);
+		break;
+	case 7:
+		memory_options();
+		break;
+	case 8:
+		cpu_options();
+		break;
+	case 9:
+		gameport_options();
 		break;
 	case 11:
 		uae_quit();
@@ -171,7 +239,7 @@ void gui_message (const char *format,...)
        va_start (parms,format);
        vsprintf ( msg, format, parms);
        va_end (parms);
-       msgYesNo(msg, 0, 24, 24);
+//       msgYesNo(msg, 0, 24, 24);
 
        write_log (msg);
 }
