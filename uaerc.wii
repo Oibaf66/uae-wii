@@ -4,6 +4,8 @@ cpu_speed=real
 cpu_type=68000
 sound_frequency=32000
 
+gfx_width=640
+gfx_height=480
 gfx_center_horizontal=true
 gfx_center_vertical=true
 
