@@ -1,0 +1,61 @@
+kickstart_rom_file=/uae/roms/kick.rom
+floppy0=/uae/floppies/budbrain.adz
+cpu_speed=real
+cpu_type=68000
+sound_frequency=32000
+
+gfx_width=640
+gfx_height=480
+gfx_center_horizontal=true
+gfx_center_vertical=true
+
+sdl.map_raw_keys=true
+input.config=1
+
+# Keyboard setup
+input.1.keyboard.0.button.96=SPC_ENTERGUI
+
+# Mouse
+input.1.mouse.0.disabled=0
+input.1.mouse.0.axis.0=MOUSE1_HORIZ
+input.1.mouse.0.axis.1=MOUSE1_VERT
+input.1.mouse.0.axis.2=MOUSE1_WHEEL
+input.1.mouse.0.button.0=JOY1_FIRE_BUTTON
+input.1.mouse.0.button.1=JOY1_2ND_BUTTON
+input.1.mouse.0.button.2=JOY1_3RD_BUTTON
+
+# Joystick configuration. Wiimote 1 is both mouse and joystick 2, with
+# the mouse button being the A key.
+# See http://wiibrew.org/wiki/SDL for the button numbers
+
+input.1.joystick.0.disabled=0
+input.1.joystick.0.axis.0=JOY2_HORIZ
+input.1.joystick.0.axis.1=JOY2_VERT
+# 2 on wiimote, Z on nunchuck and a/b on the classic controller
+input.1.joystick.0.button.3=JOY2_FIRE_BUTTON
+input.1.joystick.0.button.7=JOY2_FIRE_BUTTON
+input.1.joystick.0.button.9=JOY2_FIRE_BUTTON
+input.1.joystick.0.button.10=JOY2_FIRE_BUTTON
+
+# Bind +/- to some keys just for testing
+input.1.joystick.0.button.4=KEY_A
+input.1.joystick.0.button.5=KEY_RETURN
+input.1.joystick.0.button.17=KEY_A
+input.1.joystick.0.button.18=KEY_RETURN
+
+
+# Wiimote 2
+input.1.joystick.1.disabled=0
+input.1.joystick.1.axis.0=JOY1_HORIZ
+input.1.joystick.1.axis.1=JOY1_VERT
+input.1.joystick.1.button.3=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.7=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.9=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.10=JOY1_FIRE_BUTTON
+
+
+# Home button
+input.1.joystick.1.button.6=SPC_ENTERGUI
+input.1.joystick.1.button.19=SPC_ENTERGUI
+input.1.joystick.0.button.6=SPC_ENTERGUI
+input.1.joystick.0.button.19=SPC_ENTERGUI
