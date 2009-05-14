@@ -4,6 +4,9 @@ cpu_speed=real
 cpu_type=68000
 sound_frequency=32000
 
+gfx_center_horizontal=true
+gfx_center_vertical=true
+
 sdl.map_raw_keys=true
 input.config=1
 
