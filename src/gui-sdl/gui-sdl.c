@@ -291,7 +291,7 @@ void gui_display(int shortcut)
 	case 8:
 		other_options();
 		break;
-	case 9:
+	case 10:
 		uae_quit();
 		break;
 	default:
