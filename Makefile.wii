@@ -134,6 +134,7 @@ dist: uae.dol
 	install -d $@/uae/roms
 	install -d $@/uae/harddisks
 	install -d $@/uae/saves
+	touch $@/uae/roms/put-your-kick-dot-rom-here
 	cp $< $@/apps/uae/boot.dol
 	cp meta.xml $@/apps/uae/
 	cp icon.png $@/apps/uae/
