@@ -1,37 +1,43 @@
 kickstart_rom_file=/uae/roms/kick.rom
-floppy0=/uae/floppies/budbrain.adz
+#kickstart_ext_rom_file=
+floppy0=/uae/floppies/
 
 # Alters CPU speed (values are; real, max. CPU to Chipset; 1 through 20)
-cpu_speed=5
-# CPU Type (values are; 68000, 68010, 68020 etc etc)
-cpu_type=68020
-#No need to explain
-cpu_compatible=false
-cpu_24bit_addressing=false
-collision_level=playfields
+# Current setting of 3 = 17% CHIPSET and 83% CPU
+cpu_speed=3
+# CPU Type (values are; 68000, 68020, 68020/68881 and 68040)
+cpu_type=68000
 
-# Chipset type (values are; OCS, ECS AGNUS, ECS DENISE, FULL ECS, AGA)
-chipset=aga
+#No need to explain
+cpu_24bit_addressing=false
 #Immediate blits helps with speed
 immediate_blits=true
+collision_level=playfields
 
-# Mem values (0 = 0MB, 1 = 512KB, 2 = 1024MB etc etc)
-chipmem_size=4
-fastmem_size=4
-
-# Floppy speed, can cause incompatbility if set too high.
-# E.g., 800 is much faster though
-floppy_speed=100
+# Chipset type (values are; ocs, ecs_agnus, ecs, aga)
+chipset=aga
 
 
-gfx_width=640
-gfx_height=480
+# Chip Memory (Values are; 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
+chipmem_size=2
+# Fast Memory (Values are; 0 = 0MB, 4 = 2MB and 8 = 8MB)
+fastmem_size=0
+# Accellerator Memory (Values are; 1MB, 2MB, 4MB, 8MB, 16MB and 32MB)
+z3mem_size=0
+
+# Floppy speed, can cause incompatbility with certain floppy loaders
+# (Values are; 0 = Turbo, 100 = Standard and 800 = 800% faster)
+floppy_speed=800
+
 gfx_center_horizontal=true
 gfx_center_vertical=true
 gfx_vsync=false
-gfx_correct_aspect=true
+gfx_correct_aspect=false
 gfx_framerate=2
 show_leds=true
+
+sound_frequency=32000
+sound_latency=200
 
 
 sdl.map_raw_keys=true
