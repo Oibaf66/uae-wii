@@ -27,7 +27,7 @@ z3mem_size=0
 
 # Floppy speed, can cause incompatbility with certain floppy loaders
 # (Values are; 0 = Turbo, 100 = Standard and 800 = 800% faster)
-floppy_speed=800
+floppy_speed=100
 
 gfx_center_horizontal=true
 gfx_center_vertical=true
