@@ -258,6 +258,7 @@ static void amiga_model_options(void)
 	int opt;
 
 	memset(submenus, 0, sizeof(submenus));
+	submenus[1] = currprefs.cpu_cycle_exact;
 	opt = menu_select_title("Amiga model menu",
 			amiga_model_messages, submenus);
 	if (opt < 0)
@@ -272,7 +273,7 @@ static void amiga_model_options(void)
 		break;
 	}
 	/* Cycle-exact or not? */
-	changed_prefs.cpu_cycle_exact = submenus[1] == 0 ? 0 : 1;
+	changed_prefs.cpu_cycle_exact = submenus[1];
 }
 
 static void save_load_state(int which)
