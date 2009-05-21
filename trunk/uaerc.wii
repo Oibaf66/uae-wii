@@ -15,7 +15,7 @@ immediate_blits=true
 collision_level=playfields
 
 # Chipset type (values are; ocs, ecs_agnus, ecs, aga)
-chipset=aga
+chipset=ecs_agnus
 
 
 # Chip Memory (Values are; 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
