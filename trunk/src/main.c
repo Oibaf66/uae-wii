@@ -433,6 +433,26 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
     fix_options ();
 
     parse_cmdline (argc, argv);
+    /* FIXME! ska: This is temporary, and will be removed when you can
+     * pass command line options in meta.xml for the homebrew channel */
+	{
+		char user_options[255];
+		char *user_argv[] = {"program", "-f", user_options};
+#ifdef OPTIONS_IN_HOME
+		char *home = getenv ("HOME");
+		if (home != NULL && strlen (home) < 240)
+		{
+			strcpy (user_options, home);
+			strcat (user_options, "/");
+		}
+#endif
+		strcat(user_options, OPTIONSFILENAME);
+		strcat(user_options, ".user");
+
+		/* Allow the user uaerc to override the default one */
+		parse_cmdline (3, user_argv);
+	}
+    /* Until here */
 
     fix_options ();
 }
