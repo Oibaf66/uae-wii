@@ -37,7 +37,7 @@ static const char *amiga_model_messages[] = {
 		/*00*/		"Amiga model",
 		/*01*/		"^|A1000|A500|A600|A1200|Custom",
 		/*02*/		"Emulation accuracy",
-		/*03*/		"^|Fast|Accurate",
+		/*03*/		"^|Fast|Compatible|Cycle-exact",
 		NULL
 };
 
@@ -82,7 +82,6 @@ static void A500_config(void)
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
 	changed_prefs.chipset_mask = 0; //OCS
-	changed_prefs.floppy_speed = 100;  //Normal
 	changed_prefs.immediate_blits = 1; //ON
 }
 
@@ -252,13 +251,59 @@ static void general_options(void)
 {
 }
 
+/* Helpers to determine the accuracy */
+static int get_emulation_accuracy(void)
+{
+	if (currprefs.cpu_compatible == 0 &&
+			currprefs.cpu_cycle_exact == 0)
+		return 0;
+	if (currprefs.cpu_compatible == 1 &&
+			currprefs.cpu_cycle_exact == 0)
+		return 1;
+	return 2;
+}
+
+static void set_emulation_accuracy(int which)
+{
+	switch (which)
+	{
+	case 1:
+		changed_prefs.cpu_compatible = 1;
+		changed_prefs.cpu_cycle_exact = 0;
+		break;
+	case 2:
+		changed_prefs.cpu_compatible = 1;
+		changed_prefs.cpu_cycle_exact = 1;
+		break;
+	case 0:
+	default:
+		changed_prefs.cpu_compatible = 0;
+		changed_prefs.cpu_cycle_exact = 0;
+		break;
+	}
+}
+
+static int get_model(void)
+{
+	if (currprefs.cpu_level == 1) /* 68010 - only on the A600 */
+		return 2;
+	if (currprefs.cpu_level == 2) /* 68020 - only on the A1200 */
+		return 3;
+	if (currprefs.bogomem_size == 0) /* A1000 */
+		return 0;
+
+	/* A500 */
+	return 1;
+}
+
 static void amiga_model_options(void)
 {
 	int submenus[2];
 	int opt;
 
-	memset(submenus, 0, sizeof(submenus));
-	submenus[1] = currprefs.cpu_cycle_exact;
+	submenus[0] = get_model();
+	submenus[1] = get_emulation_accuracy();
+
 	opt = menu_select_title("Amiga model menu",
 			amiga_model_messages, submenus);
 	if (opt < 0)
@@ -273,7 +318,7 @@ static void amiga_model_options(void)
 		break;
 	}
 	/* Cycle-exact or not? */
-	changed_prefs.cpu_cycle_exact = submenus[1];
+	set_emulation_accuracy(submenus[1]);
 }
 
 static void save_load_state(int which)
