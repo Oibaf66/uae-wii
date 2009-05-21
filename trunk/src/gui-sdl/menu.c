@@ -938,7 +938,7 @@ static const char *menu_select_file_internal(const char *dir_path,
 const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 {
 	const char *file = menu_select_file_internal(dir_path,
-			32, 32, FULL_DISPLAY_X/2, FULL_DISPLAY_Y - 32);
+			32, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32);
 
 	if (!file)
 		return NULL;
@@ -949,7 +949,7 @@ const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 const char *menu_select_file(const char *dir_path)
 {
 	return menu_select_file_internal(dir_path,
-			32, 32, FULL_DISPLAY_X/2, FULL_DISPLAY_Y - 32);
+			32, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32);
 }
 
 static TTF_Font *read_font(const char *path)
