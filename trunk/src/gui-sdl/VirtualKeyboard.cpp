@@ -60,8 +60,8 @@ typedef struct virtkey
 static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   N("Esc", "ESC"), KNL(), K("F1"),K("F2"),K("F3"),K("F4"),K("F5"),K("F6"),K("F7"),K("F8"),K("F9"),KNL(), N("Del","DEL"),N("Help", "HELP"),
   N("~`","BACKQUOTE"),KNL(),K("1"), K("2"), K("3"), K("4"), K("5"), K("6"), K("7"), K("8"), K("9"), K("0"), N("-", "SUB"),N("+", "PLUS"),
-  N("Tab", "TAB"), KNL(), K("Q"), K("W"), K("R"), K("T"), K("Y"), K("U"), K("I"), K("O"), K("P"),N("[", "LEFTBRACKET"),N("]","RIGHTBRACKET"),D("Done"),
-  N("Sft","SHIFT_LEFT"),KNL(), K("A"), K("D"), K("F"), K("G"), K("H"), K("J"), K("K"), K("L"), N(":;", "SEMICOLON"), N("@#", "??"), N("Sft", "SHIFT_RIGHT"),K("Ret"),
+  N("Tab", "TAB"), KNL(), K("Q"), K("W"), K("R"), K("T"), K("Y"), K("U"), K("I"), K("O"), K("P"),N("[", "LEFTBRACKET"),N("]","RIGHTBRACKET"),D("None"),
+  N("Sft","SHIFT_LEFT"),KNL(), K("A"), K("D"), K("F"), K("G"), K("H"), K("J"), K("K"), K("L"), N(":;", "SEMICOLON"), N("@#", "??"), N("Sft", "SHIFT_RIGHT"),N("Ret", "RETURN"),
   N("Ctrl","CTRL"),KNL(),K("Z"),K("X"), K("C"), K("V"), K("B"), K("N"), K("M"),N("<,", "COMMA"),N(">.", "PERIOD"), N("\\","KEY_BACKSLASH"),N("Up", "CURSOR_UP"), N("/", "SLASH"),
   N("Alt","ALT_LEFT"),KNL(), N("Amg","AMIGA_LEFT"),KNL(),N("space", "SPACE"),KNL(),KNL(),N("Amg","AMIGA_RIGHT"),KNL(),N("Alt","ALT_RIGHT"),KNL(),N("Lft", "CURSOR_LEFT"),N("Dwn", "CURSOR_DOWN"), N("Rgt", "CURSOR_RIGHT")
 };
