@@ -16,6 +16,10 @@
 #include <SDL_ttf.h>
 #include <stdint.h>
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define KEY_UP         1
 #define KEY_DOWN       2
 #define KEY_LEFT       4
@@ -45,5 +49,10 @@ extern int msgYesNo(char *text, int def,int x, int y);
 void menu_init(SDL_Surface *screen);
 
 int menu_is_inited(void);
+
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* !__MENU_H__ */
