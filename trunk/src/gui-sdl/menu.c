@@ -228,7 +228,6 @@ static int ext_matches(const char *name, const char *ext)
 	if (len <= ext_len)
 		return 0;
 	return (strcmp(name + len - ext_len, ext) == 0);
-	
 }
 
 static int ext_matches_list(const char *name, const char **exts)
@@ -265,7 +264,7 @@ static const char **get_file_list(const char *base_dir)
 	{
 		char buf[255];
 		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ",
-				".t64", ".T64", ".sav", ".SAV", NULL};
+				".sav", ".SAV", NULL};
 		struct stat st;
 
 		snprintf(buf, 255, "%s/%s", base_dir, de->d_name);
