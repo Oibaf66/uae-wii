@@ -8,6 +8,7 @@
 
 #include "sysconfig.h"
 #include "sysdeps.h"
+#include "savestate.h"
 
 #include "options.h"
 #include "gui.h"
@@ -21,11 +22,19 @@ static const char *main_menu_messages[] = {
 		/*03*/		"^|Load|Save|Delete",
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Reset UAE",
-		/*06*/		"Memory options",
-		/*07*/		"CPU/Chipset options",
-		/*08*/		"Other options",
+		/*06*/		"Amiga model",
+		/*07*/		"Options",
+		/*08*/		"Advanced options",
 		/*09*/		"Help",
 		/*10*/		"Quit",
+		NULL
+};
+
+static const char *amiga_model_messages[] = {
+		/*00*/		"Amiga model",
+		/*01*/		"^|A500|A500(max mem)|A1200|Custom",
+		/*02*/		"Emulation accuracy",
+		/*03*/		"^|Fast|Accurate",
 		NULL
 };
 
@@ -216,8 +225,20 @@ static void cpu_options(void)
 	prefs_has_changed = 1;
 }
 
-static void other_options(void)
+static void general_options(void)
 {
+}
+
+static void amiga_model_options(void)
+{
+	int submenus[2];
+	int opt;
+
+	memset(submenus, 0, sizeof(submenus));
+	opt = menu_select_title("Amiga model menu",
+			amiga_model_messages, submenus);
+	if (opt < 0)
+		return;
 }
 
 static void save_load_state(int which)
@@ -283,13 +304,13 @@ void gui_display(int shortcut)
 		uae_reset(1);
 		break;
 	case 6:
-		memory_options();
+		amiga_model_options();
 		break;
 	case 7:
-		cpu_options();
+		general_options();
 		break;
 	case 8:
-		other_options();
+		//other_options();
 		break;
 	case 10:
 		uae_quit();
