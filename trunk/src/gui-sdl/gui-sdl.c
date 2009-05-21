@@ -170,7 +170,7 @@ static void insert_floppy(int which)
 			changed_prefs.df[which][0] = '\0';
 		else
 			strcpy (changed_prefs.df[which], name);
-		free(name);
+		free((void*)name);
 	}
 	else
 		changed_prefs.df[which][0] = '\0';
@@ -379,7 +379,7 @@ static void save_load_state(int which)
 			restore_state(name);
 		else
 			unlink(name);
-		free(name);
+		free((void*)name);
 	} break;
 	case 1: /* Save state */
 		snprintf(db, 255, "%s/%s.sav", dir, fb);
