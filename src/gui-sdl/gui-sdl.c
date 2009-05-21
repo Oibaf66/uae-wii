@@ -319,6 +319,7 @@ static void amiga_model_options(void)
 	}
 	/* Cycle-exact or not? */
 	set_emulation_accuracy(submenus[1]);
+	prefs_has_changed = 1;
 }
 
 static void save_load_state(int which)
@@ -453,6 +454,9 @@ void gui_display(int shortcut)
 	prefs_has_changed = 0;
 
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
+	if (opt < 0)
+		return;
+
 	switch(opt)
 	{
 	case 0:
@@ -480,6 +484,24 @@ void gui_display(int shortcut)
 		break;
 	default:
 		break;
+	}
+
+	if (prefs_has_changed)
+	{
+		char user_options[255];
+#ifdef OPTIONS_IN_HOME
+		char *home = getenv ("HOME");
+		if (home != NULL && strlen (home) < 240)
+		{
+			strcpy (user_options, home);
+			strcat (user_options, "/");
+		}
+#endif
+		strcat(user_options, OPTIONSFILENAME);
+		strcat(user_options, ".user");
+
+		printf("Saving user options in %s\n", user_options);
+		cfgfile_save(&changed_prefs, user_options, 0);
 	}
 }
 
