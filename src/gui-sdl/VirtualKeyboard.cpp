@@ -50,7 +50,7 @@ typedef struct virtkey
 #define N(name, key_name) \
   { name, "KEY_"key_name, false }
 #define D(name) \
-  { name, "", true }
+  { name, "None", true }
 #define KNL() \
   { NULL, NULL, false }
 
