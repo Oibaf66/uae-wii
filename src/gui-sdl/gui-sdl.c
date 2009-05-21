@@ -9,11 +9,14 @@
 #include "sysconfig.h"
 #include "sysdeps.h"
 #include "savestate.h"
+#include "custom.h"
 
 #include "options.h"
 #include "gui.h"
 #include "uae.h"
 #include "menu.h"
+
+static void default_config(void);
 
 static const char *main_menu_messages[] = {
 		/*00*/		"Insert floppy",
@@ -32,7 +35,7 @@ static const char *main_menu_messages[] = {
 
 static const char *amiga_model_messages[] = {
 		/*00*/		"Amiga model",
-		/*01*/		"^|A500|A500(max mem)|A1200|Custom",
+		/*01*/		"^|A1000|A500|A600|A1200|Custom",
 		/*02*/		"Emulation accuracy",
 		/*03*/		"^|Fast|Accurate",
 		NULL
@@ -66,6 +69,101 @@ static const char *other_messages[] = {
 		NULL	
 };
 
+/* All this is taken directly from PSPUAE */
+static void A500_config(void)
+{
+	default_config();
+
+	changed_prefs.collision_level = 2; //Playfields
+	changed_prefs.cpu_level = 0; //68000
+	changed_prefs.cpu_compatible = 1; //ON
+	changed_prefs.m68k_speed = -1; // max speed
+	changed_prefs.fastmem_size = 0; //OFF
+	changed_prefs.chipmem_size = 512 * 1024; //512
+	changed_prefs.bogomem_size = 512 * 1024; //512
+	changed_prefs.chipset_mask = 0; //OCS
+	changed_prefs.floppy_speed = 100;  //Normal
+	changed_prefs.immediate_blits = 1; //ON
+}
+
+static void A600_config(void)
+{
+	default_config();
+
+	changed_prefs.collision_level = 2; //Playfields
+	changed_prefs.cpu_level = 1; //68010
+	changed_prefs.cpu_compatible = 1; //ON
+	changed_prefs.m68k_speed = -1; // max speed
+	changed_prefs.fastmem_size = 0; //OFF
+	changed_prefs.chipmem_size = 1024 * 1024; //1024
+	changed_prefs.bogomem_size = 0; //OFF
+	changed_prefs.chipset_mask = 2; //ECS Denise
+	changed_prefs.immediate_blits = 1; //ON
+}
+
+static void A1000_config(void)
+{
+	default_config();
+
+	changed_prefs.collision_level = 2; //Playfields
+	changed_prefs.cpu_level = 0; //68000
+	changed_prefs.cpu_compatible = 1; //ON
+	changed_prefs.m68k_speed = -1; // max speed
+	changed_prefs.fastmem_size = 0; //OFF
+	changed_prefs.chipmem_size = 512 * 1024; //512
+	changed_prefs.bogomem_size = 0; //OFF
+	changed_prefs.chipset_mask = 0; //OCS
+	changed_prefs.immediate_blits = 1; //ON
+}
+
+static void A1200_config(void)
+{
+	default_config();
+
+	changed_prefs.cpu_level = 2; //68020
+	changed_prefs.cpu_compatible = 1; //ON
+	changed_prefs.m68k_speed = -1; // max speed
+	changed_prefs.fastmem_size = 0; //OFF
+	changed_prefs.chipmem_size = 1024 * 2048; //2048
+	changed_prefs.bogomem_size = 0;
+	changed_prefs.chipset_mask = 3; //ECS
+	changed_prefs.immediate_blits = 1; //ON
+}
+
+static void default_config(void)
+{
+	changed_prefs.gfx_framerate=5;
+	changed_prefs.produce_sound=2; //normal
+	changed_prefs.sound_stereo = 0;	//Stereo
+	changed_prefs.sound_interpol = 0; //None FOL (Added Interpol to Sound Menu)
+
+	changed_prefs.collision_level = 2; //Playfields
+	changed_prefs.cpu_level = 0; //M68k
+	changed_prefs.cpu_idle = 0; // OFF FOL
+	changed_prefs.cpu_compatible = 0; //OFF
+	changed_prefs.m68k_speed = -1; // max speed
+	changed_prefs.fastmem_size = 0; //OFF
+	changed_prefs.chipmem_size = 512 * 1024; //512kb
+	changed_prefs.bogomem_size = 512 * 1024; //512kb
+	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; //ECS Super AGNUS
+	changed_prefs.leds_on_screen = 1; //Floppy, Power, FPS, etc etc.
+
+	changed_prefs.floppy_speed = 100; //Floppy Speed Normal
+	changed_prefs.immediate_blits = 0; //OFF
+	changed_prefs.blitter_cycle_exact = 0; //OFF
+	changed_prefs.gfx_correct_aspect = 0; //OFF FOL (This doesnt work any more) FOL
+	changed_prefs.dfxtype[0] = 0; //Drive Type Double Density, can be set to High Density 1.7Megs
+	changed_prefs.dfxtype[1] = 0; //Drive Type Double Density, can be set to High Density 1.7Megs
+	changed_prefs.tod_hack = 1; //ON, Syncronise Clocks FOL
+	changed_prefs.gfx_xcenter = 1; //Simple   Horizontal Center FOL
+	changed_prefs.gfx_ycenter = 1;  //Simple   Vertical Center FOL
+	changed_prefs.gfx_width_fs = 480;  //FOL
+	changed_prefs.gfx_height_fs = 272;  //FOL
+	changed_prefs.gfx_afullscreen = 1; //ON    Amiga FullScreen
+	changed_prefs.sound_stereo_separation = 0;
+
+	changed_prefs.chipset_refreshrate = 50; //Chipset Refresh Rate
+}
 
 static int prefs_has_changed;
 
@@ -134,11 +232,11 @@ static void cpu_options(void)
 	if (opt < 0)
 		return;
 
-	currprefs.cpu_level = submenus[0];
-	currprefs.cpu_cycle_exact = submenus[1];
-	currprefs.m68k_speed = submenus[2];
+	changed_prefs.cpu_level = submenus[0];
+	changed_prefs.cpu_cycle_exact = submenus[1];
+	changed_prefs.m68k_speed = submenus[2];
 	/* FIXME! Chipset mask */
-	currprefs.chipset_refreshrate = submenus[4] == 1 ? 60 : 50;
+	changed_prefs.chipset_refreshrate = submenus[4] == 1 ? 60 : 50;
 	prefs_has_changed = 1;
 }
 
@@ -156,6 +254,17 @@ static void amiga_model_options(void)
 			amiga_model_messages, submenus);
 	if (opt < 0)
 		return;
+	switch(submenus[0])
+	{
+	case 0:	A1000_config(); break;
+	case 1:	A500_config(); break;
+	case 2:	A600_config(); break;
+	case 3:	A1200_config(); break;
+	default: /* custom */
+		break;
+	}
+	/* Cycle-exact or not? */
+	changed_prefs.cpu_cycle_exact = submenus[1] == 0 ? 0 : 1;
 }
 
 static void save_load_state(int which)
