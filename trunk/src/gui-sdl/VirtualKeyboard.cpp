@@ -13,7 +13,7 @@
 #include <SDL_ttf.h>
 
 #include "menu.h"
-#include "VirtualKeyboard.hh"
+#include "VirtualKeyboard.h"
 
 
 struct virtkey;
