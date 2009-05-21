@@ -383,7 +383,6 @@ void gui_notify_state (int state)
 
 int gui_update (void)
 {
-	printf("Al-mibb: Gui is updejted!\n");
     return 0;
 }
 
@@ -488,8 +487,6 @@ void gui_message (const char *format,...)
 {
        char msg[2048];
        va_list parms;
-
-       printf("Al-mibb: Gui message!\n");
 
        va_start (parms,format);
        vsprintf ( msg, format, parms);
