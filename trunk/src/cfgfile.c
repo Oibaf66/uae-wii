@@ -249,7 +249,7 @@ static int match_string (const char *table[], const char *str)
 char *cfgfile_subst_path (const char *path, const char *subst, const char *file)
 {
     /* @@@ use strcasecmp for some targets.  */
-    if (strlen (path) > 0 && strncmp (file, path, strlen (path)) == 0) {
+    if (path && strlen (path) > 0 && strncmp (file, path, strlen (path)) == 0) {
 	int l;
 	char *p = xmalloc (strlen (file) + strlen (subst) + 2);
 	strcpy (p, subst);
