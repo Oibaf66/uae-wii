@@ -15,6 +15,7 @@
 #include "gui.h"
 #include "uae.h"
 #include "menu.h"
+#include "VirtualKeyboard.h"
 
 static void default_config(void);
 
@@ -26,11 +27,21 @@ static const char *main_menu_messages[] = {
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Reset UAE",
 		/*06*/		"Amiga model",
-		/*07*/		"Options",
-		/*08*/		"Advanced options",
+		/*07*/		"Keyboard bindings",
+		/*08*/		"Options",
 		/*09*/		"Help",
 		/*10*/		"Quit",
 		NULL
+};
+
+static const  char *keyboard_messages[] = {
+		/*00*/		"Wiimote",
+		/*01*/		"^|B|1|-|+",
+		/*02*/		"Nunchuk",
+		/*03*/		"^|C",
+		/*04*/		"Classic",
+		/*05*/		"^|b|x|y|l|r|Zl|Zr|-|+",
+		NULL,
 };
 
 static const char *amiga_model_messages[] = {
@@ -269,6 +280,59 @@ static void general_options(void)
 	prefs_has_changed = 1;
 }
 
+/* There are a few unfortunate header problems, so I'll do like this for now */
+struct uae_prefs;
+void read_inputdevice_config (struct uae_prefs *pr, const char *option, const char *value);
+
+static void keyboard_options(void)
+{
+	const int wiimote_to_sdl[] = {1, 2, 4, 5};
+	const int nunchuk_to_sdl[] = {8};
+	const int classic_to_sdl[] = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+	int sdl_key = 1;
+	const char *key;
+	int submenus[3];
+	int opt;
+	int i;
+
+	memset(submenus, 0, sizeof(submenus));
+
+	opt = menu_select_title("Keyboard menu",
+			keyboard_messages, submenus);
+	if (opt < 0)
+		return;
+	/* Translate key to keycode */
+	key = virtkbd_get_key();
+	if (key == NULL)
+		return;
+	switch(opt)
+	{
+	case 0: /* wiimote */
+		sdl_key = wiimote_to_sdl[submenus[0]]; break; 
+	case 2: /* nunchuk */
+		sdl_key = nunchuk_to_sdl[submenus[1]]; break; 
+	case 4: /* classic */
+		sdl_key = classic_to_sdl[submenus[2]]; break; 
+	default: /* can never happen */
+		break;
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		char buf[80];
+		if (snprintf(buf, 80, "input.1.joystick.%d.button.%d",
+				i, sdl_key) >= 255)
+		{
+			fprintf(stderr, "Buffer overflow. Something is wrong\n");
+			return;
+		}
+		read_inputdevice_config (&changed_prefs, buf, key);
+	}
+
+	prefs_has_changed = 1;
+}
+
+
 /* Helpers to determine the accuracy */
 static int get_emulation_accuracy(void)
 {
@@ -492,10 +556,10 @@ void gui_display(int shortcut)
 		amiga_model_options();
 		break;
 	case 7:
-		general_options();
+		keyboard_options();
 		break;
 	case 8:
-		//other_options();
+		general_options();
 		break;
 	case 10:
 		uae_quit();
