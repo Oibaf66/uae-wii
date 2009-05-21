@@ -72,8 +72,6 @@ static void A500_config(void)
 
 	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 0; //68000
-	changed_prefs.cpu_compatible = 1; //ON
-	changed_prefs.m68k_speed = -1; // max speed
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
@@ -87,8 +85,6 @@ static void A600_config(void)
 
 	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 1; //68010
-	changed_prefs.cpu_compatible = 1; //ON
-	changed_prefs.m68k_speed = -1; // max speed
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
@@ -102,8 +98,6 @@ static void A1000_config(void)
 
 	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 0; //68000
-	changed_prefs.cpu_compatible = 1; //ON
-	changed_prefs.m68k_speed = -1; // max speed
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
@@ -116,8 +110,6 @@ static void A1200_config(void)
 	default_config();
 
 	changed_prefs.cpu_level = 2; //68020
-	changed_prefs.cpu_compatible = 1; //ON
-	changed_prefs.m68k_speed = -1; // max speed
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
@@ -136,13 +128,11 @@ static void default_config(void)
 	changed_prefs.cpu_level = 0; //M68k
 	changed_prefs.cpu_idle = 0; // OFF FOL
 	changed_prefs.cpu_compatible = 0; //OFF
-	changed_prefs.m68k_speed = -1; // max speed
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512kb
 	changed_prefs.bogomem_size = 512 * 1024; //512kb
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; //ECS Super AGNUS
 
-	changed_prefs.floppy_speed = 100; //Floppy Speed Normal
 	changed_prefs.immediate_blits = 0; //OFF
 	changed_prefs.blitter_cycle_exact = 0; //OFF
 	changed_prefs.gfx_correct_aspect = 0; //OFF FOL (This doesnt work any more) FOL
@@ -151,8 +141,6 @@ static void default_config(void)
 	changed_prefs.tod_hack = 1; //ON, Syncronise Clocks FOL
 	changed_prefs.gfx_xcenter = 1; //Simple   Horizontal Center FOL
 	changed_prefs.gfx_ycenter = 1;  //Simple   Vertical Center FOL
-	changed_prefs.gfx_width_fs = 480;  //FOL
-	changed_prefs.gfx_height_fs = 272;  //FOL
 	changed_prefs.sound_stereo_separation = 0;
 
 	changed_prefs.chipset_refreshrate = 50; //Chipset Refresh Rate
