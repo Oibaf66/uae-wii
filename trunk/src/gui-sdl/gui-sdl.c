@@ -317,16 +317,27 @@ static void keyboard_options(void)
 		break;
 	}
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 2; i++)
 	{
+		int fire_buttons[] = {3,7,9,10};
 		char buf[80];
-		if (snprintf(buf, 80, "input.1.joystick.%d.button.%d",
-				i, sdl_key) >= 255)
-		{
-			fprintf(stderr, "Buffer overflow. Something is wrong\n");
-			return;
-		}
+		int j;
+
+		snprintf(buf, 80, "input.1.joystick.%d.button.%d", i, sdl_key);
 		read_inputdevice_config (&changed_prefs, buf, key);
+
+		snprintf(buf, 80, "input.1.joystick.%d.button.6", i);
+		read_inputdevice_config (&changed_prefs, buf, "SPC_ENTERGUI");
+		snprintf(buf, 80, "input.1.joystick.%d.button.19", i);
+		read_inputdevice_config (&changed_prefs, buf, "SPC_ENTERGUI");
+
+		for (j = 0; j < sizeof(fire_buttons) / sizeof(fire_buttons[0]); j++)
+		{
+			snprintf(buf, 80, "input.1.joystick.%d.button.%d",
+					i, fire_buttons[j]);
+			read_inputdevice_config (&changed_prefs, buf,
+					i == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON");
+		}
 	}
 
 	prefs_has_changed = 1;
