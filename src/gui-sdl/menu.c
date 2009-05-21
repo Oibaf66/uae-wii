@@ -18,7 +18,7 @@
 
 #include "sysconfig.h"
 #include "menu.h"
-#include "VirtualKeyboard.hh"
+#include "VirtualKeyboard.h"
 
 #define FULL_DISPLAY_X 640
 #define FULL_DISPLAY_Y 480
