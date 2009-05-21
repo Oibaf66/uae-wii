@@ -491,7 +491,16 @@ void gui_message (const char *format,...)
        va_start (parms,format);
        vsprintf ( msg, format, parms);
        va_end (parms);
-//       msgYesNo(msg, 0, 24, 24);
+
+       if (!menu_is_inited())
+       {
+    	   /* Some error message at startup - just quit */
+    	   SDL_Surface *screen = SDL_SetVideoMode(640, 480, 16, 0);
+    	   if (!screen)
+    		   return; /* Deep trouble! */
+    	   menu_init(screen);
+       }
+       msgYesNo(msg, 0, 24, 24);
 
        write_log (msg);
 }

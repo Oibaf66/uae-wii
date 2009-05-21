@@ -44,4 +44,6 @@ extern int msgYesNo(char *text, int def,int x, int y);
 
 void menu_init(SDL_Surface *screen);
 
+int menu_is_inited(void);
+
 #endif /* !__MENU_H__ */
