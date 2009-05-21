@@ -37,7 +37,7 @@ SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support
 	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
-OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
+OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o)) $(OBJ_DIR)/guidep/VirtualKeyboard.o
 
 # Test source files.
 # It can be useful to switch this variable around to select individual tests which are problematic.
@@ -157,3 +157,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
 	@powerpc-gekko-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@echo Compiling $<
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-g++ $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)

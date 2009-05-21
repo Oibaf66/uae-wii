@@ -18,6 +18,7 @@
 
 #include "sysconfig.h"
 #include "menu.h"
+#include "VirtualKeyboard.hh"
 
 #define FULL_DISPLAY_X 640
 #define FULL_DISPLAY_Y 480
@@ -992,6 +993,7 @@ void menu_init(SDL_Surface *screen)
 	menu_font64 = read_font(FONT_ALT_PATH);
 
 	real_screen = screen;
+	virtkbd_init(screen, menu_font64);
 	is_inited = 1;
 }
 
