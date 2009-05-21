@@ -343,12 +343,12 @@ static void save_load_state(int which)
 
 		if (!name)
 			return;
-		snprintf(db, 255, "%s/%s", dir, name);
 
 		if (which == 0)
-			restore_state(db);
+			restore_state(name);
 		else
-			unlink(db);
+			unlink(name);
+		free(name);
 	} break;
 	case 1: /* Save state */
 		snprintf(db, 255, "%s/%s.sav", dir, fb);
