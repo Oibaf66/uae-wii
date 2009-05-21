@@ -28,7 +28,7 @@ SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
 	src/filesys.c src/fsdb.c src/fsdb_unix.c src/hardfile_unix.c src/genblitter.c src/gencomp.c src/gencpu.c \
 	src/hardfile.c src/genlinetoscr.c src/compemu.c src/compstbl.c src/fsusage.c src/filesys_unix.c \
-	src/enforcer.c src/ar.c src/debug.c \
+	src/enforcer.c src/ar.c src/debug.c src/cpuemu_6.c \
 	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
 # Library object files.
@@ -112,11 +112,11 @@ $(BIN_DIR)/%.dol: %.elf
 # Compilation flags.
 COMMON_FLAGS	:= -g -Wall $(MACHDEP)
 INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I/usr/include/SDL
-DEFINES		:= -DFPUEMU -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 -DAGA \
-		   -DSUPPORT_THREADS -DUSE_SDL -DFDI2RAW -DSAVESTATE \
-		   -DOS_WITHOUT_MEMORY_MANAGEMENT
+DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DFPUEMU -DAGA \
+				-DAUTOCONFIG
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
+#unused defines; -DFDI2RAW 
 # Test link flags.
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -lz -lSDL_ttf -lSDL -lfreetype -lm
 
