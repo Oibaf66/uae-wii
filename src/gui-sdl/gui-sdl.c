@@ -172,7 +172,15 @@ static void insert_floppy(int which)
 	const char *name = menu_select_file(prefs_get_attr("floppy_path"));
 
 	if (name != NULL)
-		strcpy (changed_prefs.df[which], name);
+	{
+		if (strcmp(name, "None") == 0)
+			changed_prefs.df[which][0] = '\0';
+		else
+			strcpy (changed_prefs.df[which], name);
+		free(name);
+	}
+	else
+		changed_prefs.df[which][0] = '\0';
 }
 
 static void memory_options(void)
