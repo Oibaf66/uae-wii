@@ -53,6 +53,7 @@ static SDL_Surface *real_screen;
 #define IS_TEXT(p_msg) ( (p_msg)[0] == '#' || (p_msg)[0] == ' ' )
 #define IS_MARKER(p_msg) ( (p_msg)[0] == '@' )
 
+static int is_inited = 0;
 static TTF_Font *menu_font;
 static TTF_Font *menu_font64;
 #if defined(GEKKO)
@@ -992,4 +993,10 @@ void menu_init(SDL_Surface *screen)
 	menu_font64 = read_font(FONT_ALT_PATH);
 
 	real_screen = screen;
+	is_inited = 1;
+}
+
+int menu_is_inited(void)
+{
+	return is_inited;
 }
