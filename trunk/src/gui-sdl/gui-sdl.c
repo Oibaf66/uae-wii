@@ -51,17 +51,13 @@ static const char *memory_messages[] = {
 		NULL
 };
 
-static const char *cpu_messages[] = {
-		/*00*/		"Model",
-		/*01*/		"^|68000|68010|68020|68030|68040",
-		/*02*/		"Accuracy",
-		/*03*/		"^|Normal|Compatible|Cycle exact",
-		/*04*/		"Speed",
-		/*05*/		"^|Approx 1-1|Maximum",
-		/*06*/		"Chipset",
-		/*07*/		"^|OCS|ECS Agnus|Full ECS|AGA",
-		/*08*/		"TV mode (emulation)",
-		/*09*/		"^|NTSC|PAL",
+static const char *options_messages[] = {
+		/*00*/		"CPU to chipset speed",
+		/*01*/		"^|max|1|2|3|5|10|15|20",
+		/*02*/		"Floppy speed",
+		/*03*/		"^|100|400|800",
+		/*04*/		"Leds",
+		/*05*/		"^|on|off",
 		NULL
 };
 
@@ -221,33 +217,68 @@ static void memory_options(void)
 	prefs_has_changed = 1;
 }
 
-static void cpu_options(void)
+static int get_cpu_to_chipset_speed(void)
 {
-	int submenus[5], opt;
-	memset(submenus, 0, sizeof(submenus));
+	switch(currprefs.m68k_speed)
+	{
+	case 1:	return 1;
+	case 2:	return 2;
+	case 3:	return 3;
+	case 5:	return 4;
+	case 10: return 5;
+	case 15: return 6;
+	case 20: return 7;
+	default: break; /* max */
+	}
+	return 0;
+}
 
-	submenus[0] = currprefs.cpu_level;
-	submenus[1] = currprefs.cpu_cycle_exact;
-	submenus[2] = currprefs.m68k_speed;
-//	submenus[3] = currprefs.chipset_mask; // FIXME!
-	submenus[4] = currprefs.chipset_refreshrate == 50;
+static void set_cpu_to_chipset_speed(int which)
+{
+	int table[] = {-1,1,2,3,5,10,15,20};
 
-	opt = menu_select_title("CPU options menu",
-			cpu_messages, submenus);
-	if (opt < 0)
-		return;
+	changed_prefs.m68k_speed = table[which];
+}
 
-	changed_prefs.cpu_level = submenus[0];
-	changed_prefs.cpu_cycle_exact = submenus[1];
-	changed_prefs.m68k_speed = submenus[2];
-	/* FIXME! Chipset mask */
-	changed_prefs.chipset_refreshrate = submenus[4] == 1 ? 60 : 50;
-	prefs_has_changed = 1;
+static int get_floppy_speed(void)
+{
+	switch(currprefs.floppy_speed)
+	{
+	case 400:
+		return 1;
+	case 800:
+		return 2;
+	default: break; /* 100 */
+	}
+	return 0;
+}
+
+static void set_floppy_speed(int which)
+{
+	int table[] = {100, 400, 800};
+
+	changed_prefs.floppy_speed = table[which];
 }
 
 static void general_options(void)
 {
-//	changed_prefs.leds_on_screen = 1; //Floppy, Power, FPS, etc etc.
+	int submenus[3];
+	int opt;
+
+	submenus[0] = get_cpu_to_chipset_speed();
+	submenus[1] = get_floppy_speed();
+	submenus[2] = currprefs.leds_on_screen;
+
+	opt = menu_select_title("General options menu",
+			options_messages, submenus);
+	if (opt < 0)
+		return;
+	set_cpu_to_chipset_speed(submenus[0]);
+	set_floppy_speed(submenus[1]);
+	//Floppy, Power, FPS, etc etc.
+	changed_prefs.leds_on_screen = submenus[2];
+
+	prefs_has_changed = 1;
 }
 
 /* Helpers to determine the accuracy */
