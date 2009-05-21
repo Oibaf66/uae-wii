@@ -436,7 +436,7 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
     /* FIXME! ska: This is temporary, and will be removed when you can
      * pass command line options in meta.xml for the homebrew channel */
 	{
-		char user_options[255];
+		char user_options[255] = "";
 		char *user_argv[] = {"program", "-f", user_options};
 #ifdef OPTIONS_IN_HOME
 		char *home = getenv ("HOME");

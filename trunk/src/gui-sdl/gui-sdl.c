@@ -570,7 +570,7 @@ void gui_display(int shortcut)
 
 	if (prefs_has_changed)
 	{
-		char user_options[255];
+		char user_options[255] = "";
 #ifdef OPTIONS_IN_HOME
 		char *home = getenv ("HOME");
 		if (home != NULL && strlen (home) < 240)
