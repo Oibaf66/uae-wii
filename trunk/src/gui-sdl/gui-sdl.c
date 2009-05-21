@@ -145,7 +145,6 @@ static void default_config(void)
 	changed_prefs.chipmem_size = 512 * 1024; //512kb
 	changed_prefs.bogomem_size = 512 * 1024; //512kb
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; //ECS Super AGNUS
-	changed_prefs.leds_on_screen = 1; //Floppy, Power, FPS, etc etc.
 
 	changed_prefs.floppy_speed = 100; //Floppy Speed Normal
 	changed_prefs.immediate_blits = 0; //OFF
@@ -158,7 +157,6 @@ static void default_config(void)
 	changed_prefs.gfx_ycenter = 1;  //Simple   Vertical Center FOL
 	changed_prefs.gfx_width_fs = 480;  //FOL
 	changed_prefs.gfx_height_fs = 272;  //FOL
-	changed_prefs.gfx_afullscreen = 1; //ON    Amiga FullScreen
 	changed_prefs.sound_stereo_separation = 0;
 
 	changed_prefs.chipset_refreshrate = 50; //Chipset Refresh Rate
@@ -249,6 +247,7 @@ static void cpu_options(void)
 
 static void general_options(void)
 {
+//	changed_prefs.leds_on_screen = 1; //Floppy, Power, FPS, etc etc.
 }
 
 /* Helpers to determine the accuracy */
