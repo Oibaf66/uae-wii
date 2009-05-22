@@ -415,11 +415,17 @@ static int get_model(void)
 		return 2;
 	if (currprefs.cpu_level == 2) /* 68020 - only on the A1200 */
 		return 3;
-	if (currprefs.bogomem_size == 0) /* A1000 */
-		return 0;
+	if (currprefs.cpu_level == 0) /* 68000 - A1000/A500 */
+	{
+		if (currprefs.bogomem_size == 0) /* A1000 */
+			return 0;
 
-	/* A500 */
-	return 1;
+		/* A500 */
+		return 1;
+	}
+
+	/* Custom */
+	return 4;
 }
 
 static void amiga_model_options(void)
