@@ -284,6 +284,21 @@ static void general_options(void)
 struct uae_prefs;
 void read_inputdevice_config (struct uae_prefs *pr, const char *option, const char *value);
 
+static void insert_keyboard_map(const char *key, const char *fmt, ...)
+{
+	char buf[255];
+	va_list ap;
+	int r;
+
+	va_start(ap, fmt);
+	r = vsnprintf(buf, 255, fmt, ap);
+	if (r >= 255)
+		fprintf(stderr, "Too long string passed\n");
+	va_end(ap);
+
+	read_inputdevice_config (&changed_prefs, buf, key);
+}
+
 static void keyboard_options(void)
 {
 	const int wiimote_to_sdl[] = {1, 2, 4, 5};
@@ -320,23 +335,19 @@ static void keyboard_options(void)
 	for (i = 0; i < 2; i++)
 	{
 		int fire_buttons[] = {3,7,9,10};
-		char buf[80];
 		int j;
 
-		snprintf(buf, 80, "input.1.joystick.%d.button.%d", i, sdl_key);
-		read_inputdevice_config (&changed_prefs, buf, key);
+		insert_keyboard_map(key, "input.1.joystick.%d.button.%d", i, sdl_key);
 
-		snprintf(buf, 80, "input.1.joystick.%d.button.6", i);
-		read_inputdevice_config (&changed_prefs, buf, "SPC_ENTERGUI");
-		snprintf(buf, 80, "input.1.joystick.%d.button.19", i);
-		read_inputdevice_config (&changed_prefs, buf, "SPC_ENTERGUI");
+		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", i);
+		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", i);
 
 		for (j = 0; j < sizeof(fire_buttons) / sizeof(fire_buttons[0]); j++)
 		{
-			snprintf(buf, 80, "input.1.joystick.%d.button.%d",
+			const char *btn = i == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON";
+
+			insert_keyboard_map(btn, "input.1.joystick.%d.button.%d",
 					i, fire_buttons[j]);
-			read_inputdevice_config (&changed_prefs, buf,
-					i == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON");
 		}
 	}
 
@@ -582,6 +593,8 @@ void gui_display(int shortcut)
 	if (prefs_has_changed)
 	{
 		char user_options[255] = "";
+		int dummy;
+
 #ifdef OPTIONS_IN_HOME
 		char *home = getenv ("HOME");
 		if (home != NULL && strlen (home) < 240)
