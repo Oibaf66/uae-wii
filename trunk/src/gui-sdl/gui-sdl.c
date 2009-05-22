@@ -432,7 +432,7 @@ static void amiga_model_options(void)
 static void save_load_state(int which)
 {
 	const char *dir = prefs_get_attr("savestate_path");
-	const char *floppy0 = prefs_get_attr("floppy0");
+	const char *floppy0 = currprefs.df[0];
 	char db[256];
 	char fb[81];
 
