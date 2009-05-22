@@ -324,11 +324,11 @@ static void keyboard_options(void)
 	switch(opt)
 	{
 	case 0: /* wiimote */
-		sdl_key = wiimote_to_sdl[submenus[0]]; break; 
+		sdl_key = wiimote_to_sdl[submenus[0]]; break;
 	case 2: /* nunchuk */
-		sdl_key = nunchuk_to_sdl[submenus[1]]; break; 
+		sdl_key = nunchuk_to_sdl[submenus[1]]; break;
 	case 4: /* classic */
-		sdl_key = classic_to_sdl[submenus[2]]; break; 
+		sdl_key = classic_to_sdl[submenus[2]]; break;
 	default: /* can never happen */
 		break;
 	}
