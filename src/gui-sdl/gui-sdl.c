@@ -145,31 +145,7 @@ static void A1200_config(void)
 
 static void default_config(void)
 {
-	changed_prefs.gfx_framerate=5;
-	changed_prefs.produce_sound=2; //normal
-	changed_prefs.sound_stereo = 0;	//Stereo
-	changed_prefs.sound_interpol = 0; //None FOL (Added Interpol to Sound Menu)
-
-	changed_prefs.collision_level = 2; //Playfields
-	changed_prefs.cpu_level = 0; //M68k
-	changed_prefs.cpu_idle = 0; // OFF FOL
-	changed_prefs.cpu_compatible = 0; //OFF
-	changed_prefs.fastmem_size = 0; //OFF
-	changed_prefs.chipmem_size = 512 * 1024; //512kb
-	changed_prefs.bogomem_size = 512 * 1024; //512kb
-	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; //ECS Super AGNUS
-
-	changed_prefs.immediate_blits = 1; //OFF
-	changed_prefs.blitter_cycle_exact = 0; //OFF
-	changed_prefs.gfx_correct_aspect = 0; //OFF FOL (This doesnt work any more) FOL
-	changed_prefs.dfxtype[0] = 0; //Drive Type Double Density, can be set to High Density 1.7Megs
-	changed_prefs.dfxtype[1] = 0; //Drive Type Double Density, can be set to High Density 1.7Megs
-	changed_prefs.tod_hack = 1; //ON, Syncronise Clocks FOL
-	changed_prefs.gfx_xcenter = 1; //Simple   Horizontal Center FOL
-	changed_prefs.gfx_ycenter = 1;  //Simple   Vertical Center FOL
-	changed_prefs.sound_stereo_separation = 0;
-
-	changed_prefs.chipset_refreshrate = 50; //Chipset Refresh Rate
+	/* For now these are in uaerc instead */
 }
 
 static int prefs_has_changed;
