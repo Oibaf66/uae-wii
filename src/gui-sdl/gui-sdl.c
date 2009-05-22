@@ -297,6 +297,7 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 	va_end(ap);
 
 	read_inputdevice_config (&changed_prefs, buf, key);
+	read_inputdevice_config (&currprefs, buf, key);
 }
 
 static void keyboard_options(void)
