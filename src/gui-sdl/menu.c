@@ -705,7 +705,7 @@ uint32_t menu_wait_key_press(void)
 					SDL_JoystickGetButton(joy, 9) != 0 ||  /* CA */
 					SDL_JoystickGetButton(joy, 10) != 0)   /* CB */
 				keys |= KEY_SELECT;
-			if (SDL_JoystickGetButton(joy, 0) != 0 ||      /* 1 */
+			if (SDL_JoystickGetButton(joy, 2) != 0 ||      /* 1 */
 					SDL_JoystickGetButton(joy, 11) != 0 || /* CX */
 					SDL_JoystickGetButton(joy, 12) != 0)   /* CY */
 				keys |= KEY_ESCAPE;
