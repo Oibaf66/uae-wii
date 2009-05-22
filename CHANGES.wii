@@ -1,4 +1,6 @@
 version 2:
+                * Fix save/restore state
+
 		* Add virtual keyboard (for binding joystick buttons to keyboard keys)
 
                 * Load a uaerc.user if it exists. This is also saved when configuration changes and it
