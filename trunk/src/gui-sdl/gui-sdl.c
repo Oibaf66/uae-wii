@@ -6,6 +6,9 @@
   * Copyright 1996 Bernd Schmidt
   */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "sysconfig.h"
 #include "sysdeps.h"
 #include "savestate.h"
@@ -26,7 +29,7 @@ static const char *main_menu_messages[] = {
 		/*03*/		"^|Load|Save|Delete",
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Reset UAE",
-		/*06*/		"Amiga model",
+		/*06*/		"Amiga options",
 		/*07*/		"Keyboard bindings",
 		/*08*/		"Options",
 		/*09*/		"Help",
@@ -51,6 +54,7 @@ static const char *amiga_model_messages[] = {
 		/*03*/		"^|Fast|Compatible|Cycle-exact",
 		/*04*/		"Memory options",
 		/*05*/		"CPU/Chipset options",
+		/*06*/		"Change ROM",
 		NULL
 };
 
@@ -116,6 +120,23 @@ static int find_index_by_val(int val, const int vec[], int vec_size)
 	return 0;
 }
 
+/* From PSPUAE (implementation is different though!) */
+static void maybe_load_kick_rom(const char *name)
+{
+	const char *dir = prefs_get_attr("rom_path");
+	char buf[255];
+	struct stat st;
+
+	if (!dir)
+		dir="";
+	snprintf(buf, 255, "%s/%s", dir, name);
+	if (stat(buf, &st) < 0)
+		return;
+
+	/* Setup the new kickstart ROM */
+	if (!S_ISDIR(st.st_mode))
+		strncpy(changed_prefs.romfile, buf, 255);
+}
 
 /* All this is taken directly from PSPUAE */
 static void A500_config(void)
@@ -127,6 +148,8 @@ static void A500_config(void)
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
 	changed_prefs.chipset_mask = 0; //OCS
+
+	maybe_load_kick_rom("kick13.rom");
 }
 
 static void A600_config(void)
@@ -138,6 +161,8 @@ static void A600_config(void)
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = CSMASK_ECS_DENISE; //ECS Denise
+
+	maybe_load_kick_rom("kick20.rom");
 }
 
 static void A1000_config(void)
@@ -149,6 +174,8 @@ static void A1000_config(void)
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 0; //OCS
+
+	maybe_load_kick_rom("kick12.rom");
 }
 
 static void A1200_config(void)
@@ -160,6 +187,8 @@ static void A1200_config(void)
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
 	changed_prefs.chipset_mask = CSMASK_AGA; //AGA
+
+	maybe_load_kick_rom("kick30.rom");
 }
 
 static void default_config(void)
@@ -183,6 +212,20 @@ static void insert_floppy(int which)
 	}
 	else
 		changed_prefs.df[which][0] = '\0';
+}
+
+static void insert_rom(void)
+{
+	const char *name = menu_select_file(prefs_get_attr("rom_path"));
+
+	/* None or NULL means no change */
+	if (name != NULL)
+	{
+		if (strcmp(name, "None") == 0)
+			return;
+		strcpy (changed_prefs.romfile, name);
+		free((void*)name);
+	}
 }
 
 static void cpu_chipset_options(void)
@@ -457,6 +500,8 @@ static void amiga_model_options(void)
 		memory_options();
 	else if (opt == 5)
 		cpu_chipset_options();
+	else if (opt == 6)
+		insert_rom();
 	prefs_has_changed = 1;
 }
 
