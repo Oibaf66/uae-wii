@@ -50,6 +50,7 @@ static const char *amiga_model_messages[] = {
 		/*02*/		"Emulation accuracy",
 		/*03*/		"^|Fast|Compatible|Cycle-exact",
 		/*04*/		"Memory options",
+		/*05*/		"CPU/Chipset options",
 		NULL
 };
 
@@ -63,6 +64,14 @@ static const char *memory_messages[] = {
 		NULL
 };
 
+static const char *cpu_chipset_messages[] = {
+		/*00*/		"CPU type",
+		/*01*/		"^|68000|68010|68020",
+		/*03*/		"Chipset type",
+		/*04*/		"^|OCS|ECS|ECS full|AGA",
+		NULL
+};
+
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
 		/*01*/		"^|max|1|2|3|5|10|15|20",
@@ -72,6 +81,22 @@ static const char *options_messages[] = {
 		/*05*/		"^|on|off",
 		NULL
 };
+
+
+static int find_index_by_val(int val, const int vec[], int vec_size)
+{
+	int i;
+
+	for (i = 0; i < vec_size; i++)
+	{
+		if (val == vec[i])
+			return i;
+	}
+
+	/* Some default */
+	return 0;
+}
+
 
 /* All this is taken directly from PSPUAE */
 static void A500_config(void)
@@ -172,18 +197,23 @@ static void insert_floppy(int which)
 		changed_prefs.df[which][0] = '\0';
 }
 
-static int find_size(int size, const int vec[], int vec_size)
+static void cpu_chipset_options(void)
 {
-	int i;
+	const int chipset_masks[] = {0, CSMASK_ECS_AGNUS, CSMASK_ECS_DENISE, CSMASK_AGA};
+	int submenus[2], opt;
 
-	for (i = 0; i < vec_size; i++)
-	{
-		if (size == vec[i])
-			return i;
-	}
+	submenus[0] = currprefs.cpu_level;
+	submenus[1] = find_index_by_val(currprefs.chipset_mask, chipset_masks,
+			sizeof(chipset_masks) / sizeof(chipset_masks[0]));
 
-	/* Some default */
-	return 0;
+	opt = menu_select_title("CPU/Chipset options menu",
+			cpu_chipset_messages, submenus);
+	if (opt < 0)
+		return;
+	changed_prefs.cpu_level = submenus[0];
+	changed_prefs.chipset_mask = chipset_masks[submenus[1]];
+
+	prefs_has_changed = 1;
 }
 
 static void memory_options(void)
@@ -198,11 +228,11 @@ static void memory_options(void)
 	memset(submenus, 0, sizeof(submenus));
 
 	/* Setup current values */
-	submenus[0] = find_size(currprefs.chipmem_size, chipmem_size,
+	submenus[0] = find_index_by_val(currprefs.chipmem_size, chipmem_size,
 			sizeof(chipmem_size) / sizeof(chipmem_size[0]));
-	submenus[1] = find_size(currprefs.bogomem_size, slowmem_size,
+	submenus[1] = find_index_by_val(currprefs.bogomem_size, slowmem_size,
 			sizeof(slowmem_size) / sizeof(slowmem_size[0]));
-	submenus[2] = find_size(currprefs.fastmem_size, fastmem_size,
+	submenus[2] = find_index_by_val(currprefs.fastmem_size, fastmem_size,
 			sizeof(fastmem_size) / sizeof(fastmem_size[0]));
 
 	opt = menu_select_title("Memory options menu",
@@ -429,6 +459,8 @@ static void amiga_model_options(void)
 	set_emulation_accuracy(submenus[1]);
 	if (opt == 4)
 		memory_options();
+	else if (opt == 5)
+		cpu_chipset_options();
 	prefs_has_changed = 1;
 }
 
