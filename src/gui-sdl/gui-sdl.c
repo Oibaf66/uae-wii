@@ -40,7 +40,7 @@ static const  char *keyboard_messages[] = {
 		/*02*/		"Nunchuk",
 		/*03*/		"^|C",
 		/*04*/		"Classic",
-		/*05*/		"^|b|x|y|l|r|Zl|Zr|-|+",
+		/*05*/		"^|b|x|y|L|R|Zl|Zr|-|+",
 		NULL,
 };
 
