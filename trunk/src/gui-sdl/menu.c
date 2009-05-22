@@ -265,7 +265,7 @@ static const char **get_file_list(const char *base_dir)
 	{
 		char buf[255];
 		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ",
-				".sav", ".SAV", NULL};
+				".sav", ".SAV", ".uss", ".USS", NULL};
 		struct stat st;
 
 		snprintf(buf, 255, "%s/%s", base_dir, de->d_name);

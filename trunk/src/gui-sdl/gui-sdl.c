@@ -453,13 +453,17 @@ static void save_load_state(int which)
 			return;
 
 		if (which == 0)
-			restore_state(name);
+		{
+			strcpy(savestate_fname, name);
+			savestate_state = STATE_DORESTORE;
+		}
 		else
 			unlink(name);
 		free((void*)name);
 	} break;
 	case 1: /* Save state */
-		snprintf(db, 255, "%s/%s.sav", dir, fb);
+		snprintf(db, 255, "%s/%s.uss", dir, fb);
+		savestate_state = STATE_DOSAVE;
 		save_state(db, floppy0);
 		break;
 	default:
