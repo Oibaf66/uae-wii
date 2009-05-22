@@ -465,17 +465,10 @@ static void save_load_state(int which)
 	}
 }
 
-static void exit_fn(void)
-{
-	sleep(3);
-}
-
-
 
 void gui_init (int argc, char **argv)
 {
 	printf("Init gui\n");
-	atexit(exit_fn);
 }
 
 int gui_open (void)
