@@ -69,11 +69,8 @@ static const char *options_messages[] = {
 		/*03*/		"^|100|400|800",
 		/*04*/		"Leds",
 		/*05*/		"^|on|off",
+		/*06*/		"Memory options",
 		NULL
-};
-
-static const char *other_messages[] = {
-		NULL	
 };
 
 /* All this is taken directly from PSPUAE */
@@ -272,6 +269,11 @@ static void general_options(void)
 			options_messages, submenus);
 	if (opt < 0)
 		return;
+	if (opt == 6)
+	{
+		memory_options();
+		return;
+	}
 	set_cpu_to_chipset_speed(submenus[0]);
 	set_floppy_speed(submenus[1]);
 	//Floppy, Power, FPS, etc etc.
@@ -468,7 +470,6 @@ static void save_load_state(int which)
 
 void gui_init (int argc, char **argv)
 {
-	printf("Init gui\n");
 }
 
 int gui_open (void)
@@ -548,7 +549,6 @@ void gui_display(int shortcut)
 	int opt;
 
 	memset(submenus, 0, sizeof(submenus));
-	printf("gui_display: %d\n", shortcut);
 	prefs_has_changed = 0;
 
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
@@ -587,7 +587,6 @@ void gui_display(int shortcut)
 	if (prefs_has_changed)
 	{
 		char user_options[255] = "";
-		int dummy;
 
 #ifdef OPTIONS_IN_HOME
 		char *home = getenv ("HOME");
@@ -600,7 +599,6 @@ void gui_display(int shortcut)
 		strcat(user_options, OPTIONSFILENAME);
 		strcat(user_options, ".user");
 
-		printf("Saving user options in %s\n", user_options);
 		cfgfile_save(&changed_prefs, user_options, 0);
 	}
 }
