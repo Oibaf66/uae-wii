@@ -103,39 +103,33 @@ static void A500_config(void)
 {
 	default_config();
 
-	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 0; //68000
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
 	changed_prefs.chipset_mask = 0; //OCS
-	changed_prefs.immediate_blits = 1; //ON
 }
 
 static void A600_config(void)
 {
 	default_config();
 
-	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 1; //68010
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
-	changed_prefs.chipset_mask = 2; //ECS Denise
-	changed_prefs.immediate_blits = 1; //ON
+	changed_prefs.chipset_mask = CSMASK_ECS_DENISE; //ECS Denise
 }
 
 static void A1000_config(void)
 {
 	default_config();
 
-	changed_prefs.collision_level = 2; //Playfields
 	changed_prefs.cpu_level = 0; //68000
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 0; //OCS
-	changed_prefs.immediate_blits = 1; //ON
 }
 
 static void A1200_config(void)
@@ -146,8 +140,7 @@ static void A1200_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
-	changed_prefs.chipset_mask = 3; //ECS
-	changed_prefs.immediate_blits = 1; //ON
+	changed_prefs.chipset_mask = CSMASK_AGA; //AGA
 }
 
 static void default_config(void)
@@ -166,7 +159,7 @@ static void default_config(void)
 	changed_prefs.bogomem_size = 512 * 1024; //512kb
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; //ECS Super AGNUS
 
-	changed_prefs.immediate_blits = 0; //OFF
+	changed_prefs.immediate_blits = 1; //OFF
 	changed_prefs.blitter_cycle_exact = 0; //OFF
 	changed_prefs.gfx_correct_aspect = 0; //OFF FOL (This doesnt work any more) FOL
 	changed_prefs.dfxtype[0] = 0; //Drive Type Double Density, can be set to High Density 1.7Megs
