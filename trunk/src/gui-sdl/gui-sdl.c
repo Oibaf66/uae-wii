@@ -66,7 +66,7 @@ static const char *memory_messages[] = {
 
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
-		/*01*/		"^|68000|68010|68020",
+		/*01*/		"^|68000|68010|68020|68030|68040|68060",
 		/*03*/		"Chipset type",
 		/*04*/		"^|OCS|ECS|ECS full|AGA",
 		NULL
@@ -187,10 +187,12 @@ static void insert_floppy(int which)
 
 static void cpu_chipset_options(void)
 {
+	const int cpu_levels[] = { 0, 1, 2, 3, 4, 6};
 	const int chipset_masks[] = {0, CSMASK_ECS_AGNUS, CSMASK_ECS_DENISE, CSMASK_AGA};
 	int submenus[2], opt;
 
-	submenus[0] = currprefs.cpu_level;
+	submenus[0] = find_index_by_val(currprefs.cpu_level, cpu_levels,
+			sizeof(cpu_levels) / sizeof(cpu_levels[0]));
 	submenus[1] = find_index_by_val(currprefs.chipset_mask, chipset_masks,
 			sizeof(chipset_masks) / sizeof(chipset_masks[0]));
 
@@ -198,7 +200,7 @@ static void cpu_chipset_options(void)
 			cpu_chipset_messages, submenus);
 	if (opt < 0)
 		return;
-	changed_prefs.cpu_level = submenus[0];
+	changed_prefs.cpu_level = cpu_levels[submenus[0]];
 	changed_prefs.chipset_mask = chipset_masks[submenus[1]];
 
 	prefs_has_changed = 1;
