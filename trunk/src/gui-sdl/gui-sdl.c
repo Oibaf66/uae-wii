@@ -49,6 +49,7 @@ static const char *amiga_model_messages[] = {
 		/*01*/		"^|A1000|A500|A600|A1200|Custom",
 		/*02*/		"Emulation accuracy",
 		/*03*/		"^|Fast|Compatible|Cycle-exact",
+		/*04*/		"Memory options",
 		NULL
 };
 
@@ -56,7 +57,7 @@ static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
 		/*01*/		"^|512K|1M|2M|4M|8M",
 		/*02*/		"Slow mem",
-		/*03*/		"^|512K|1M|1.8M",
+		/*03*/		"^|None|512K|1M|1.8M",
 		/*04*/		"Fast mem",
 		/*05*/		"^|None|1M|2M|4M|8M",
 		NULL
@@ -69,7 +70,6 @@ static const char *options_messages[] = {
 		/*03*/		"^|100|400|800",
 		/*04*/		"Leds",
 		/*05*/		"^|on|off",
-		/*06*/		"Memory options",
 		NULL
 };
 
@@ -172,44 +172,48 @@ static void insert_floppy(int which)
 		changed_prefs.df[which][0] = '\0';
 }
 
+static int find_size(int size, const int vec[], int vec_size)
+{
+	int i;
+
+	for (i = 0; i < vec_size; i++)
+	{
+		if (size == vec[i])
+			return i;
+	}
+
+	/* Some default */
+	return 0;
+}
+
 static void memory_options(void)
 {
+	const int chipmem_size[] = { 512 * 1024, 1024 * 1024, 2048 * 1024,
+			4096 * 1024, 8192 * 1024 };
+	const int slowmem_size[] = { 0, 512 * 1024, 1024 * 1024, 1800 * 1024 }; /* FIXME! Correct? */
+	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024,
+			4096 * 1024, 8192 * 1024 };
 	int submenus[3], opt;
+
 	memset(submenus, 0, sizeof(submenus));
 
-	switch(currprefs.chipmem_size)
-	{
-	case 1 * 1024 * 1024:
-		submenus[0] = 1; break;
-	case 2 * 1024 * 1024:
-		submenus[0] = 2; break;
-	case 4 * 1024 * 1024:
-		submenus[0] = 3; break;
-	case 8 * 1024 * 1024:
-		submenus[0] = 4; break;
-	case 512 * 1024:
-	default:
-		submenus[0] = 0; break;
-	}
-	switch(currprefs.fastmem_size)
-	{
-	case 1 * 1024 * 1024:
-		submenus[2] = 1; break;
-	case 2 * 1024 * 1024:
-		submenus[2] = 2; break;
-	case 4 * 1024 * 1024:
-		submenus[2] = 3; break;
-	case 8 * 1024 * 1024:
-		submenus[2] = 4; break;
-	case 0:
-	default:
-		submenus[2] = 0; break;
-	}
-	
+	/* Setup current values */
+	submenus[0] = find_size(currprefs.chipmem_size, chipmem_size,
+			sizeof(chipmem_size) / sizeof(chipmem_size[0]));
+	submenus[1] = find_size(currprefs.bogomem_size, slowmem_size,
+			sizeof(slowmem_size) / sizeof(slowmem_size[0]));
+	submenus[2] = find_size(currprefs.fastmem_size, fastmem_size,
+			sizeof(fastmem_size) / sizeof(fastmem_size[0]));
+
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
 	if (opt < 0)
 		return;
+	/* And update with the new settings */
+	changed_prefs.chipmem_size = chipmem_size[submenus[0]];
+	changed_prefs.bogomem_size = slowmem_size[submenus[1]];
+	changed_prefs.fastmem_size = fastmem_size[submenus[2]];
+
 	prefs_has_changed = 1;
 }
 
@@ -269,11 +273,6 @@ static void general_options(void)
 			options_messages, submenus);
 	if (opt < 0)
 		return;
-	if (opt == 6)
-	{
-		memory_options();
-		return;
-	}
 	set_cpu_to_chipset_speed(submenus[0]);
 	set_floppy_speed(submenus[1]);
 	//Floppy, Power, FPS, etc etc.
@@ -428,6 +427,8 @@ static void amiga_model_options(void)
 	}
 	/* Cycle-exact or not? */
 	set_emulation_accuracy(submenus[1]);
+	if (opt == 4)
+		memory_options();
 	prefs_has_changed = 1;
 }
 
