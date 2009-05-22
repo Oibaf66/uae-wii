@@ -482,7 +482,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel)
 							x_start, y_start + y, msg+2);
 					break;
 				case '2':
-					menu_print_font(screen, 0x80,0x80,0x80,
+					menu_print_font(screen, 0x40,0x40,0x40,
 							x_start, y_start + y, msg+2);
 					break;
 				default:

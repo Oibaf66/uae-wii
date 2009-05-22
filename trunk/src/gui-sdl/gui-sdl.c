@@ -82,6 +82,25 @@ static const char *options_messages[] = {
 		NULL
 };
 
+static const char *help_messages[] = {
+		/*00*/		"#2HOME enters the menu system, where arrow",
+		/*01*/		"#2keys and +/- are used to navigate up and down.",
+		/*02*/		"#2You can bind keyboard keys to the wiimote",
+		/*03*/		"#2buttons in the 'keyboard bindings' menu and",
+		/*04*/		"#2change emulation options in the Amiga menu.",
+		/*05*/		"#2 ",
+		/*06*/		"#2Kickstart roms should be named kick.rom,",
+		/*07*/		"#2kick10.rom, kick12.rom, kick13.rom, kick20.rom,",
+		/*08*/		"#2kick30.rom, and kick31.rom for different Amiga",
+		/*09*/		"#2models selectable in the Amiga menu.",
+		/*10*/		"#2 ",
+		/*11*/		"#2More information is available on the wiki:",
+		/*12*/		"#2   http://wiibrew.org/wiki/UAE_Wii",
+		/*13*/		"#2 ",
+		/*14*/		"OK",
+		NULL,
+};
+
 
 static int find_index_by_val(int val, const int vec[], int vec_size)
 {
@@ -475,6 +494,11 @@ static void save_load_state(int which)
 	}
 }
 
+static void help(void)
+{
+	menu_select_title("UAE-wii help",
+			help_messages, NULL);
+}
 
 void gui_init (int argc, char **argv)
 {
@@ -584,6 +608,9 @@ void gui_display(int shortcut)
 		break;
 	case 8:
 		general_options();
+		break;
+	case 9:
+		help();
 		break;
 	case 10:
 		uae_quit();
