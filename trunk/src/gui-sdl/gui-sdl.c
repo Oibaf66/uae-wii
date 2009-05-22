@@ -319,7 +319,7 @@ static void keyboard_options(void)
 			keyboard_messages, submenus);
 	if (opt < 0)
 		return;
-	/* Translate key to keycode */
+	/* Translate key to UAE key event name */
 	key = virtkbd_get_key();
 	if (key == NULL)
 		return;
@@ -342,6 +342,8 @@ static void keyboard_options(void)
 
 		insert_keyboard_map(key, "input.1.joystick.%d.button.%d", i, sdl_key);
 
+		/* For some reason, the user uaerc removes these. The following
+		 * lines should be removed when this is properly figured out */
 		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", i);
 		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", i);
 
@@ -457,7 +459,7 @@ static void save_load_state(int which)
 			strcpy(savestate_fname, name);
 			savestate_state = STATE_DORESTORE;
 		}
-		else
+		else /* Delete saved state */
 			unlink(name);
 		free((void*)name);
 	} break;
