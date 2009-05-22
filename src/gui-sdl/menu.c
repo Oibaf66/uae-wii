@@ -948,6 +948,8 @@ const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 
 const char *menu_select_file(const char *dir_path)
 {
+	if (dir_path == NULL)
+		dir_path = "";
 	return menu_select_file_internal(dir_path,
 			32, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32);
 }
