@@ -188,7 +188,7 @@ static void A1200_config(void)
 	changed_prefs.bogomem_size = 0;
 	changed_prefs.chipset_mask = CSMASK_AGA; //AGA
 
-	maybe_load_kick_rom("kick30.rom");
+	maybe_load_kick_rom("kick31.rom");
 }
 
 static void default_config(void)
