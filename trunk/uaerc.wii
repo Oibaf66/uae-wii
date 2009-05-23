@@ -14,13 +14,16 @@ cpu_24bit_addressing=false
 #Immediate blits helps with speed
 immediate_blits=true
 collision_level=playfields
+cpu_compatible=false
+cpu_24bit_addressing=false
 
 # Chipset type (values are; ocs, ecs_agnus, ecs, aga)
 chipset=ecs_agnus
 
-
+# Slow Memory (Values are; 0 = 0MB, 1 = 256KB, 2 = 512KB, 3 = 1MB and 4 = 1.7MB)
+bogomem_size=2
 # Chip Memory (Values are; 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
-chipmem_size=2
+chipmem_size=1
 # Fast Memory (Values are; 0 = 0MB, 4 = 2MB and 8 = 8MB)
 fastmem_size=0
 # Accellerator Memory (Values are; 1MB, 2MB, 4MB, 8MB, 16MB and 32MB)
