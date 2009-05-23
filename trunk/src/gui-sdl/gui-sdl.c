@@ -60,11 +60,13 @@ static const char *amiga_model_messages[] = {
 
 static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
-		/*01*/		"^|512K|1M|2M|4M|8M",
+		/*01*/		"^|512K|1M|2M|",
 		/*02*/		"Slow mem",
 		/*03*/		"^|None|512K|1M|1.8M",
 		/*04*/		"Fast mem",
-		/*05*/		"^|None|1M|2M|4M|8M",
+		/*05*/		"^|None|1M|2M|4M|8M|16M",
+		/*04*/		"Zorro3 mem",
+		/*05*/		"^|None|1M|2M|4M|8M|16M|32M",		
 		NULL
 };
 
@@ -72,7 +74,7 @@ static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
 		/*01*/		"^|68000|68010|68020|68030|68040|68060",
 		/*03*/		"Chipset type",
-		/*04*/		"^|OCS|ECS|ECS full|AGA",
+		/*04*/		"^|OCS|ECS AGNUS|ECS|AGA",
 		NULL
 };
 
@@ -147,7 +149,7 @@ static void A500_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
-	changed_prefs.chipset_mask = 0; //OCS
+	changed_prefs.chipset_mask = 1; //OCS
 
 	maybe_load_kick_rom("kick13.rom");
 }
@@ -160,7 +162,7 @@ static void A600_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
-	changed_prefs.chipset_mask = CSMASK_ECS_DENISE; //ECS Denise
+	changed_prefs.chipset_mask = 2; //ECS Agnus
 
 	maybe_load_kick_rom("kick20.rom");
 }
@@ -171,7 +173,7 @@ static void A1000_config(void)
 
 	changed_prefs.cpu_level = 0; //68000
 	changed_prefs.fastmem_size = 0; //OFF
-	changed_prefs.chipmem_size = 512 * 1024; //512
+	changed_prefs.chipmem_size = 256 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 0; //OCS
 
@@ -186,7 +188,7 @@ static void A1200_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
-	changed_prefs.chipset_mask = CSMASK_AGA; //AGA
+	changed_prefs.chipset_mask = 3; //AGA
 
 	maybe_load_kick_rom("kick31.rom");
 }
@@ -251,12 +253,13 @@ static void cpu_chipset_options(void)
 
 static void memory_options(void)
 {
-	const int chipmem_size[] = { 512 * 1024, 1024 * 1024, 2048 * 1024,
-			4096 * 1024, 8192 * 1024 };
-	const int slowmem_size[] = { 0, 512 * 1024, 1024 * 1024, 1800 * 1024 }; /* FIXME! Correct? */
-	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024,
-			4096 * 1024, 8192 * 1024 };
-	int submenus[3], opt;
+	const int chipmem_size[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
+	const int slowmem_size[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
+	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };	
+	const int z3fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024, 32768 * 1024};	
+	//FOL - GFXCard no point in this yet, until GFX and HDD are working properly, we can then use Picasso screen modes.
+	//const int gfxcard_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };
+	int submenus[4], opt;
 
 	memset(submenus, 0, sizeof(submenus));
 
@@ -267,6 +270,8 @@ static void memory_options(void)
 			sizeof(slowmem_size) / sizeof(slowmem_size[0]));
 	submenus[2] = find_index_by_val(currprefs.fastmem_size, fastmem_size,
 			sizeof(fastmem_size) / sizeof(fastmem_size[0]));
+	submenus[3] = find_index_by_val(currprefs.z3fastmem_size, z3fastmem_size,
+			sizeof(z3fastmem_size) / sizeof(z3fastmem_size[0]));
 
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
@@ -276,6 +281,7 @@ static void memory_options(void)
 	changed_prefs.chipmem_size = chipmem_size[submenus[0]];
 	changed_prefs.bogomem_size = slowmem_size[submenus[1]];
 	changed_prefs.fastmem_size = fastmem_size[submenus[2]];
+	changed_prefs.z3fastmem_size = z3fastmem_size[submenus[3]];
 
 	prefs_has_changed = 1;
 }
