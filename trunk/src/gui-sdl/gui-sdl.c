@@ -330,7 +330,7 @@ static void general_options(void)
 
 	submenus[0] = get_cpu_to_chipset_speed();
 	submenus[1] = get_floppy_speed();
-	submenus[2] = currprefs.leds_on_screen;
+	submenus[2] = currprefs.leds_on_screen == 0 ? 1 : 0;
 
 	opt = menu_select_title("General options menu",
 			options_messages, submenus);
@@ -338,8 +338,10 @@ static void general_options(void)
 		return;
 	set_cpu_to_chipset_speed(submenus[0]);
 	set_floppy_speed(submenus[1]);
-	//Floppy, Power, FPS, etc etc.
-	changed_prefs.leds_on_screen = submenus[2];
+
+	/* Floppy, Power, FPS, etc etc. */
+	changed_prefs.leds_on_screen = !submenus[2];
+	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 
 	prefs_has_changed = 1;
 }
