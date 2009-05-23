@@ -64,7 +64,7 @@ static const char *memory_messages[] = {
 		/*02*/		"Slow mem",
 		/*03*/		"^|None|256K|512K|1M|1.8M",
 		/*04*/		"Fast mem",
-		/*05*/		"^|None|1M|2M|4M|8M|16M",
+		/*05*/		"^|None|1M|2M|4M|8M",
 		/*04*/		"Zorro3 mem",
 		/*05*/		"^|None|1M|2M|4M|8M|16M|32M",		
 		NULL
@@ -255,7 +255,7 @@ static void memory_options(void)
 {
 	const int chipmem_size[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
 	const int slowmem_size[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
-	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };	
+	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024 };	
 	const int z3fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024, 32768 * 1024};	
 	//FOL - GFXCard no point in this yet, until GFX and HDD are working properly, we can then use Picasso screen modes.
 	//const int gfxcard_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };
