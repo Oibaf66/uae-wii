@@ -478,9 +478,10 @@ static int get_model(void)
 static void amiga_model_options(void)
 {
 	int submenus[2];
+	int cur_model = get_model();
 	int opt;
 
-	submenus[0] = get_model();
+	submenus[0] = cur_model;
 	submenus[1] = get_emulation_accuracy();
 
 	opt = menu_select_title("Amiga model menu",
@@ -496,6 +497,11 @@ static void amiga_model_options(void)
 	default: /* custom */
 		break;
 	}
+
+	/* Reset the Amiga if the model has changed */
+	if (cur_model != submenus[0])
+		uae_reset(1);
+
 	/* Cycle-exact or not? */
 	set_emulation_accuracy(submenus[1]);
 	if (opt == 4)
