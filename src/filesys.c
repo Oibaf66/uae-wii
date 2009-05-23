@@ -67,7 +67,7 @@ static int wii_access (const char *pathname, int mode)
 
 	if (stat(pathname, &st) < 0)
 		return -1;
-	if (mode == R_OK && !S_ISDIR(st))
+	if (mode == R_OK && !S_ISDIR(st.st_mode))
 		return 0;
 	return -1;
 }

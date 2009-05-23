@@ -26,8 +26,8 @@ SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_D
 
 SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
 	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
-	src/filesys.c src/fsdb.c src/fsdb_unix.c src/hardfile_unix.c src/genblitter.c src/gencomp.c src/gencpu.c \
-	src/hardfile.c src/genlinetoscr.c src/compemu.c src/compstbl.c src/fsusage.c src/filesys_unix.c \
+	src/genblitter.c src/gencomp.c src/gencpu.c \
+	src/genlinetoscr.c src/compemu.c src/compstbl.c \
 	src/enforcer.c src/ar.c src/debug.c \
 	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
@@ -44,7 +44,7 @@ all: uae-host.elf
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
-	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h $(SYMLINKS)
+	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h src/sysconfig.h $(SYMLINKS)
 
 $(OBJ_DIR):
 	install -d $@
@@ -113,7 +113,7 @@ $(BIN_DIR)/%.dol: %.elf
 COMMON_FLAGS	:= -g -Wall $(MACHDEP)
 INCLUDES	:= -Isrc/md-generic/ -Isrc/include -Isrc -I/usr/include/SDL
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
-		    -DFPUEMU -DAGA -DAUTOCONFIG
+		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 #unused defines; -DFDI2RAW 
