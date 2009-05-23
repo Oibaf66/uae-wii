@@ -62,7 +62,7 @@ static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
 		/*01*/		"^|512K|1M|2M|",
 		/*02*/		"Slow mem",
-		/*03*/		"^|None|512K|1M|1.8M",
+		/*03*/		"^|None|256K|512K|1M|1.8M",
 		/*04*/		"Fast mem",
 		/*05*/		"^|None|1M|2M|4M|8M|16M",
 		/*04*/		"Zorro3 mem",
