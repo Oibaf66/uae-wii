@@ -39,7 +39,7 @@ static const char *main_menu_messages[] = {
 
 static const  char *keyboard_messages[] = {
 		/*00*/		"Wiimote",
-		/*01*/		"^|B|1|-|+",
+		/*01*/		"^|1|-|+",
 		/*02*/		"Nunchuk",
 		/*03*/		"^|C",
 		/*04*/		"Classic",
@@ -368,7 +368,7 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 
 static void keyboard_options(void)
 {
-	const int wiimote_to_sdl[] = {1, 2, 4, 5};
+	const int wiimote_to_sdl[] = {2, 4, 5};
 	const int nunchuk_to_sdl[] = {8};
 	const int classic_to_sdl[] = {10, 11, 12, 13, 14, 15, 16, 17, 18};
 	int sdl_key = 1;
