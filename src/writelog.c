@@ -39,12 +39,15 @@ void set_logfile (const char *logfile_name)
     }
 }
 
+int log_quiet = 0;
+
 void write_log (const char *fmt, ...)
 {
     va_list ap;
     va_start (ap, fmt);
 #ifdef HAVE_VFPRINTF
-    vfprintf (logfile ? logfile : stderr, fmt, ap);
+    if (!log_quiet)
+    	vfprintf (logfile ? logfile : stderr, fmt, ap);
 #else
     /* Technique stolen from GCC.  */
     {

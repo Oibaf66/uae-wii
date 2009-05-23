@@ -574,8 +574,11 @@ void gui_notify_state (int state)
 {
 }
 
+extern int log_quiet;
 int gui_update (void)
 {
+	log_quiet = 1;
+
     return 0;
 }
 
