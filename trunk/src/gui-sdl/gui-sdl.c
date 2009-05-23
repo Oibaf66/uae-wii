@@ -349,6 +349,7 @@ static void general_options(void)
 /* There are a few unfortunate header problems, so I'll do like this for now */
 struct uae_prefs;
 void read_inputdevice_config (struct uae_prefs *pr, const char *option, const char *value);
+void notice_screen_contents_lost (void);
 
 static void insert_keyboard_map(const char *key, const char *fmt, ...)
 {
@@ -648,6 +649,7 @@ void gui_display(int shortcut)
 	prefs_has_changed = 0;
 
 	opt = menu_select_title("Main menu", main_menu_messages, submenus);
+	notice_screen_contents_lost ();
 	if (opt < 0)
 		return;
 
