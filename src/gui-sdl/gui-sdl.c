@@ -80,9 +80,9 @@ static const char *cpu_chipset_messages[] = {
 
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
-		/*01*/		"^|max|1|2|3|5|10|15|20",
+		/*01*/		"^|max|real|0%|25%|50%|100% Chipset",
 		/*02*/		"Floppy speed",
-		/*03*/		"^|100|400|800",
+		/*03*/		"^|normal|turbo|400%|800%",
 		/*04*/		"Leds",
 		/*05*/		"^|on|off",
 		NULL
@@ -164,7 +164,7 @@ static void A600_config(void)
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 2; //ECS Agnus
 
-	maybe_load_kick_rom("kick20.rom");
+	maybe_load_kick_rom("kick205.rom");
 }
 
 static void A1000_config(void)
@@ -304,8 +304,7 @@ static int get_cpu_to_chipset_speed(void)
 
 static void set_cpu_to_chipset_speed(int which)
 {
-	int table[] = {-1,1,2,3,5,10,15,20};
-
+	int table[] = {-1,0,1024,2048,3072,4096};
 	changed_prefs.m68k_speed = table[which];
 }
 
@@ -313,10 +312,12 @@ static int get_floppy_speed(void)
 {
 	switch(currprefs.floppy_speed)
 	{
-	case 400:
+	case 200:
 		return 1;
-	case 800:
+	case 400:
 		return 2;
+	case 800:
+		return 3;
 	default: break; /* 100 */
 	}
 	return 0;
@@ -324,7 +325,7 @@ static int get_floppy_speed(void)
 
 static void set_floppy_speed(int which)
 {
-	int table[] = {100, 400, 800};
+	int table[] = {100, 0, 400, 800};
 
 	changed_prefs.floppy_speed = table[which];
 }
