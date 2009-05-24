@@ -490,13 +490,13 @@ static void set_emulation_accuracy(int which)
 
 static int get_model(void)
 {
-	if (currprefs.cpu_level == 1) /* 68010 - only on the A600 */
+	if (changed_prefs.cpu_level == 1) /* 68010 - only on the A600 */
 		return 2;
-	if (currprefs.cpu_level == 2) /* 68020 - only on the A1200 */
+	if (changed_prefs.cpu_level == 2) /* 68020 - only on the A1200 */
 		return 3;
-	if (currprefs.cpu_level == 0) /* 68000 - A1000/A500 */
+	if (changed_prefs.cpu_level == 0) /* 68000 - A1000/A500 */
 	{
-		if (currprefs.bogomem_size == 0) /* A1000 */
+		if (changed_prefs.bogomem_size == 0) /* A1000 */
 			return 0;
 
 		/* A500 */
@@ -509,27 +509,31 @@ static int get_model(void)
 
 static void amiga_model_options(void)
 {
-	int submenus[2];
-	int cur_model = get_model();
 	int opt;
-
-	submenus[0] = cur_model;
-	submenus[1] = get_emulation_accuracy();
+	int cur_model;
+	int submenus[2];
 
 	do
 	{
+		cur_model = get_model();
+		submenus[0] = cur_model;
+		submenus[1] = get_emulation_accuracy();
+
 		opt = menu_select_title("Amiga model menu",
 				amiga_model_messages, submenus);
 		if (opt < 0)
 			return;
-		switch(submenus[0])
+		if (submenus[0] != cur_model)
 		{
-		case 0:	A1000_config(); break;
-		case 1:	A500_config(); break;
-		case 2:	A600_config(); break;
-		case 3:	A1200_config(); break;
-		default: /* custom */
-			break;
+			switch(submenus[0])
+			{
+			case 0:	A1000_config(); break;
+			case 1:	A500_config(); break;
+			case 2:	A600_config(); break;
+			case 3:	A1200_config(); break;
+			default: /* custom */
+				break;
+			}
 		}
 
 		switch(opt)
@@ -693,7 +697,7 @@ void gui_display(int shortcut)
 		opt = menu_select_title("Main menu", main_menu_messages, submenus);
 		notice_screen_contents_lost ();
 		if (opt < 0)
-			return;
+			break;
 
 		switch(opt)
 		{
