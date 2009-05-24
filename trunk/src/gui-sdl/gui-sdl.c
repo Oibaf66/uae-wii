@@ -82,7 +82,7 @@ static const char *cpu_chipset_messages[] = {
 
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
-		/*01*/		"^|max|real|0%|25%|50%|100% Chipset",
+		/*01*/		"^|max|0%|34%|51%|68%|84%|100% Chipset",
 		/*02*/		"Floppy speed",
 		/*03*/		"^|normal|turbo|400%|800%",
 		/*04*/		"Leds",
@@ -298,7 +298,6 @@ static int get_cpu_to_chipset_speed(void)
 	case 5:	return 4;
 	case 10: return 5;
 	case 15: return 6;
-	case 20: return 7;
 	default: break; /* max */
 	}
 	return 0;
@@ -306,7 +305,7 @@ static int get_cpu_to_chipset_speed(void)
 
 static void set_cpu_to_chipset_speed(int which)
 {
-	int table[] = {-1,0,1024,2048,3072,4096};
+	int table[] = {-1,512,2560,5120,7168,8704,10240};
 	changed_prefs.m68k_speed = table[which];
 }
 
