@@ -496,7 +496,7 @@ static int get_model(void)
 		return 3;
 	if (changed_prefs.cpu_level == 0) /* 68000 - A1000/A500 */
 	{
-		if (changed_prefs.bogomem_size == 0) /* A1000 */
+		if (changed_prefs.chipmem_size == 256 * 1024) /* A1000 */
 			return 0;
 
 		/* A500 */
