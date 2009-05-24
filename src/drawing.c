@@ -1640,7 +1640,11 @@ static int td_pos = (TD_RIGHT|TD_BOTTOM);
 #define TD_NUM_WIDTH 7
 #define TD_NUM_HEIGHT 7
 
-#define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
+#ifndef TD_START_HEIGHT
+# define TD_START_HEIGHT 0
+#endif
+
+#define TD_TOTAL_HEIGHT (TD_PADY + TD_NUM_HEIGHT + TD_START_HEIGHT)
 
 #define NUMBERS_NUM 14
 

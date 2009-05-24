@@ -118,7 +118,8 @@ $(BIN_DIR)/%.dol: %.elf
 COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP)
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
-		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS
+		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
+		    -DTD_START_HEIGHT=32
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 #unused defines; -DFDI2RAW 
