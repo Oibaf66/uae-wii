@@ -1,4 +1,10 @@
 version 2:
+                * Fix bug where the nunchuk analogue controller and
+                  the DPAD would not work at the same time
+
+                * Lots of menu improvements (pressing 1 will now go
+                  back to the last menu for example)
+
                 * Enable use of harddisks
 
                 * Fix save/restore state
