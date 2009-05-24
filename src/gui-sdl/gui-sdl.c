@@ -374,6 +374,46 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 	read_inputdevice_config (&currprefs, buf, key);
 }
 
+static void setup_joystick(int joy, const char *key, int sdl_key)
+{
+	int fire_buttons[] = {3,7,9,10};
+	int i;
+
+	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
+
+	/* For some reason, the user uaerc removes these. The following
+	 * lines should be removed when this is properly figured out */
+	for (i = 0; i < 6; i++)
+	{
+		const char *what = "JOY2_HORIZ"; /* Assume port 1 */
+
+		/* Odd - vertical */
+		if (i % 2 != 0)
+		{
+			if (joy == 1)
+				what = "JOY1_VERT";
+			else
+				what = "JOY2_VERT";
+		}
+		else if (joy == 1) /* Even - horizontal (and port 2) */
+			what = "JOY1_HORIZ";
+
+		insert_keyboard_map(what,
+				"input.1.joystick.%d.axis.%d", joy, i);
+	}
+
+	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", joy);
+	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", joy);
+
+	for (i = 0; i < sizeof(fire_buttons) / sizeof(fire_buttons[0]); i++)
+	{
+		const char *btn = joy == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON";
+
+		insert_keyboard_map(btn, "input.1.joystick.%d.button.%d",
+				joy, fire_buttons[i]);
+	}
+}
+
 static void keyboard_options(void)
 {
 	const int wiimote_to_sdl[] = {2, 4, 5};
@@ -408,25 +448,7 @@ static void keyboard_options(void)
 	}
 
 	for (i = 0; i < 2; i++)
-	{
-		int fire_buttons[] = {3,7,9,10};
-		int j;
-
-		insert_keyboard_map(key, "input.1.joystick.%d.button.%d", i, sdl_key);
-
-		/* For some reason, the user uaerc removes these. The following
-		 * lines should be removed when this is properly figured out */
-		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", i);
-		insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", i);
-
-		for (j = 0; j < sizeof(fire_buttons) / sizeof(fire_buttons[0]); j++)
-		{
-			const char *btn = i == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON";
-
-			insert_keyboard_map(btn, "input.1.joystick.%d.button.%d",
-					i, fire_buttons[j]);
-		}
-	}
+		setup_joystick(i, key, sdl_key);
 
 	prefs_has_changed = 1;
 }
