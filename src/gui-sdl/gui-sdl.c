@@ -34,6 +34,8 @@ static const char *main_menu_messages[] = {
 		/*08*/		"Options",
 		/*09*/		"Help",
 		/*10*/		"Quit",
+		/*04*/		"#1-------------------------------------",
+		/*04*/		"#21 - back,  2/A - select",
 		NULL
 };
 
@@ -514,32 +516,41 @@ static void amiga_model_options(void)
 	submenus[0] = cur_model;
 	submenus[1] = get_emulation_accuracy();
 
-	opt = menu_select_title("Amiga model menu",
-			amiga_model_messages, submenus);
-	if (opt < 0)
-		return;
-	switch(submenus[0])
+	do
 	{
-	case 0:	A1000_config(); break;
-	case 1:	A500_config(); break;
-	case 2:	A600_config(); break;
-	case 3:	A1200_config(); break;
-	default: /* custom */
-		break;
-	}
+		opt = menu_select_title("Amiga model menu",
+				amiga_model_messages, submenus);
+		if (opt < 0)
+			return;
+		switch(submenus[0])
+		{
+		case 0:	A1000_config(); break;
+		case 1:	A500_config(); break;
+		case 2:	A600_config(); break;
+		case 3:	A1200_config(); break;
+		default: /* custom */
+			break;
+		}
+
+		switch(opt)
+		{
+		case 4:
+			memory_options(); break;
+		case 5:
+			cpu_chipset_options(); break;
+		case 6:
+			insert_rom(); break;
+		default:
+			break;
+		}
+	} while (opt == 4 || opt == 5 || opt == 6);
 
 	/* Reset the Amiga if the model has changed */
 	if (cur_model != submenus[0])
 		uae_reset(1);
-
 	/* Cycle-exact or not? */
 	set_emulation_accuracy(submenus[1]);
-	if (opt == 4)
-		memory_options();
-	else if (opt == 5)
-		cpu_chipset_options();
-	else if (opt == 6)
-		insert_rom();
+
 	prefs_has_changed = 1;
 }
 
@@ -677,42 +688,45 @@ void gui_display(int shortcut)
 	memset(submenus, 0, sizeof(submenus));
 	prefs_has_changed = 0;
 
-	opt = menu_select_title("Main menu", main_menu_messages, submenus);
-	notice_screen_contents_lost ();
-	if (opt < 0)
-		return;
-
-	switch(opt)
+	do
 	{
-	case 0:
-		/* Insert floppy */
-		insert_floppy(submenus[0]);
-		break;
-	case 2:
-		/* States */
-		save_load_state(submenus[1]);
-		break;
-	case 5:
-		uae_reset(1);
-		break;
-	case 6:
-		amiga_model_options();
-		break;
-	case 7:
-		keyboard_options();
-		break;
-	case 8:
-		general_options();
-		break;
-	case 9:
-		help();
-		break;
-	case 10:
-		uae_quit();
-		break;
-	default:
-		break;
-	}
+		opt = menu_select_title("Main menu", main_menu_messages, submenus);
+		notice_screen_contents_lost ();
+		if (opt < 0)
+			return;
+
+		switch(opt)
+		{
+		case 0:
+			/* Insert floppy */
+			insert_floppy(submenus[0]);
+			break;
+		case 2:
+			/* States */
+			save_load_state(submenus[1]);
+			break;
+		case 5:
+			uae_reset(1);
+			break;
+		case 6:
+			amiga_model_options();
+			break;
+		case 7:
+			keyboard_options();
+			break;
+		case 8:
+			general_options();
+			break;
+		case 9:
+			help();
+			break;
+		case 10:
+			uae_quit();
+			break;
+		default:
+			break;
+		}
+	} while( opt != 5 && opt != 9 && opt != 10);
 
 	if (prefs_has_changed)
 	{
