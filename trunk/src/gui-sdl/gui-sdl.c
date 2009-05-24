@@ -730,7 +730,7 @@ void gui_display(int shortcut)
 		default:
 			break;
 		}
-	} while (opt != 5 && opt != 9 && opt != 10);
+	} while (opt == 0 || opt == 6 || opt == 7 || opt == 8);
 
 	if (prefs_has_changed)
 	{
