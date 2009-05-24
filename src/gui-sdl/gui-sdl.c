@@ -385,7 +385,7 @@ static void setup_joystick(int joy, const char *key, int sdl_key)
 
 	/* For some reason, the user uaerc removes these. The following
 	 * lines should be removed when this is properly figured out */
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < 8; i++)
 	{
 		const char *what = "JOY2_HORIZ"; /* Assume port 1 */
 

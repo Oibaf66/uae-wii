@@ -58,8 +58,8 @@ static void read_joy (unsigned int nr)
     	if (v & SDL_HAT_RIGHT)
     		x = 1;
 
-        setjoystickstate (nr, 0, x, 1);
-        setjoystickstate (nr, 1, y, 1);
+        setjoystickstate (nr, axes + i * 2, x, 1);
+        setjoystickstate (nr, axes + i * 2 + 1, y, 1);
     }
 
     num = SDL_JoystickNumButtons (joy);
