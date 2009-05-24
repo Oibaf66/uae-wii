@@ -1,4 +1,6 @@
 version 2:
+                * Enable use of harddisks
+
                 * Fix save/restore state
 
 		* Add virtual keyboard (for binding joystick buttons to keyboard keys)
