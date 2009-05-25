@@ -14,7 +14,7 @@ cpu_24bit_addressing=false
 #Immediate blits helps with speed
 immediate_blits=true
 collision_level=playfields
-cpu_compatible=false
+cpu_compatible=true
 cpu_24bit_addressing=false
 
 # Chipset type (values are; ocs, ecs_agnus, ecs, aga)
