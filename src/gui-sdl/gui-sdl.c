@@ -62,7 +62,7 @@ static const char *amiga_model_messages[] = {
 
 static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
-		/*01*/		"^|512K|1M|2M|",
+		/*01*/		"^|512K|1M|2M",
 		/*02*/		"Slow mem",
 		/*03*/		"^|None|256K|512K|1M|1.8M",
 		/*04*/		"Fast mem",
@@ -266,13 +266,13 @@ static void memory_options(void)
 	memset(submenus, 0, sizeof(submenus));
 
 	/* Setup current values */
-	submenus[0] = find_index_by_val(currprefs.chipmem_size, chipmem_size,
+	submenus[0] = find_index_by_val(changed_prefs.chipmem_size, chipmem_size,
 			sizeof(chipmem_size) / sizeof(chipmem_size[0]));
-	submenus[1] = find_index_by_val(currprefs.bogomem_size, slowmem_size,
+	submenus[1] = find_index_by_val(changed_prefs.bogomem_size, slowmem_size,
 			sizeof(slowmem_size) / sizeof(slowmem_size[0]));
-	submenus[2] = find_index_by_val(currprefs.fastmem_size, fastmem_size,
+	submenus[2] = find_index_by_val(changed_prefs.fastmem_size, fastmem_size,
 			sizeof(fastmem_size) / sizeof(fastmem_size[0]));
-	submenus[3] = find_index_by_val(currprefs.z3fastmem_size, z3fastmem_size,
+	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size,
 			sizeof(z3fastmem_size) / sizeof(z3fastmem_size[0]));
 
 	opt = menu_select_title("Memory options menu",
@@ -311,7 +311,7 @@ static void set_cpu_to_chipset_speed(int which)
 
 static int get_floppy_speed(void)
 {
-	switch(currprefs.floppy_speed)
+	switch(changed_prefs.floppy_speed)
 	{
 	case 200:
 		return 1;
