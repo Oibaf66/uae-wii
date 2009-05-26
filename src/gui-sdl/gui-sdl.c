@@ -83,10 +83,14 @@ static const char *cpu_chipset_messages[] = {
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
 		/*01*/		"^|max|0%|34%|51%|68%|84%|100% Chipset",
-		/*02*/		"Floppy speed",
-		/*03*/		"^|normal|turbo|400%|800%",
-		/*04*/		"Leds",
-		/*05*/		"^|on|off",
+		/*02*/		"Frameskip",
+		/*03*/		"^|none|2|3|4|8|custom",
+		/*04*/		"Floppy speed",
+		/*05*/		"^|normal|turbo|400%|800%",
+		/*06*/		"Correct aspect",
+		/*07*/		"^|true|false",
+		/*08*/		"Leds",
+		/*09*/		"^|on|off",
 		NULL
 };
 
@@ -110,7 +114,7 @@ static const char *help_messages[] = {
 };
 
 
-static int find_index_by_val(int val, const int vec[], int vec_size)
+static int find_index_by_val(int val, const int vec[], int vec_size, int default_val)
 {
 	int i;
 
@@ -121,7 +125,7 @@ static int find_index_by_val(int val, const int vec[], int vec_size)
 	}
 
 	/* Some default */
-	return 0;
+	return default_val;
 }
 
 /* From PSPUAE (implementation is different though!) */
@@ -239,9 +243,9 @@ static void cpu_chipset_options(void)
 	int submenus[2], opt;
 
 	submenus[0] = find_index_by_val(currprefs.cpu_level, cpu_levels,
-			sizeof(cpu_levels) / sizeof(cpu_levels[0]));
+			sizeof(cpu_levels) / sizeof(cpu_levels[0]), 0);
 	submenus[1] = find_index_by_val(currprefs.chipset_mask, chipset_masks,
-			sizeof(chipset_masks) / sizeof(chipset_masks[0]));
+			sizeof(chipset_masks) / sizeof(chipset_masks[0]), 0);
 
 	opt = menu_select_title("CPU/Chipset options menu",
 			cpu_chipset_messages, submenus);
@@ -267,13 +271,13 @@ static void memory_options(void)
 
 	/* Setup current values */
 	submenus[0] = find_index_by_val(changed_prefs.chipmem_size, chipmem_size,
-			sizeof(chipmem_size) / sizeof(chipmem_size[0]));
+			sizeof(chipmem_size) / sizeof(chipmem_size[0]), 0);
 	submenus[1] = find_index_by_val(changed_prefs.bogomem_size, slowmem_size,
-			sizeof(slowmem_size) / sizeof(slowmem_size[0]));
+			sizeof(slowmem_size) / sizeof(slowmem_size[0]), 0);
 	submenus[2] = find_index_by_val(changed_prefs.fastmem_size, fastmem_size,
-			sizeof(fastmem_size) / sizeof(fastmem_size[0]));
+			sizeof(fastmem_size) / sizeof(fastmem_size[0]), 0);
 	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size,
-			sizeof(z3fastmem_size) / sizeof(z3fastmem_size[0]));
+			sizeof(z3fastmem_size) / sizeof(z3fastmem_size[0]), 0);
 
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
@@ -331,24 +335,47 @@ static void set_floppy_speed(int which)
 	changed_prefs.floppy_speed = table[which];
 }
 
+static void set_gfx_framerate(int which)
+{
+	int table[] = {1, 2, 3, 4, 8};
+
+	/* Custom setting - don't touch! */
+	if (which > sizeof(table) / sizeof(table[0]))
+		return;
+	changed_prefs.gfx_framerate = table[which];
+}
+
+static int get_gfx_framerate(void)
+{
+	int table[] = {1, 2, 3, 4, 8};
+
+	return find_index_by_val(changed_prefs.gfx_framerate, table,
+			sizeof(table) / sizeof(table[0]), 5);
+
+}
+
 static void general_options(void)
 {
-	int submenus[3];
+	int submenus[5];
 	int opt;
 
 	submenus[0] = get_cpu_to_chipset_speed();
-	submenus[1] = get_floppy_speed();
-	submenus[2] = currprefs.leds_on_screen == 0 ? 1 : 0;
+	submenus[1] = get_gfx_framerate();
+	submenus[2] = get_floppy_speed();
+	submenus[3] = changed_prefs.gfx_correct_aspect == 0 ? 1 : 0;
+	submenus[4] = currprefs.leds_on_screen == 0 ? 1 : 0;
 
 	opt = menu_select_title("General options menu",
 			options_messages, submenus);
 	if (opt < 0)
 		return;
 	set_cpu_to_chipset_speed(submenus[0]);
-	set_floppy_speed(submenus[1]);
+	set_gfx_framerate(submenus[1]);
+	set_floppy_speed(submenus[2]);
 
+	changed_prefs.gfx_correct_aspect = !submenus[3];
 	/* Floppy, Power, FPS, etc etc. */
-	changed_prefs.leds_on_screen = !submenus[2];
+	changed_prefs.leds_on_screen = !submenus[4];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 
 	prefs_has_changed = 1;
