@@ -375,12 +375,10 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 	read_inputdevice_config (&currprefs, buf, key);
 }
 
-static void setup_joystick(int joy, const char *key, int sdl_key)
+static void setup_joystick_defaults(int joy)
 {
 	int fire_buttons[] = {3,7,9,10};
 	int i;
-
-	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
 
 	/* For some reason, the user uaerc removes these. The following
 	 * lines should be removed when this is properly figured out */
@@ -413,6 +411,11 @@ static void setup_joystick(int joy, const char *key, int sdl_key)
 		insert_keyboard_map(btn, "input.1.joystick.%d.button.%d",
 				joy, fire_buttons[i]);
 	}
+}
+
+static void setup_joystick(int joy, const char *key, int sdl_key)
+{
+	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
 }
 
 static void keyboard_options(void)
@@ -734,6 +737,7 @@ void gui_display(int shortcut)
 	if (prefs_has_changed)
 	{
 		char user_options[255] = "";
+		int i;
 
 #ifdef OPTIONS_IN_HOME
 		char *home = getenv ("HOME");
@@ -745,6 +749,9 @@ void gui_display(int shortcut)
 #endif
 		strcat(user_options, OPTIONSFILENAME);
 		strcat(user_options, ".user");
+
+		for (i = 0; i < 2; i++)
+			setup_joystick_defaults(i);
 
 		cfgfile_save(&changed_prefs, user_options, 0);
 	}
