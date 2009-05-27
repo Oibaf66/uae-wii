@@ -374,6 +374,7 @@ static void general_options(void)
 	set_floppy_speed(submenus[2]);
 
 	changed_prefs.gfx_correct_aspect = !submenus[3];
+	currprefs.gfx_correct_aspect = changed_prefs.gfx_correct_aspect;
 	/* Floppy, Power, FPS, etc etc. */
 	changed_prefs.leds_on_screen = !submenus[4];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
