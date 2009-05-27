@@ -293,25 +293,17 @@ static void memory_options(void)
 	prefs_has_changed = 1;
 }
 
+static int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
+
 static int get_cpu_to_chipset_speed(void)
 {
-	switch(currprefs.m68k_speed)
-	{
-	case 1:	return 1;
-	case 2:	return 2;
-	case 3:	return 3;
-	case 5:	return 4;
-	case 10: return 5;
-	case 15: return 6;
-	default: break; /* max */
-	}
-	return 0;
+	return find_index_by_val(changed_prefs.m68k_speed, cpu_to_chipset_table,
+			sizeof(cpu_to_chipset_table) / sizeof(cpu_to_chipset_table[0]), 0);
 }
 
 static void set_cpu_to_chipset_speed(int which)
 {
-	int table[] = {-1,512,2560,5120,7168,8704,10240};
-	changed_prefs.m68k_speed = table[which];
+	changed_prefs.m68k_speed = cpu_to_chipset_table[which];
 }
 
 static int get_floppy_speed(void)
