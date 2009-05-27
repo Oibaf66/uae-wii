@@ -201,7 +201,8 @@ static void A1200_config(void)
 
 static void default_config(void)
 {
-	/* For now these are in uaerc instead */
+	/* "good enough" and "fast enough" on the Wii */
+	changed_prefs.gfx_framerate = 2;
 }
 
 static int prefs_has_changed;
