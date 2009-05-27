@@ -239,12 +239,12 @@ static void insert_rom(void)
 static void cpu_chipset_options(void)
 {
 	const int cpu_levels[] = { 0, 1, 2, 3, 4, 6};
-	const int chipset_masks[] = {0, CSMASK_ECS_AGNUS, CSMASK_ECS_DENISE, CSMASK_AGA};
+	const int chipset_masks[] = {0, 1, 2, 3};
 	int submenus[2], opt;
 
-	submenus[0] = find_index_by_val(currprefs.cpu_level, cpu_levels,
+	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_levels,
 			sizeof(cpu_levels) / sizeof(cpu_levels[0]), 0);
-	submenus[1] = find_index_by_val(currprefs.chipset_mask, chipset_masks,
+	submenus[1] = find_index_by_val(changed_prefs.chipset_mask, chipset_masks,
 			sizeof(chipset_masks) / sizeof(chipset_masks[0]), 0);
 
 	opt = menu_select_title("CPU/Chipset options menu",
