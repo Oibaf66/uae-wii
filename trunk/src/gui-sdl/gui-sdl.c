@@ -249,9 +249,9 @@ static void cpu_chipset_options(void)
 	int submenus[2], opt;
 
 	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_levels,
-			sizeof(cpu_levels) / sizeof(cpu_levels[0]), 0);
+			SDL_arraysize(cpu_levels), 0);
 	submenus[1] = find_index_by_val(changed_prefs.chipset_mask, chipset_masks,
-			sizeof(chipset_masks) / sizeof(chipset_masks[0]), 0);
+			SDL_arraysize(chipset_masks), 0);
 
 	opt = menu_select_title("CPU/Chipset options menu",
 			cpu_chipset_messages, submenus);
@@ -277,13 +277,13 @@ static void memory_options(void)
 
 	/* Setup current values */
 	submenus[0] = find_index_by_val(changed_prefs.chipmem_size, chipmem_size,
-			sizeof(chipmem_size) / sizeof(chipmem_size[0]), 0);
+			SDL_arraysize(chipmem_size), 0);
 	submenus[1] = find_index_by_val(changed_prefs.bogomem_size, slowmem_size,
-			sizeof(slowmem_size) / sizeof(slowmem_size[0]), 0);
+			SDL_arraysize(slowmem_size), 0);
 	submenus[2] = find_index_by_val(changed_prefs.fastmem_size, fastmem_size,
-			sizeof(fastmem_size) / sizeof(fastmem_size[0]), 0);
+			SDL_arraysize(fastmem_size), 0);
 	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size,
-			sizeof(z3fastmem_size) / sizeof(z3fastmem_size[0]), 0);
+			SDL_arraysize(z3fastmem_size), 0);
 
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
@@ -301,7 +301,7 @@ static void memory_options(void)
 static int get_cpu_to_chipset_speed(void)
 {
 	return find_index_by_val(changed_prefs.m68k_speed, cpu_to_chipset_table,
-			sizeof(cpu_to_chipset_table) / sizeof(cpu_to_chipset_table[0]), 0);
+			SDL_arraysize(cpu_to_chipset_table), 0);
 }
 
 static void set_cpu_to_chipset_speed(int which)
@@ -312,7 +312,7 @@ static void set_cpu_to_chipset_speed(int which)
 static int get_floppy_speed(void)
 {
 	return find_index_by_val(changed_prefs.floppy_speed, floppy_table,
-			sizeof(floppy_table) / sizeof(floppy_table[0]), 0);
+			SDL_arraysize(floppy_table), 0);
 }
 
 static void set_floppy_speed(int which)
@@ -323,7 +323,7 @@ static void set_floppy_speed(int which)
 static void set_gfx_framerate(int which)
 {
 	/* Custom setting - don't touch! */
-	if (which > sizeof(framerate_table) / sizeof(framerate_table[0]))
+	if (which > SDL_arraysize(framerate_table))
 		return;
 	changed_prefs.gfx_framerate = framerate_table[which];
 }
@@ -331,7 +331,7 @@ static void set_gfx_framerate(int which)
 static int get_gfx_framerate(void)
 {
 	return find_index_by_val(changed_prefs.gfx_framerate, framerate_table,
-			sizeof(framerate_table) / sizeof(framerate_table[0]), 5);
+			SDL_arraysize(framerate_table), 5);
 
 }
 
@@ -413,7 +413,7 @@ static void setup_joystick_defaults(int joy)
 	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", joy);
 	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", joy);
 
-	for (i = 0; i < sizeof(fire_buttons) / sizeof(fire_buttons[0]); i++)
+	for (i = 0; i < SDL_arraysize(fire_buttons); i++)
 	{
 		const char *btn = joy == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON";
 
