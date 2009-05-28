@@ -94,6 +94,11 @@ static const char *options_messages[] = {
 		NULL
 };
 
+static int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
+static int floppy_table[] = {100, 0, 400, 800};
+static int framerate_table[] = {1, 2, 3, 4, 8};
+
+
 static const char *help_messages[] = {
 		/*00*/		"#2HOME enters the menu system, where arrow",
 		/*01*/		"#2keys and +/- are used to navigate up and down.",
@@ -293,8 +298,6 @@ static void memory_options(void)
 	prefs_has_changed = 1;
 }
 
-static int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
-
 static int get_cpu_to_chipset_speed(void)
 {
 	return find_index_by_val(changed_prefs.m68k_speed, cpu_to_chipset_table,
@@ -306,8 +309,6 @@ static void set_cpu_to_chipset_speed(int which)
 	changed_prefs.m68k_speed = cpu_to_chipset_table[which];
 }
 
-static int floppy_table[] = {100, 0, 400, 800};
-
 static int get_floppy_speed(void)
 {
 	return find_index_by_val(changed_prefs.floppy_speed, floppy_table,
@@ -318,8 +319,6 @@ static void set_floppy_speed(int which)
 {
 	changed_prefs.floppy_speed = floppy_table[which];
 }
-
-static int framerate_table[] = {1, 2, 3, 4, 8};
 
 static void set_gfx_framerate(int which)
 {
