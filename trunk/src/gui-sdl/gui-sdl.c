@@ -319,22 +319,20 @@ static void set_floppy_speed(int which)
 	changed_prefs.floppy_speed = floppy_table[which];
 }
 
+static int framerate_table[] = {1, 2, 3, 4, 8};
+
 static void set_gfx_framerate(int which)
 {
-	int table[] = {1, 2, 3, 4, 8};
-
 	/* Custom setting - don't touch! */
-	if (which > sizeof(table) / sizeof(table[0]))
+	if (which > sizeof(framerate_table) / sizeof(framerate_table[0]))
 		return;
-	changed_prefs.gfx_framerate = table[which];
+	changed_prefs.gfx_framerate = framerate_table[which];
 }
 
 static int get_gfx_framerate(void)
 {
-	int table[] = {1, 2, 3, 4, 8};
-
-	return find_index_by_val(changed_prefs.gfx_framerate, table,
-			sizeof(table) / sizeof(table[0]), 5);
+	return find_index_by_val(changed_prefs.gfx_framerate, framerate_table,
+			sizeof(framerate_table) / sizeof(framerate_table[0]), 5);
 
 }
 
