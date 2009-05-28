@@ -306,26 +306,17 @@ static void set_cpu_to_chipset_speed(int which)
 	changed_prefs.m68k_speed = cpu_to_chipset_table[which];
 }
 
+static int floppy_table[] = {100, 0, 400, 800};
+
 static int get_floppy_speed(void)
 {
-	switch(changed_prefs.floppy_speed)
-	{
-	case 200:
-		return 1;
-	case 400:
-		return 2;
-	case 800:
-		return 3;
-	default: break; /* 100 */
-	}
-	return 0;
+	return find_index_by_val(changed_prefs.floppy_speed, floppy_table,
+			sizeof(floppy_table) / sizeof(floppy_table[0]), 0);
 }
 
 static void set_floppy_speed(int which)
 {
-	int table[] = {100, 0, 400, 800};
-
-	changed_prefs.floppy_speed = table[which];
+	changed_prefs.floppy_speed = floppy_table[which];
 }
 
 static void set_gfx_framerate(int which)
