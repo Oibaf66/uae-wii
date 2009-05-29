@@ -757,7 +757,7 @@ void gui_display(int shortcut)
 		}
 #endif
 		strcat(user_options, OPTIONSFILENAME);
-		strcat(user_options, ".user");
+		strcat(user_options, ".saved");
 
 		for (i = 0; i < 2; i++)
 			setup_joystick_defaults(i);
