@@ -40,9 +40,9 @@ gfx_correct_aspect=false
 gfx_framerate=2
 show_leds=true
 
+sound_output=normal
 sound_frequency=32000
 sound_latency=200
-
 
 sdl.map_raw_keys=true
 input.config=1
