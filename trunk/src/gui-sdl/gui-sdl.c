@@ -160,7 +160,7 @@ static void A500_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
-	changed_prefs.chipset_mask = 1; //OCS
+	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; // A500 are OCS/ECS
 
 	maybe_load_kick_rom("kick13.rom");
 }
@@ -173,7 +173,7 @@ static void A600_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
-	changed_prefs.chipset_mask = 2; //ECS Agnus
+	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE; //ECS Agnus
 
 	maybe_load_kick_rom("kick205.rom");
 }
@@ -199,7 +199,7 @@ static void A1200_config(void)
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
-	changed_prefs.chipset_mask = 3; //AGA
+	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA; //AGA
 
 	maybe_load_kick_rom("kick31.rom");
 }
@@ -245,7 +245,9 @@ static void insert_rom(void)
 static void cpu_chipset_options(void)
 {
 	const int cpu_levels[] = { 0, 1, 2, 3, 4, 6};
-	const int chipset_masks[] = {0, 1, 2, 3};
+	const int chipset_masks[] = {0, CSMASK_ECS_AGNUS,
+			CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE,
+			CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA};
 	int submenus[2], opt;
 
 	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_levels,
