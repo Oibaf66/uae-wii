@@ -72,6 +72,11 @@ static const char *memory_messages[] = {
 		NULL
 };
 
+static const int chipmem_size_table[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
+static const int slowmem_size_table[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
+static const int fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024 };	
+static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024, 32768 * 1024};	
+
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
 		/*01*/		"^|68000|68010|68020|68030|68040|68060",
@@ -79,6 +84,12 @@ static const char *cpu_chipset_messages[] = {
 		/*04*/		"^|OCS|ECS AGNUS|ECS|AGA",
 		NULL
 };
+
+static const int cpu_level_table[] = { 0, 1, 2, 3, 4, 6};
+static const int chipset_mask_table[] = {0, CSMASK_ECS_AGNUS,
+		CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE,
+		CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA};
+
 
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
@@ -94,9 +105,9 @@ static const char *options_messages[] = {
 		NULL
 };
 
-static int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
-static int floppy_table[] = {100, 0, 400, 800};
-static int framerate_table[] = {1, 2, 3, 4, 8};
+static const int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
+static const int floppy_table[] = {100, 0, 400, 800};
+static const int framerate_table[] = {1, 2, 3, 4, 8};
 
 
 static const char *help_messages[] = {
@@ -244,33 +255,25 @@ static void insert_rom(void)
 
 static void cpu_chipset_options(void)
 {
-	const int cpu_levels[] = { 0, 1, 2, 3, 4, 6};
-	const int chipset_masks[] = {0, CSMASK_ECS_AGNUS,
-			CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE,
-			CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA};
 	int submenus[2], opt;
 
-	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_levels,
-			SDL_arraysize(cpu_levels), 0);
-	submenus[1] = find_index_by_val(changed_prefs.chipset_mask, chipset_masks,
-			SDL_arraysize(chipset_masks), 0);
+	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_level_table,
+			SDL_arraysize(cpu_level_table), 0);
+	submenus[1] = find_index_by_val(changed_prefs.chipset_mask, chipset_mask_table,
+			SDL_arraysize(chipset_mask_table), 0);
 
 	opt = menu_select_title("CPU/Chipset options menu",
 			cpu_chipset_messages, submenus);
 	if (opt < 0)
 		return;
-	changed_prefs.cpu_level = cpu_levels[submenus[0]];
-	changed_prefs.chipset_mask = chipset_masks[submenus[1]];
+	changed_prefs.cpu_level = cpu_level_table[submenus[0]];
+	changed_prefs.chipset_mask = chipset_mask_table[submenus[1]];
 
 	prefs_has_changed = 1;
 }
 
 static void memory_options(void)
 {
-	const int chipmem_size[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
-	const int slowmem_size[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
-	const int fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024 };	
-	const int z3fastmem_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024, 32768 * 1024};	
 	//FOL - GFXCard no point in this yet, until GFX and HDD are working properly, we can then use Picasso screen modes.
 	//const int gfxcard_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };
 	int submenus[4], opt;
@@ -278,24 +281,24 @@ static void memory_options(void)
 	memset(submenus, 0, sizeof(submenus));
 
 	/* Setup current values */
-	submenus[0] = find_index_by_val(changed_prefs.chipmem_size, chipmem_size,
-			SDL_arraysize(chipmem_size), 0);
-	submenus[1] = find_index_by_val(changed_prefs.bogomem_size, slowmem_size,
-			SDL_arraysize(slowmem_size), 0);
-	submenus[2] = find_index_by_val(changed_prefs.fastmem_size, fastmem_size,
-			SDL_arraysize(fastmem_size), 0);
-	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size,
-			SDL_arraysize(z3fastmem_size), 0);
+	submenus[0] = find_index_by_val(changed_prefs.chipmem_size, chipmem_size_table,
+			SDL_arraysize(chipmem_size_table), 0);
+	submenus[1] = find_index_by_val(changed_prefs.bogomem_size, slowmem_size_table,
+			SDL_arraysize(slowmem_size_table), 0);
+	submenus[2] = find_index_by_val(changed_prefs.fastmem_size, fastmem_size_table,
+			SDL_arraysize(fastmem_size_table), 0);
+	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size_table,
+			SDL_arraysize(z3fastmem_size_table), 0);
 
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
 	if (opt < 0)
 		return;
 	/* And update with the new settings */
-	changed_prefs.chipmem_size = chipmem_size[submenus[0]];
-	changed_prefs.bogomem_size = slowmem_size[submenus[1]];
-	changed_prefs.fastmem_size = fastmem_size[submenus[2]];
-	changed_prefs.z3fastmem_size = z3fastmem_size[submenus[3]];
+	changed_prefs.chipmem_size = chipmem_size_table[submenus[0]];
+	changed_prefs.bogomem_size = slowmem_size_table[submenus[1]];
+	changed_prefs.fastmem_size = fastmem_size_table[submenus[2]];
+	changed_prefs.z3fastmem_size = z3fastmem_size_table[submenus[3]];
 
 	prefs_has_changed = 1;
 }
