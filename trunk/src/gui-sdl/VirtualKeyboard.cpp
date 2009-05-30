@@ -64,7 +64,7 @@ static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   N("Sft","SHIFT_LEFT"),KNL(), K("A"), K("S"), K("D"), K("F"), K("G"), K("H"), K("J"), K("K"), K("L"), N(":;", "SEMICOLON"), N("@#", "??"), N("Sft", "SHIFT_RIGHT"),
   N("Ctrl","CTRL"),KNL(),K("Z"),K("X"), K("C"), K("V"), K("B"), K("N"), K("M"),N("<,", "COMMA"),N(">.", "PERIOD"), N("\\","KEY_BACKSLASH"), N("/", "SLASH"),N("Ret", "RETURN"),
   N("Alt","ALT_LEFT"),KNL(), N("Amg","AMIGA_LEFT"),KNL(),N("space", "SPACE"),KNL(),KNL(),KNL(), N("Up", "CURSOR_UP"),KNL(),KNL(),N("Amg","AMIGA_RIGHT"),KNL(),N("Alt","ALT_RIGHT"), 
-  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft", "CURSOR_LEFT"),KNL(), N("Dwn", "CURSOR_DOWN"), KNL(), N("Rgt", "CURSOR_RIGHT"),KNL(), KNL(),
+  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft", "CURSOR_LEFT"),KNL(), N("Dwn", "CURSOR_DOWN"), KNL(), N("Rgt", "CURSOR_RIGHT"),KNL(), N("Enter", "ENTER"),
 };
 
 VirtualKeyboard::VirtualKeyboard(SDL_Surface *screen, TTF_Font *font)
