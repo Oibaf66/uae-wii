@@ -74,12 +74,10 @@ input.1.joystick.0.axis.5=JOY2_VERT
 input.1.joystick.0.axis.6=JOY2_HORIZ
 input.1.joystick.0.axis.7=JOY2_VERT
 
-# 2 on wiimote, Z on nunchuck and a/b on the classic controller
+# 2 on wiimote, Z on nunchuck and a on the classic controller
 input.1.joystick.0.button.3=JOY2_FIRE_BUTTON
 input.1.joystick.0.button.7=JOY2_FIRE_BUTTON
 input.1.joystick.0.button.9=JOY2_FIRE_BUTTON
-input.1.joystick.0.button.10=JOY2_FIRE_BUTTON
-
 
 # Wiimote 2
 input.1.joystick.1.disabled=0

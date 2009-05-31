@@ -391,7 +391,7 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 
 static void setup_joystick_defaults(int joy)
 {
-	int fire_buttons[] = {3,7,9,10};
+	int fire_buttons[] = {3,7,9};
 	int i;
 
 	/* For some reason, the user uaerc removes these. The following
