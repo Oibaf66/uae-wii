@@ -1,0 +1,165 @@
+#---------------------------------------------------------------------------------
+# Clear the implicit built in rules
+#---------------------------------------------------------------------------------
+.SUFFIXES:
+#---------------------------------------------------------------------------------
+ifeq ($(strip $(DEVKITPPC)),)
+$(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
+endif
+
+include $(DEVKITPPC)/wii_rules
+
+# Directories.
+OBJ_DIR			:= obj
+LIB_DIR			:= lib
+BIN_DIR			:= .
+SRC_DIR			:= src
+INCLUDE_DIR		:= include
+
+# Tools.
+PIPE_TO_SED := 2>&1 | sed "s/:\([0-9]*\):/\(\1\) :/"
+
+SYMLINKS=src/machdep src/osdep src/gfxdep src/joydep src/guidep src/sounddep src/threaddep
+
+
+# Source files.
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/keymap/*.c) \
+	$(SRC_DIR)/machdep/support.c $(SRC_DIR)/gfxdep/rawkeys.c  $(SRC_DIR)/guidep/gui-sdl.c $(SRC_DIR)/sounddep/sound.c \
+	$(SRC_DIR)/gfxdep/sdlgfx.c $(SRC_DIR)/guidep/menu.c $(SRC_DIR)/osdep/main.c $(SRC_DIR)/threaddep/thread.c \
+	$(SRC_DIR)/gfxdep/sdlkeys.c $(SRC_DIR)/joydep/joystick.c $(SRC_DIR)/osdep/memory.c
+
+
+SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
+	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
+	src/genblitter.c src/gencomp.c src/gencpu.c \
+	src/genlinetoscr.c src/compemu.c src/compstbl.c \
+	src/enforcer.c src/ar.c src/debug.c \
+	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
+
+# Library object files.
+OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o)) $(OBJ_DIR)/guidep/VirtualKeyboard.o
+
+# Test source files.
+# It can be useful to switch this variable around to select individual tests which are problematic.
+TEST_SRCS	:= $(TEST_SRC_DIR)/showfont.c
+
+# What's a full build?
+all: uae.dol
+
+# How to delete the intermediate files.
+clean:
+	@echo Cleaning $(OBJ_DIR)
+	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h src/sysconfig.h $(SYMLINKS)
+
+$(OBJ_DIR):
+	install -d $@
+
+src/sysconfig.h: src/sysconfig.h.wii
+	cp $< $@
+
+src/machdep:
+	rm -f $@
+	cd src && ln -s md-ppc-gcc machdep
+
+src/osdep:
+	rm -f $@
+	cd src && ln -s od-generic osdep
+
+src/gfxdep:
+	rm -f $@
+	cd src && ln -s gfx-sdl gfxdep
+
+src/joydep:
+	rm -f $@
+	cd src && ln -s jd-sdl joydep
+
+src/guidep:
+	rm -f $@
+	cd src && ln -s gui-sdl guidep
+
+src/sounddep:
+	rm -f $@
+	cd src && ln -s sd-sdl sounddep
+
+src/threaddep:
+	rm -f $@
+	cd src && ln -s td-sdl threaddep
+
+src/target.h:
+	rm -f $@
+	cd src && ln -s targets/t-wii.h target.h
+
+src/md-fpp.h:
+	rm -f $@
+	cd src && ln -s include/fpp-ieee.h md-fpp.h
+
+%.h: %.h.wii
+	cp $< $@
+
+%.c: %.c.wii
+	cp $< $@
+
+# How to build a library.
+$(LIB_DIR)/libSDL_ttf.a: $(OBJS)
+	@echo Archiving $@
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-ar crs $@ $(OBJS)
+	@echo ----
+
+# How to build a DOL.
+$(BIN_DIR)/%.dol: %.elf
+	@echo Creating DOL $@
+	@-mkdir -p $(dir $@)
+	#powerpc-gekko-objcopy -O binary $< $@
+	elf2dol $< $@
+	@echo ----
+
+# Compilation flags.
+COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP)
+INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
+DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
+		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
+		    -DTD_START_HEIGHT=16
+CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
+
+#unused defines; -DFDI2RAW 
+
+# Test link flags.
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard
+
+dist: uae.dol
+
+dist: uae.dol
+	install -d $@/apps/uae
+	install -d $@/uae
+	install -d $@/uae/floppies
+	install -d $@/uae/roms
+	install -d $@/uae/harddisks
+	install -d $@/uae/saves
+	touch $@/uae/roms/put-your-kick-dot-rom-here
+	cp $< $@/apps/uae/boot.dol
+	cp meta.xml $@/apps/uae/
+	cp icon.png $@/apps/uae/
+	cp FreeMono.ttf $@/apps/uae/
+	cp Smaller.ttf $@/apps/uae/
+	cp uaerc.wii $@/uae/uaerc
+	cd $@ && tar -czf ../uae-bin.tar.gz *
+
+# How to link an ELF.
+uae.elf: $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
+	@echo Linking $@
+	@-mkdir -p $(dir $@)
+	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)
+	#keep elf for debugging
+	#cp $@ /tmp/elf
+
+# How to compile C file (SDL library).
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo Compiling $<
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@echo Compiling $<
+	@-mkdir -p $(dir $@)
+	@powerpc-gekko-g++ $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)

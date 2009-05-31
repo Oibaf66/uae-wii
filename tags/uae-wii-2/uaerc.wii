@@ -1,0 +1,103 @@
+wii.rom_path=/uae/roms
+kickstart_rom_file=/uae/roms/kick.rom
+#kickstart_ext_rom_file=
+floppy0=/uae/floppies/
+
+# Alters CPU speed (values are; real, max. CPU to Chipset; 1 through 20)
+# Current setting of 3 = 17% CHIPSET and 83% CPU
+cpu_speed=3
+# CPU Type (values are; 68000, 68020, 68020/68881 and 68040)
+cpu_type=68000
+
+#No need to explain
+cpu_24bit_addressing=false
+#Immediate blits helps with speed
+immediate_blits=true
+collision_level=playfields
+cpu_compatible=true
+cpu_24bit_addressing=false
+
+# Chipset type (values are; ocs, ecs_agnus, ecs, aga)
+chipset=ecs_agnus
+
+# Slow Memory (Values are; 0 = 0MB, 1 = 256KB, 2 = 512KB, 3 = 1MB and 4 = 1.7MB)
+bogomem_size=2
+# Chip Memory (Values are; 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
+chipmem_size=1
+# Fast Memory (Values are; 0 = 0MB, 4 = 2MB and 8 = 8MB)
+fastmem_size=0
+# Accellerator Memory (Values are; 1MB, 2MB, 4MB, 8MB, 16MB and 32MB)
+z3mem_size=0
+
+# Floppy speed, can cause incompatbility with certain floppy loaders
+# (Values are; 0 = Turbo, 100 = Standard and 800 = 800% faster)
+floppy_speed=100
+
+gfx_center_horizontal=true
+gfx_center_vertical=true
+gfx_vsync=false
+gfx_correct_aspect=false
+gfx_framerate=2
+show_leds=true
+
+sound_output=normal
+sound_frequency=32000
+sound_latency=200
+
+sdl.map_raw_keys=true
+input.config=1
+
+# Keyboard setup
+input.1.keyboard.0.button.96=SPC_ENTERGUI
+
+# Mouse
+input.1.mouse.0.disabled=0
+input.1.mouse.0.axis.0=MOUSE1_HORIZ
+input.1.mouse.0.axis.1=MOUSE1_VERT
+input.1.mouse.0.axis.2=MOUSE1_WHEEL
+input.1.mouse.0.button.0=JOY1_FIRE_BUTTON
+input.1.mouse.0.button.1=JOY1_2ND_BUTTON
+input.1.mouse.0.button.2=JOY1_3RD_BUTTON
+
+# Joystick configuration. Wiimote 1 is both mouse and joystick 2, with
+# the mouse button being the A key.
+# See http://wiibrew.org/wiki/SDL for the button numbers
+
+input.1.joystick.0.disabled=0
+input.1.joystick.0.axis.0=JOY2_HORIZ
+input.1.joystick.0.axis.1=JOY2_VERT
+input.1.joystick.0.axis.2=JOY2_HORIZ
+input.1.joystick.0.axis.3=JOY2_VERT
+input.1.joystick.0.axis.4=JOY2_HORIZ
+input.1.joystick.0.axis.5=JOY2_VERT
+# The "hat" on the wiimote (dpad)
+input.1.joystick.0.axis.6=JOY2_HORIZ
+input.1.joystick.0.axis.7=JOY2_VERT
+
+# 2 on wiimote, Z on nunchuck and a on the classic controller
+input.1.joystick.0.button.3=JOY2_FIRE_BUTTON
+input.1.joystick.0.button.7=JOY2_FIRE_BUTTON
+input.1.joystick.0.button.9=JOY2_FIRE_BUTTON
+
+# Wiimote 2
+input.1.joystick.1.disabled=0
+input.1.joystick.1.axis.0=JOY1_HORIZ
+input.1.joystick.1.axis.1=JOY1_VERT
+input.1.joystick.1.axis.2=JOY1_HORIZ
+input.1.joystick.1.axis.3=JOY1_VERT
+input.1.joystick.1.axis.4=JOY1_HORIZ
+input.1.joystick.1.axis.5=JOY1_VERT
+input.1.joystick.1.axis.6=JOY1_HORIZ
+input.1.joystick.1.axis.7=JOY1_VERT
+
+input.1.joystick.1.button.3=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.7=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.9=JOY1_FIRE_BUTTON
+input.1.joystick.1.button.10=JOY1_FIRE_BUTTON
+
+
+# Home button
+input.1.joystick.1.button.6=SPC_ENTERGUI
+input.1.joystick.1.button.19=SPC_ENTERGUI
+input.1.joystick.0.button.6=SPC_ENTERGUI
+input.1.joystick.0.button.19=SPC_ENTERGUI

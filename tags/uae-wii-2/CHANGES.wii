@@ -1,0 +1,26 @@
+version 2:
+                * Fix bug where the nunchuk analogue controller and
+                  the DPAD would not work at the same time
+
+                * Lots of menu improvements (pressing 1 will now go
+                  back to the last menu for example)
+
+                * Enable use of harddisks
+
+                * Fix save/restore state
+
+		* Add virtual keyboard (for binding joystick buttons to keyboard keys)
+
+                * Load a uaerc.user if it exists. This is also saved when configuration changes and it
+                  overrides stuff from uaerc
+
+                * Allow setting of Amiga type (from PSPUae / FOL)
+
+                * Better default configuration (from PSPUae / FOL)
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>
+
+version 1:
+		* Initial release
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>
