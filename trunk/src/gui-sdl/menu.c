@@ -264,7 +264,7 @@ static const char **get_file_list(const char *base_dir)
 	de = readdir(d))
 	{
 		char buf[255];
-		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ",
+		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ", ".ipf", ".IPF", ".fdi", ".FDI",
 				".sav", ".SAV", ".uss", ".USS", ".rom", ".ROM", NULL};
 		struct stat st;
 
