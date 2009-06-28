@@ -142,6 +142,7 @@ dist: uae.dol
 	cp icon.png $@/apps/uae/
 	cp FreeMono.ttf $@/apps/uae/
 	cp Smaller.ttf $@/apps/uae/
+	cp README.Cloanto-Amiga_Forever $@/apps/uae/
 	cp uaerc.wii $@/uae/uaerc
 	cd $@ && tar -czf ../uae-bin.tar.gz *
 
