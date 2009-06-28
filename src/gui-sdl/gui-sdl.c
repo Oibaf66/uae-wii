@@ -170,7 +170,6 @@ static int maybe_load_kick_rom_list(const char *roms[])
 
 	for (p = roms; p; p++)
 	{
-		printf("Trying to open %s\n", *p);
 		/* OK to open? */
 		if (maybe_load_kick_rom(*p) == 0)
 			return 0;
