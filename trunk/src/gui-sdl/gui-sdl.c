@@ -145,7 +145,7 @@ static int find_index_by_val(int val, const int vec[], int vec_size, int default
 }
 
 /* From PSPUAE (implementation is different though!) */
-static void maybe_load_kick_rom(const char *name)
+static int maybe_load_kick_rom(const char *name)
 {
 	const char *dir = prefs_get_attr("rom_path");
 	char buf[255];
@@ -155,16 +155,34 @@ static void maybe_load_kick_rom(const char *name)
 		dir="";
 	snprintf(buf, 255, "%s/%s", dir, name);
 	if (stat(buf, &st) < 0)
-		return;
+		return 1;
 
 	/* Setup the new kickstart ROM */
 	if (!S_ISDIR(st.st_mode))
 		strncpy(changed_prefs.romfile, buf, 255);
+
+	return 0;
+}
+
+static int maybe_load_kick_rom_list(const char *roms[])
+{
+	const char **p;
+
+	for (p = roms; p; p++)
+	{
+		printf("Trying to open %s\n", *p);
+		/* OK to open? */
+		if (maybe_load_kick_rom(*p) == 0)
+			return 0;
+	}
+
+	return 1;
 }
 
 /* All this is taken directly from PSPUAE */
 static void A500_config(void)
 {
+	const char *roms[] = {"amiga-os-130.rom", "kick13.rom", NULL};
 	default_config();
 
 	changed_prefs.cpu_level = 0; //68000
@@ -173,11 +191,12 @@ static void A500_config(void)
 	changed_prefs.bogomem_size = 512 * 1024; //512
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS; // A500 are OCS/ECS
 
-	maybe_load_kick_rom("kick13.rom");
+	maybe_load_kick_rom_list( roms );
 }
 
 static void A600_config(void)
 {
+	const char *roms[] = {"amiga-os-205.rom", "kick205.rom", NULL};
 	default_config();
 
 	changed_prefs.cpu_level = 1; //68010
@@ -186,11 +205,12 @@ static void A600_config(void)
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE; //ECS Agnus
 
-	maybe_load_kick_rom("kick205.rom");
+	maybe_load_kick_rom_list(roms);
 }
 
 static void A1000_config(void)
 {
+	const char *roms[] = {"amiga-os-120.rom", "kick12.rom", NULL};
 	default_config();
 
 	changed_prefs.cpu_level = 0; //68000
@@ -199,11 +219,12 @@ static void A1000_config(void)
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 0; //OCS
 
-	maybe_load_kick_rom("kick12.rom");
+	maybe_load_kick_rom_list(roms);
 }
 
 static void A1200_config(void)
 {
+	const char *roms[] = {"amiga-os-310.rom", "kick31.rom", NULL};
 	default_config();
 
 	changed_prefs.cpu_level = 2; //68020
@@ -212,7 +233,7 @@ static void A1200_config(void)
 	changed_prefs.bogomem_size = 0;
 	changed_prefs.chipset_mask = CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA; //AGA
 
-	maybe_load_kick_rom("kick31.rom");
+	maybe_load_kick_rom_list(roms);
 }
 
 static void default_config(void)

@@ -1,5 +1,6 @@
 wii.rom_path=/uae/roms
 kickstart_rom_file=/uae/roms/kick.rom
+kickstart_key_file=$(FILE_PATH)/rom.key
 #kickstart_ext_rom_file=
 floppy0=/uae/floppies/
 
