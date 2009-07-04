@@ -3,7 +3,7 @@ version 3:
 
 		* Support Cloanto's amiga forever ROMs in the default config
 
-		-- Simon Kagstrom <simon.kagstrom@gmail.com>,
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>, Sat Jul  4 09:32:30 CEST 2009
 
 version 2:
 		* Fix bug where the nunchuk analogue controller and
