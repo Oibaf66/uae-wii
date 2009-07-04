@@ -1,5 +1,9 @@
 version 3:
-		-- Simon Kagstrom <simon.kagstrom@gmail.com>
+		* Correct banner showing errors (a SDL_Flip was needed)
+
+		* Support Cloanto's amiga forever ROMs in the default config
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>,
 
 version 2:
                 * Fix bug where the nunchuk analogue controller and
