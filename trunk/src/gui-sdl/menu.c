@@ -185,6 +185,7 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 		SDL_UpdateRect(real_screen, rc.x, rc.y, rc.w,rc.h);
 		SDL_UpdateRect(real_screen, brc.x, brc.y, brc.w,brc.h);
 
+		SDL_Flip(real_screen);
 		key = menu_wait_key_press();
 		if (key & KEY_SELECT)
 		{
