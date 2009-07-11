@@ -1,3 +1,10 @@
+version 4:
+		* Add Mario Kart wheel support: Let the orientation of the wiimote control
+		  left-right joystick direction. Useful for stunt car racer. This feature
+		  requires SDL r62 or above.
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>,
+
 version 3:
 		* Correct banner showing errors (a SDL_Flip was needed)
 
