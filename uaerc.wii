@@ -72,8 +72,8 @@ input.1.joystick.0.axis.3=JOY2_VERT
 input.1.joystick.0.axis.4=JOY2_HORIZ
 input.1.joystick.0.axis.5=JOY2_VERT
 # The "hat" on the wiimote (dpad)
-input.1.joystick.0.axis.6=JOY2_HORIZ
-input.1.joystick.0.axis.7=JOY2_VERT
+input.1.joystick.0.axis.9=JOY2_HORIZ
+input.1.joystick.0.axis.10=JOY2_VERT
 
 # 2 on wiimote, Z on nunchuck and a on the classic controller
 input.1.joystick.0.button.3=JOY2_FIRE_BUTTON
@@ -88,8 +88,8 @@ input.1.joystick.1.axis.2=JOY1_HORIZ
 input.1.joystick.1.axis.3=JOY1_VERT
 input.1.joystick.1.axis.4=JOY1_HORIZ
 input.1.joystick.1.axis.5=JOY1_VERT
-input.1.joystick.1.axis.6=JOY1_HORIZ
-input.1.joystick.1.axis.7=JOY1_VERT
+input.1.joystick.1.axis.9=JOY1_HORIZ
+input.1.joystick.1.axis.10=JOY1_VERT
 
 input.1.joystick.1.button.3=JOY1_FIRE_BUTTON
 input.1.joystick.1.button.7=JOY1_FIRE_BUTTON

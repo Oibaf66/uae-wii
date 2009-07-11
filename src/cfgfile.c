@@ -556,6 +556,10 @@ void save_options (FILE *f, const struct uae_prefs *p, int type)
     cfgfile_write (f, "state_replay_buffer=%d\n", p->statecapturebuffersize);
 #endif
 
+#if defined GEKKO
+    cfgfile_write (f, "wii_use_mario_kart_wheel=%s\n", p->use_wheel_input ? "yes" : "no");
+#endif
+
 #ifdef FILESYS
     write_filesys_config (currprefs.mountinfo, UNEXPANDED, prefs_get_attr ("hardfile_path"), f);
     if (p->filesys_no_uaefsdb)
@@ -844,6 +848,11 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 	|| cfgfile_intval (option, value, "state_replay_buffer", &p->statecapturebuffersize, 1)
 	|| cfgfile_yesno  (option, value, "state_replay", &p->statecapture))
 	return 1;
+#endif
+
+#if defined GEKKO
+    if (cfgfile_yesno  (option, value, "wii_use_mario_kart_wheel", &p->use_wheel_input))
+    	return 1;
 #endif
 
 #ifdef DRIVESOUND
@@ -2458,6 +2467,10 @@ void default_prefs (struct uae_prefs *p, int type)
 
 #ifdef FILESYS
     p->mountinfo = &options_mountinfo;
+#endif
+
+#ifdef GEKKO
+    p->use_wheel_input = 0;
 #endif
 
 #ifdef UAE_MINI
