@@ -30,8 +30,8 @@ static const char *main_menu_messages[] = {
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Reset UAE",
 		/*06*/		"Amiga options",
-		/*07*/		"Keyboard bindings",
-		/*08*/		"Options",
+		/*07*/		"Input options",
+		/*08*/		"Other options",
 		/*09*/		"Help",
 		/*10*/		"Quit",
 		/*04*/		"#1-------------------------------------",
@@ -39,13 +39,15 @@ static const char *main_menu_messages[] = {
 		NULL
 };
 
-static const  char *keyboard_messages[] = {
-		/*00*/		"Wiimote",
+static const  char *input_messages[] = {
+		/*00*/		"Bind key to Wiimote",
 		/*01*/		"^|1|-|+",
-		/*02*/		"Nunchuk",
+		/*02*/		"Bind key to Nunchuk",
 		/*03*/		"^|C",
-		/*04*/		"Classic",
+		/*04*/		"Bind key to Classic",
 		/*05*/		"^|b|x|y|L|R|Zl|Zr|-|+",
+		/*06*/		"Mario kart wheel (horizontal only)",
+		/*07*/		"^|On|Off",
 		NULL,
 };
 
@@ -405,6 +407,7 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 		fprintf(stderr, "Too long string passed\n");
 	va_end(ap);
 
+	printf("Mibb: %s:%s\n", buf, key);
 	read_inputdevice_config (&changed_prefs, buf, key);
 	read_inputdevice_config (&currprefs, buf, key);
 }
@@ -416,7 +419,7 @@ static void setup_joystick_defaults(int joy)
 
 	/* For some reason, the user uaerc removes these. The following
 	 * lines should be removed when this is properly figured out */
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 6; i++)
 	{
 		const char *what = "JOY2_HORIZ"; /* Assume port 1 */
 
@@ -434,6 +437,18 @@ static void setup_joystick_defaults(int joy)
 		insert_keyboard_map(what,
 				"input.1.joystick.%d.axis.%d", joy, i);
 	}
+#ifdef GEKKO
+	if (currprefs.use_wheel_input)
+		insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
+				"input.1.joystick.%d.axis.6", joy);
+	else /* Just select something which will not affect play! */
+		insert_keyboard_map("PAR_JOY2_VERT",
+				"input.1.joystick.%d.axis.6", joy);
+#endif
+	insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
+			"input.1.joystick.%d.axis.9", joy);
+	insert_keyboard_map(joy == 1 ? "JOY1_VERT" : "JOY2_VERT",
+			"input.1.joystick.%d.axis.10", joy);
 
 	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", joy);
 	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", joy);
@@ -452,24 +467,33 @@ static void setup_joystick(int joy, const char *key, int sdl_key)
 	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
 }
 
-static void keyboard_options(void)
+static void input_options(void)
 {
 	const int wiimote_to_sdl[] = {2, 4, 5};
 	const int nunchuk_to_sdl[] = {8};
 	const int classic_to_sdl[] = {10, 11, 12, 13, 14, 15, 16, 17, 18};
 	int sdl_key = 1;
 	const char *key;
-	int submenus[3];
+	int submenus[4];
 	int opt;
 	int i;
 
 	memset(submenus, 0, sizeof(submenus));
+	submenus[3] = !changed_prefs.use_wheel_input;
 
 	opt = menu_select_title("Keyboard menu",
-			keyboard_messages, submenus);
+			input_messages, submenus);
 	if (opt < 0)
 		return;
 	/* Translate key to UAE key event name */
+	if (opt == 6)
+	{
+		changed_prefs.use_wheel_input = !submenus[3];
+		currprefs.use_wheel_input = changed_prefs.use_wheel_input;
+		prefs_has_changed = 1;
+		return;
+	}
+
 	key = virtkbd_get_key();
 	if (key == NULL)
 		return;
@@ -484,6 +508,8 @@ static void keyboard_options(void)
 	default: /* can never happen */
 		break;
 	}
+	changed_prefs.use_wheel_input = !submenus[3];
+	currprefs.use_wheel_input = changed_prefs.use_wheel_input;
 
 	for (i = 0; i < 2; i++)
 		setup_joystick(i, key, sdl_key);
@@ -752,7 +778,7 @@ void gui_display(int shortcut)
 			amiga_model_options();
 			break;
 		case 7:
-			keyboard_options();
+			input_options();
 			break;
 		case 8:
 			general_options();
