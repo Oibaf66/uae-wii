@@ -150,7 +150,7 @@ dist: uae.dol
 uae.elf: $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
-	powerpc-gekko-g++ -o $@ $(OBJS) $(LDFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	#keep elf for debugging
 	#cp $@ /tmp/elf
 
@@ -158,9 +158,9 @@ uae.elf: $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	@powerpc-gekko-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(CC) $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	@powerpc-gekko-g++ $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(CXX) $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
