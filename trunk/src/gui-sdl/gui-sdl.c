@@ -437,14 +437,12 @@ static void setup_joystick_defaults(int joy)
 		insert_keyboard_map(what,
 				"input.1.joystick.%d.axis.%d", joy, i);
 	}
-#ifdef GEKKO
 	if (currprefs.use_wheel_input)
 		insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
 				"input.1.joystick.%d.axis.6", joy);
 	else /* Just select something which will not affect play! */
 		insert_keyboard_map("PAR_JOY2_VERT",
 				"input.1.joystick.%d.axis.6", joy);
-#endif
 	insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
 			"input.1.joystick.%d.axis.9", joy);
 	insert_keyboard_map(joy == 1 ? "JOY1_VERT" : "JOY2_VERT",
