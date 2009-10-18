@@ -237,9 +237,7 @@ struct uae_prefs {
     int statecapturerate, statecapturebuffersize;
 #endif
 
-#ifdef GEKKO
     int use_wheel_input;
-#endif
     /* input */
 
     int jport0;
