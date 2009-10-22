@@ -1,0 +1,16 @@
+One of the best ways of getting access to Amiga kickstart ROMs and
+games completely legally is to buy the Cloanto Amiga Forever CD (see
+http://www.amigaforever.com/). To use this with UAE-wii, you'll need
+to do the following (works with version 3 and above):
+
+1. Copy everything from the "Amiga Files/System/rom/" directory on
+   your Amiga Forever CD to /uae/roms/ on your SD card.
+
+2. Copy /uae/roms/amiga-os-130.rom to /uae/roms/kick.rom
+
+3. If you have upgraded from an older version than 3, remove
+   /uae/uaerc.saved from your SD card
+
+After this, you can start UAE-Wii as you would otherwise and it will
+use the Amiga forever kickstart ROMs. You can copy floppies (ADFs)
+from the CD in the same way to /uae/floppies/.

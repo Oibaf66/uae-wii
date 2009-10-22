@@ -1,0 +1,42 @@
+version 4:
+		* (build) Update to devkitpro r18 and the new SDL-wii trunk
+
+		* Add Mario Kart wheel support: Let the orientation of the wiimote control
+		  left-right joystick direction. Useful for stunt car racer. This feature
+		  requires SDL r62 or above.
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>, Tue Oct 20 19:30:35 CEST 2009
+
+version 3:
+		* Correct banner showing errors (a SDL_Flip was needed)
+
+		* Support Cloanto's amiga forever ROMs in the default config
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>, Sat Jul  4 09:32:30 CEST 2009
+
+version 2:
+		* Fix bug where the nunchuk analogue controller and
+		  the DPAD would not work at the same time
+
+		* Lots of menu improvements (pressing 1 will now go
+		  back to the last menu for example)
+
+		* Enable use of harddisks
+
+		* Fix save/restore state
+
+		* Add virtual keyboard (for binding joystick buttons to keyboard keys)
+
+		* Load a uaerc.user if it exists. This is also saved when configuration changes and it
+		  overrides stuff from uaerc
+
+		* Allow setting of Amiga type (from PSPUae / FOL)
+
+		* Better default configuration (from PSPUae / FOL)
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>, Sun May 31 09:23:43 CEST 2009
+
+version 1:
+		* Initial release
+
+		-- Simon Kagstrom <simon.kagstrom@gmail.com>
