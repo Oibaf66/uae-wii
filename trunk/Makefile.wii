@@ -125,7 +125,7 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 #unused defines; -DFDI2RAW 
 
 # Test link flags.
-LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard
 
 dist: uae.dol
 
