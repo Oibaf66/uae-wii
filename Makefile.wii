@@ -36,12 +36,17 @@ SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support
 	src/enforcer.c src/ar.c src/debug.c \
 	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
 
+genlinetoscr_args="-b"
+
 # Library object files.
 OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o)) $(OBJ_DIR)/guidep/VirtualKeyboard.o
 
 # Test source files.
 # It can be useful to switch this variable around to select individual tests which are problematic.
 TEST_SRCS	:= $(TEST_SRC_DIR)/showfont.c
+
+src/tools/linetoscr:
+	cd src/tools/ && make -f Makefile.wii
 
 # What's a full build?
 all: uae.dol
@@ -93,6 +98,21 @@ src/md-fpp.h:
 	rm -f $@
 	cd src && ln -s include/fpp-ieee.h md-fpp.h
 
+src/blit.h:	src/tools/genblitter
+		src//tools/genblitter i >$@
+
+src/blitfunc.c: src/tools/genblitter src/blitfunc.h
+		src/tools/genblitter f >$@
+
+src/blitfunc.h: src/tools/genblitter
+		src/tools/genblitter h >$@
+
+src/blittable.c:  src/tools/genblitter src/blitfunc.h
+		src/tools/genblitter t >$@
+
+src/linetoscr.c:    src/tools/genlinetoscr
+		src/tools/genlinetoscr $(genlinetoscr_args) >$@
+
 %.h: %.h.wii
 	cp $< $@
 
@@ -107,7 +127,7 @@ $(LIB_DIR)/libSDL_ttf.a: $(OBJS)
 	@echo ----
 
 # How to build a DOL.
-$(BIN_DIR)/%.dol: %.elf
+uae.dol: uae.elf
 	@echo Creating DOL $@
 	@-mkdir -p $(dir $@)
 	#powerpc-gekko-objcopy -O binary $< $@
@@ -147,7 +167,7 @@ dist: uae.dol
 	cd $@ && tar -czf ../uae-bin.tar.gz *
 
 # How to link an ELF.
-uae.elf: $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
+uae.elf: src/tools/linetoscr src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
