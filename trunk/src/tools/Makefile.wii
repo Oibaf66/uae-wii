@@ -4,7 +4,7 @@
 
 CC        = gcc
 LDFLAGS   =
-CFLAGS    =
+CFLAGS    = -I../include
 LIBRARIES =
 
 all: gencpu gencomp build68k genblitter genlinetoscr
@@ -38,7 +38,7 @@ custom.o: blit.h
 drawing.o: linetoscr.c
 
 cpudefs.c: build68k ../table68k
-	./build68k ../table68k >cpudefs.c
+	./build68k < ../table68k >cpudefs.c
 
 .c.o:
 	$(CC) $(INCLUDES) -c $(INCDIRS) $(CFLAGS) $(X_CFLAGS) $(DEBUGFLAGS) $(CFLAGS_$@) $< -o $@
