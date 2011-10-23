@@ -13,7 +13,11 @@
 #include <assert.h>
 
 #if defined(GEKKO)
-# include <fat.h>
+#include <gccore.h>
+#include <ogc/usbstorage.h>
+#include <fat.h>
+#include <network.h>
+#include <smb.h>
 #endif
 
 #include "options.h"
@@ -57,6 +61,8 @@
 #include "windows.h"
 #endif
 
+extern int log_quiet;
+
 struct uae_prefs currprefs, changed_prefs;
 
 static int restart_program;
@@ -69,6 +75,103 @@ int log_scsi;
 
 struct gui_info gui_data;
 
+bool usbismount = false;
+bool networkisinit = false;
+bool smbismount = false; 
+
+#if defined(GEKKO)
+
+/****************************************************************************
+ * Mount SMB Share
+ ****************************************************************************/
+
+bool ConnectShare ()
+{
+	
+	if(smbismount)
+		return true;
+		//printf("user:  %s\n", network_prefs.SmbUser);
+		//printf("pass:  %s\n", network_prefs.SmbPwd);
+		//printf("share: %s\n", network_prefs.SmbShare);
+		//printf("ip:    %s\n\n", network_prefs.SmbIp);
+		
+		int a;
+		for (a=0;a<3;a++)
+		if(smbInit(currprefs.SmbUser, currprefs.SmbPwd,currprefs.SmbShare, currprefs.SmbIp))
+			{smbismount = true;	break;}
+			
+		
+		if(!smbismount) printf("Failed to connect to SMB share\n\n");
+		else {
+		printf("Established connection to SMB share\n\n");
+		}
+
+	return smbismount;
+}
+
+void CloseShare()
+{
+
+	if(smbismount) {
+	printf("Disconnected from SMB share\n");
+	smbClose("smb");
+	}
+	smbismount = false;
+}
+
+/****************************************************************************
+ * init and deinit USB device functions
+ ****************************************************************************/
+ 
+bool InitUSB()
+{ 
+	printf("Initializing USB FAT subsytem ...\n\n");
+	fatUnmount("usb:");
+	
+	// This should wake up the drive
+	bool isMounted = fatMountSimple("usb", &__io_usbstorage);
+	
+	bool isInserted = __io_usbstorage.isInserted();
+	if (!isInserted) return false; 
+ 
+	// USB Drive may be "sleeeeping" 
+	// We need to try Mounting a few times to wake it up
+	int retry = 10;
+	while (retry && !isMounted)
+	{
+		sleep(1);
+		isMounted = fatMountSimple("usb", &__io_usbstorage);
+		retry--; 
+	}
+	if (isMounted) 
+		printf("USB FAT subsytem initialized\n\n");
+	else
+		printf("Impossible to initialize USB FAT subsytem\n\n");
+	return isMounted;
+ }
+ 
+ void DeInitUSB()
+{
+	fatUnmount("usb:");
+	__io_usbstorage.shutdown(); 
+}
+
+bool InitNetwork()
+{
+        char myIP[16];
+
+        memset(myIP, 0, sizeof(myIP));
+	printf("Getting IP address via DHCP...\n\n");
+
+	if (if_config(myIP, NULL, NULL, true) < 0) {
+	        	printf("No DHCP reply\n\n");
+	        	return false;
+        }
+	printf("Got an address: %s\n\n",myIP);
+	return true;
+}
+
+#endif
 
 /*
  * Random prefs-related junk that needs to go elsewhere.
@@ -438,7 +541,8 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
     strcat (optionsfile, OPTIONSFILENAME);
 
     if (! cfgfile_load (&currprefs, optionsfile, 0)) {
-//	write_log ("failed to load config '%s'\n", optionsfile);
+	write_log ("failed to load config '%s'\n", optionsfile);
+
 #ifdef OPTIONS_IN_HOME
 	/* sam: if not found in $HOME then look in current directory */
         char *saved_path = strdup (optionsfile);
@@ -452,11 +556,11 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
         free (saved_path);
 #endif
     }
-    fix_options ();
-
+	
     parse_cmdline (argc, argv);
-    parse_user_conf_file(".saved");
-    parse_user_conf_file(".user");
+    
+	cfgfile_load (&currprefs, SAVEDFILENAME, 0);
+	cfgfile_load (&currprefs, USERFILENAME, 0);
 
     fix_options ();
 }
@@ -976,15 +1080,53 @@ int init_sdl (void)
 #ifndef NO_MAIN_IN_MAIN_C
 int main (int argc, char **argv)
 {
-	fprintf(stderr, "main started\n");
-#if defined(GEKKO)
-	fatInitDefault();
-#endif
+	
+	#ifdef GEKKO
+	
+	printf("\x1b[2;0H");
+
+	//initialize libfat library
+	if (!fatInitDefault())
+	{ 
+		printf("Couldn't initialize SD fat subsytem\n");
+		sleep(3);
+		exit(0);
+	}
+	else
+		printf("SD FAT subsytem initialized\n\n");
+	
+	usbismount = InitUSB();
+	networkisinit = InitNetwork();
+
+    default_prefs (&currprefs, 0);
+	cfgfile_load (&currprefs, SMBFILENAME, 0);
+	printf("\n");
+	
+	if (networkisinit) ConnectShare(); 
+		
+	sleep(3);
+	
+	// clear the screen
+	printf("\x1b[2J");
+	printf("\x1b[2;0H");	
+	
+	if (!(log_quiet = !currprefs.logfile))	set_logfile("/uae/uae.log");
+	
+	#endif
+	
+	write_log("main started\n");
     init_sdl ();
-	fprintf(stderr, "sdl inited\n");
+	write_log("sdl inited\n");
     gui_init (argc, argv);
-	fprintf(stderr, "Starting real main\n");
+	write_log("Starting real main\n");
     real_main (argc, argv);
+	
+	#ifdef GEKKO
+	if (smbismount) CloseShare ();
+	DeInitUSB();
+	fatUnmount(0);
+	#endif
+
     return 0;
 }
 #endif

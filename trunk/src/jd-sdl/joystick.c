@@ -113,7 +113,10 @@ static void read_joysticks (void)
 {
     if (get_joystick_num ()) {
 	unsigned int i;
+	//IR wiimote fix
+	#ifndef GEKKO
 	SDL_JoystickUpdate ();
+	#endif
 	for (i = 0; i < get_joystick_num (); i++)
 	    read_joy (i);
     }
@@ -138,6 +141,10 @@ static int init_joysticks (void)
 		joys[i].axles   = SDL_JoystickNumAxes (joys[i].joy);
 		joys[i].buttons = SDL_JoystickNumButtons (joys[i].joy);
 	    }
+		//IR wiimote fix 
+		#ifdef GEKKO
+		SDL_JoystickEventState(SDL_ENABLE);
+		#endif
 	    success = initialized = 1;
 	} else
 	    write_log ("Failed to initialize joysticks\n");

@@ -53,9 +53,11 @@ typedef struct virtkey
   { name, "None", true }
 #define KNL() \
   { NULL, NULL, false }
+#define NJ(name, joy_name) \
+  { name, joy_name, false }  
 
 #define KEY_COLS 14
-#define KEY_ROWS 7
+#define KEY_ROWS 8
 
 static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   N("Esc", "ESC"), KNL(), K("F1"),K("F2"),K("F3"),K("F4"),K("F5"),K("F6"),K("F7"),K("F8"),K("F9"),K("F10"), N("Del","DEL"),N("Help", "HELP"),
@@ -64,7 +66,8 @@ static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   N("Sft","SHIFT_LEFT"),KNL(), K("A"), K("S"), K("D"), K("F"), K("G"), K("H"), K("J"), K("K"), K("L"), N(":;", "SEMICOLON"), N("@#", "??"), N("Sft", "SHIFT_RIGHT"),
   N("Ctrl","CTRL"),KNL(),K("Z"),K("X"), K("C"), K("V"), K("B"), K("N"), K("M"),N("<,", "COMMA"),N(">.", "PERIOD"), N("\\","KEY_BACKSLASH"), N("/", "SLASH"),N("Ret", "RETURN"),
   N("Alt","ALT_LEFT"),KNL(), N("Amg","AMIGA_LEFT"),KNL(),N("space", "SPACE"),KNL(),KNL(),KNL(), N("Up", "CURSOR_UP"),KNL(),KNL(),N("Amg","AMIGA_RIGHT"),KNL(),N("Alt","ALT_RIGHT"), 
-  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft", "CURSOR_LEFT"),KNL(), N("Dwn", "CURSOR_DOWN"), KNL(), N("Rgt", "CURSOR_RIGHT"),KNL(), N("Enter", "ENTER"),
+  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft", "CURSOR_LEFT"),KNL(), N("Dwn", "CURSOR_DOWN"), KNL(), N("Rgt", "CURSOR_RIGHT"),KNL(), N("Enter", "ENTER"),KNL(),
+  NJ("Fire","JOY_FIRE_BUTTON"),KNL(),KNL(),NJ("Joy 2nd button","JOY_2ND_BUTTON"),KNL(),KNL(),KNL(),KNL(),KNL(),NJ("Joy 3rd button","JOY_3RD_BUTTON"),KNL(),KNL(),KNL(),KNL()
 };
 
 VirtualKeyboard::VirtualKeyboard(SDL_Surface *screen, TTF_Font *font)
@@ -89,7 +92,7 @@ void VirtualKeyboard::draw()
 			key_w * KEY_COLS, key_h * KEY_ROWS};
 
 	SDL_FillRect(this->screen, &bg_rect,
-			SDL_MapRGB(screen->format, 0x00, 0x80, 0x80));
+			SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
 
 	for (int y = 0; y < KEY_ROWS; y++ )
 	{
@@ -97,7 +100,7 @@ void VirtualKeyboard::draw()
 		{
 			int which = y * KEY_COLS + x;
 			virtkey_t key = keys[which];
-			int r = 255, g = 255, b = 255;
+			int r = 64, g = 64, b = 64;
 			const char *what = key.name;
 
 			/* Skip empty positions */
@@ -105,9 +108,9 @@ void VirtualKeyboard::draw()
 				continue;
 
 			if ( key.is_done )
-				r = 0;
+				r = 255;
 			if ( (x == this->sel_x && y == this->sel_y))
-				b = 0;
+				g = 200;
 
 			menu_print_font(this->screen, r, g, b,
 					x * key_w + border_x, y * key_h + border_y,
@@ -176,9 +179,10 @@ struct virtkey *VirtualKeyboard::get_key_internal()
 const char* VirtualKeyboard::get_key()
 {
 	virtkey_t *key;
+	SDL_Rect rect = {32, 32, FULL_DISPLAY_X-64, FULL_DISPLAY_Y-96};
 
-	SDL_FillRect(this->screen, 0, SDL_MapRGB(screen->format, 0x00, 0x80, 0x80));
-
+	SDL_FillRect(this->screen, &rect, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+	
 	key = this->get_key_internal();
 	if (key == NULL)
 		return NULL;

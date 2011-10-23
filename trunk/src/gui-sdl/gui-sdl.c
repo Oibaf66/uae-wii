@@ -19,6 +19,14 @@
 #include "uae.h"
 #include "menu.h"
 #include "VirtualKeyboard.h"
+#include "sounddep/sound.h"
+
+#define ID_BUTTON_OFFSET 0
+#define ID_AXIS_OFFSET 32
+
+extern int usbismount, smbismount;
+
+extern const char *strdup_path_expand (const char *src);
 
 static void default_config(void);
 
@@ -28,37 +36,49 @@ static const char *main_menu_messages[] = {
 		/*02*/		"States",
 		/*03*/		"^|Load|Save|Delete",
 		/*04*/		"#1-------------------------------------",
-		/*05*/		"Reset UAE",
-		/*06*/		"Amiga options",
-		/*07*/		"Input options",
+		/*05*/		"Wiimote configuration",
+		/*06*/		"^|Wiimote1|Wiimote2",
+		/*07*/		"Hardware options",
 		/*08*/		"Other options",
-		/*09*/		"Help",
-		/*10*/		"Quit",
-		/*04*/		"#1-------------------------------------",
-		/*04*/		"#21 - back,  2/A - select",
+		/*09*/		"Save confs",
+		/*10*/		"Reset UAE",
+		/*11*/		"Help",
+		/*12*/		"Quit",
+		/*13*/		"#1-------------------------------------",
+		/*14*/		"#21 - back,  2/A - select",
 		NULL
 };
 
 static const  char *input_messages[] = {
 		/*00*/		"Bind key to Wiimote",
-		/*01*/		"^|1|-|+",
-		/*02*/		"Bind key to Nunchuk",
-		/*03*/		"^|C",
-		/*04*/		"Bind key to Classic",
-		/*05*/		"^|b|x|y|L|R|Zl|Zr|-|+",
-		/*06*/		"Mario kart wheel (horizontal only)",
-		/*07*/		"^|On|Off",
+		/*01*/		"^|1|2|-|+",
+		/*02*/		"  ",
+		/*03*/		"Bind key to Nunchuk",
+		/*04*/		"^|Z|C",
+		/*05*/		"  ",
+		/*06*/		"Bind key to Classic",
+		/*07*/		"^|a|b|x|y|L|R|Zl|Zr|-|+",
+		/*08*/		"  ",
+		/*09*/		"Mario kart wheel (horizontal only)",
+		/*10*/		"^|On|Off",
+		/*11*/		"  ",
+		/*12*/		"Mouse emulation",
+		/*13*/		"^|On|Off",
 		NULL,
 };
 
 static const char *amiga_model_messages[] = {
 		/*00*/		"Amiga model",
 		/*01*/		"^|A1000|A500|A600|A1200|Custom",
-		/*02*/		"Emulation accuracy",
-		/*03*/		"^|Fast|Compatible|Cycle-exact",
-		/*04*/		"Memory options",
-		/*05*/		"CPU/Chipset options",
-		/*06*/		"Change ROM",
+		/*02*/		"  ",
+		/*03*/		"Emulation accuracy",
+		/*04*/		"^|Fast|Compatible|Cycle-exact",
+		/*05*/		"  ",
+		/*06*/		"Memory options",
+		/*07*/		"  ",
+		/*08*/		"CPU/Chipset options",
+		/*09*/		"  ",
+		/*10*/		"Change ROM",
 		NULL
 };
 
@@ -69,8 +89,8 @@ static const char *memory_messages[] = {
 		/*03*/		"^|None|256K|512K|1M|1.8M",
 		/*04*/		"Fast mem",
 		/*05*/		"^|None|1M|2M|4M|8M",
-		/*04*/		"Zorro3 mem",
-		/*05*/		"^|None|1M|2M|4M|8M|16M|32M",		
+		/*06*/		"Zorro3 mem",
+		/*07*/		"^|None|1M|2M|4M|8M|16M|32M",		
 		NULL
 };
 
@@ -82,6 +102,7 @@ static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
 		/*01*/		"^|68000|68010|68020|68030|68040|68060",
+		/*02*/		"  ",
 		/*03*/		"Chipset type",
 		/*04*/		"^|OCS|ECS AGNUS|ECS|AGA",
 		NULL
@@ -95,29 +116,32 @@ static const int chipset_mask_table[] = {0, CSMASK_ECS_AGNUS,
 
 static const char *options_messages[] = {
 		/*00*/		"CPU to chipset speed",
-		/*01*/		"^|max|0%|34%|51%|68%|84%|100% Chipset",
-		/*02*/		"Frameskip",
-		/*03*/		"^|none|2|3|4|8|custom",
+		/*01*/		"^|max|90%|80%|60%|40%|20%|0%",
+		/*02*/		"Framerate",
+		/*03*/		"^|100%|50%|33%|25%|12%|custom",
 		/*04*/		"Floppy speed",
 		/*05*/		"^|normal|turbo|400%|800%",
 		/*06*/		"Correct aspect",
 		/*07*/		"^|true|false",
 		/*08*/		"Leds",
 		/*09*/		"^|on|off",
+		/*10*/		"Port",
+		/*11*/		"^|SD|USB|SMB",
+		
 		NULL
 };
 
-static const int cpu_to_chipset_table[] = {-1,512,2560,5120,7168,8704,10240};
+static const int cpu_to_chipset_table[] = {-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
 static const int framerate_table[] = {1, 2, 3, 4, 8};
 
 
 static const char *help_messages[] = {
-		/*00*/		"#2HOME enters the menu system, where arrow",
-		/*01*/		"#2keys and +/- are used to navigate up and down.",
+		/*00*/		"#2HOME enters the menu system, where arrow keys",
+		/*01*/		"#2and nunchuck are used to navigate up and down.",
 		/*02*/		"#2You can bind keyboard keys to the wiimote",
 		/*03*/		"#2buttons in the 'keyboard bindings' menu and",
-		/*04*/		"#2change emulation options in the Amiga menu.",
+		/*04*/		"#2change emulation options in the hardware menu.",
 		/*05*/		"#2 ",
 		/*06*/		"#2Kickstart roms should be named kick.rom,",
 		/*07*/		"#2kick10.rom, kick12.rom, kick13.rom, kick20.rom,",
@@ -247,7 +271,8 @@ static int prefs_has_changed;
 
 static void insert_floppy(int which)
 {
-	const char *name = menu_select_file(prefs_get_attr("floppy_path"));
+	const char *selected_file=changed_prefs.df[which];
+	const char *name = menu_select_file(prefs_get_attr("floppy_path"), selected_file, which);
 
 	if (name != NULL)
 	{
@@ -257,13 +282,11 @@ static void insert_floppy(int which)
 			strcpy (changed_prefs.df[which], name);
 		free((void*)name);
 	}
-	else
-		changed_prefs.df[which][0] = '\0';
 }
 
 static void insert_rom(void)
 {
-	const char *name = menu_select_file(prefs_get_attr("rom_path"));
+	const char *name = menu_select_file(prefs_get_attr("rom_path"),NULL, -1);
 
 	/* None or NULL means no change */
 	if (name != NULL)
@@ -362,16 +385,69 @@ static int get_gfx_framerate(void)
 
 }
 
+static void set_Port(int which)
+{
+	switch (which)
+	{
+	case PORT_SD:
+		prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
+		changed_prefs.Port = which;
+		currprefs.Port = changed_prefs.Port;
+		break;
+	case PORT_USB:
+		if (usbismount) {
+			prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_USB_PATH));
+			changed_prefs.Port = which;
+			currprefs.Port = changed_prefs.Port;}
+		else
+			msgInfo("USB is not mounted",3000,NULL);
+		break;
+	case PORT_SMB:
+		if (smbismount) {
+			prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_SMB_PATH));
+			changed_prefs.Port = which;
+			currprefs.Port = changed_prefs.Port;}
+		else
+			msgInfo("SMB is not mounted",3000,NULL);
+		break;
+	default:
+		break;		
+	}	
+}
+
+static void save_configurations(void)
+{
+char user_options[255] = "";
+int i;
+
+#ifdef OPTIONS_IN_HOME
+char *home = getenv ("HOME");
+
+if (home != NULL && strlen (home) < 240)
+{
+	strcpy (user_options, home);
+	strcat (user_options, "/");
+}
+#endif
+
+strcat(user_options, OPTIONSFILENAME);
+strcat(user_options, ".saved");
+
+cfgfile_save(&changed_prefs, user_options, 0);
+msgInfo("Configurations saved",3000,NULL);
+}	
+
 static void general_options(void)
 {
-	int submenus[5];
+	int submenus[6];
 	int opt;
 
 	submenus[0] = get_cpu_to_chipset_speed();
 	submenus[1] = get_gfx_framerate();
 	submenus[2] = get_floppy_speed();
 	submenus[3] = changed_prefs.gfx_correct_aspect == 0 ? 1 : 0;
-	submenus[4] = currprefs.leds_on_screen == 0 ? 1 : 0;
+	submenus[4] = changed_prefs.leds_on_screen == 0 ? 1 : 0;
+	submenus[5] = changed_prefs.Port;
 
 	opt = menu_select_title("General options menu",
 			options_messages, submenus);
@@ -380,15 +456,17 @@ static void general_options(void)
 	set_cpu_to_chipset_speed(submenus[0]);
 	set_gfx_framerate(submenus[1]);
 	set_floppy_speed(submenus[2]);
+	set_Port(submenus[5]);
 
 	changed_prefs.gfx_correct_aspect = !submenus[3];
-	currprefs.gfx_correct_aspect = changed_prefs.gfx_correct_aspect;
+	
 	/* Floppy, Power, FPS, etc etc. */
 	changed_prefs.leds_on_screen = !submenus[4];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 
 	prefs_has_changed = 1;
 }
+
 
 /* There are a few unfortunate header problems, so I'll do like this for now */
 struct uae_prefs;
@@ -407,111 +485,98 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 		fprintf(stderr, "Too long string passed\n");
 	va_end(ap);
 
-	printf("Mibb: %s:%s\n", buf, key);
+	//printf("Mibb: %s:%s\n", buf, key);
 	read_inputdevice_config (&changed_prefs, buf, key);
 	read_inputdevice_config (&currprefs, buf, key);
 }
 
-static void setup_joystick_defaults(int joy)
-{
-	int fire_buttons[] = {3,7,9};
-	int i;
-
-	/* For some reason, the user uaerc removes these. The following
-	 * lines should be removed when this is properly figured out */
-	for (i = 0; i < 6; i++)
-	{
-		const char *what = "JOY2_HORIZ"; /* Assume port 1 */
-
-		/* Odd - vertical */
-		if (i % 2 != 0)
-		{
-			if (joy == 1)
-				what = "JOY1_VERT";
-			else
-				what = "JOY2_VERT";
-		}
-		else if (joy == 1) /* Even - horizontal (and port 2) */
-			what = "JOY1_HORIZ";
-
-		insert_keyboard_map(what,
-				"input.1.joystick.%d.axis.%d", joy, i);
-	}
-	if (currprefs.use_wheel_input)
-		insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
-				"input.1.joystick.%d.axis.6", joy);
-	else /* Just select something which will not affect play! */
-		insert_keyboard_map("PAR_JOY2_VERT",
-				"input.1.joystick.%d.axis.6", joy);
-	insert_keyboard_map(joy == 1 ? "JOY1_HORIZ" : "JOY2_HORIZ",
-			"input.1.joystick.%d.axis.9", joy);
-	insert_keyboard_map(joy == 1 ? "JOY1_VERT" : "JOY2_VERT",
-			"input.1.joystick.%d.axis.10", joy);
-
-	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.6", joy);
-	insert_keyboard_map("SPC_ENTERGUI", "input.1.joystick.%d.button.19", joy);
-
-	for (i = 0; i < SDL_arraysize(fire_buttons); i++)
-	{
-		const char *btn = joy == 0 ? "JOY2_FIRE_BUTTON" : "JOY1_FIRE_BUTTON";
-
-		insert_keyboard_map(btn, "input.1.joystick.%d.button.%d",
-				joy, fire_buttons[i]);
-	}
-}
 
 static void setup_joystick(int joy, const char *key, int sdl_key)
 {
+	if (!strcmp(key, "None")) 
+	{
+	currprefs.joystick_settings[1][joy].eventid[ID_BUTTON_OFFSET + sdl_key][0] = 0;
+	changed_prefs.joystick_settings[1][joy].eventid[ID_BUTTON_OFFSET + sdl_key][0] = 0;
+	}
+	else
 	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
 }
 
-static void input_options(void)
+static void input_options(int joy)
 {
-	const int wiimote_to_sdl[] = {2, 4, 5};
-	const int nunchuk_to_sdl[] = {8};
-	const int classic_to_sdl[] = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+	const int wiimote_to_sdl[] = {2, 3, 4, 5};
+	const int nunchuk_to_sdl[] = {7, 8};
+	const int classic_to_sdl[] = {9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
 	int sdl_key = 1;
 	const char *key;
-	int submenus[4];
+	int submenus[5];
 	int opt;
 	int i;
 
 	memset(submenus, 0, sizeof(submenus));
-	submenus[3] = !changed_prefs.use_wheel_input;
+	submenus[3] = changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0]== 0 ? 1 : 0;
+	submenus[4] = changed_prefs.mouse_settings[1][joy].enabled == 0 ? 1 : 0;
 
-	opt = menu_select_title("Keyboard menu",
+	opt = menu_select_title("Input menu",
 			input_messages, submenus);
 	if (opt < 0)
 		return;
 	/* Translate key to UAE key event name */
-	if (opt == 6)
-	{
-		changed_prefs.use_wheel_input = !submenus[3];
-		currprefs.use_wheel_input = changed_prefs.use_wheel_input;
+	
+	if (opt == 9)
+	{	
+		if (!submenus[3]){
+			if (!joy) insert_keyboard_map("JOY2_HORIZ","input.1.joystick.%d.axis.6", 0);
+			else insert_keyboard_map("JOY1_HORIZ" ,"input.1.joystick.%d.axis.6", 1);}
+		else{
+				currprefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
+				changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
+			}
 		prefs_has_changed = 1;
 		return;
 	}
 
+	if (opt == 12)
+	{
+		if (submenus[4])
+		{
+		changed_prefs.mouse_settings[1][joy].enabled = 0;
+		currprefs.mouse_settings[1][joy].enabled = 0;
+		}
+		else
+		{
+		changed_prefs.mouse_settings[1][joy].enabled = 1;
+		currprefs.mouse_settings[1][joy].enabled = 1;
+		}
+		prefs_has_changed = 1;
+		return;
+	}
+	
 	key = virtkbd_get_key();
 	if (key == NULL)
 		return;
 	switch(opt)
-	{
-	case 0: /* wiimote */
-		sdl_key = wiimote_to_sdl[submenus[0]]; break;
-	case 2: /* nunchuk */
-		sdl_key = nunchuk_to_sdl[submenus[1]]; break;
-	case 4: /* classic */
-		sdl_key = classic_to_sdl[submenus[2]]; break;
-	default: /* can never happen */
-		break;
-	}
-	changed_prefs.use_wheel_input = !submenus[3];
-	currprefs.use_wheel_input = changed_prefs.use_wheel_input;
-
-	for (i = 0; i < 2; i++)
-		setup_joystick(i, key, sdl_key);
-
+		{
+		case 0: /* wiimote */
+			sdl_key = wiimote_to_sdl[submenus[0]]; break;
+		case 3: /* nunchuk */
+			sdl_key = nunchuk_to_sdl[submenus[1]]; break;
+		case 6: /* classic */
+			sdl_key = classic_to_sdl[submenus[2]]; break;
+		default: /* can never happen */
+			break;
+		}
+	if (!strcmp(key,"JOY_FIRE_BUTTON"))
+			key= joy ? "JOY1_FIRE_BUTTON": "JOY2_FIRE_BUTTON";
+			
+	if (!strcmp(key,"JOY_2ND_BUTTON"))
+			key= joy ? "JOY1_2ND_BUTTON": "JOY2_2ND_BUTTON";
+			
+	if (!strcmp(key,"JOY_3RD_BUTTON"))
+			key= joy ? "JOY1_3RD_BUTTON": "JOY2_3RD_BUTTON";
+		
+	setup_joystick(joy, key, sdl_key);
+	
 	prefs_has_changed = 1;
 }
 
@@ -579,7 +644,7 @@ static void amiga_model_options(void)
 		submenus[0] = cur_model;
 		submenus[1] = get_emulation_accuracy();
 
-		opt = menu_select_title("Amiga model menu",
+		opt = menu_select_title("Hardware option menu",
 				amiga_model_messages, submenus);
 		if (opt < 0)
 			return;
@@ -598,16 +663,16 @@ static void amiga_model_options(void)
 
 		switch(opt)
 		{
-		case 4:
-			memory_options(); break;
-		case 5:
-			cpu_chipset_options(); break;
 		case 6:
+			memory_options(); break;
+		case 8:
+			cpu_chipset_options(); break;
+		case 10:
 			insert_rom(); break;
 		default:
 			break;
 		}
-	} while (opt == 4 || opt == 5 || opt == 6);
+	} while (opt == 6 || opt == 8 || opt == 10);
 
 	/* Reset the Amiga if the model has changed */
 	if (cur_model != submenus[0])
@@ -636,24 +701,28 @@ static void save_load_state(int which)
 	case 2:
 	case 0: /* Load state */
 	{
-		const char *name = menu_select_file(dir);
+		const char *name = menu_select_file(dir, NULL,-1);
 
 		if (!name)
 			return;
 
-		if (which == 0)
+		if (ext_matches(name, ".uss")|ext_matches(name, ".USS"))
 		{
-			strcpy(savestate_fname, name);
-			savestate_state = STATE_DORESTORE;
-		}
-		else /* Delete saved state */
-			unlink(name);
+			if (which == 0)
+			{
+				strcpy(savestate_fname, name);
+				savestate_state = STATE_DORESTORE;
+			}
+			else /* Delete saved state */
+				unlink(name);
+		}	
 		free((void*)name);
 	} break;
 	case 1: /* Save state */
 		snprintf(db, 255, "%s/%s.uss", dir, fb);
 		savestate_state = STATE_DOSAVE;
 		save_state(db, floppy0);
+		msgInfo("State saved",3000,NULL);
 		break;
 	default:
 		break;
@@ -682,7 +751,9 @@ void gui_notify_state (int state)
 extern int log_quiet;
 int gui_update (void)
 {
+	#ifndef GEKKO
 	log_quiet = 1;
+	#endif
 
     return 0;
 }
@@ -748,7 +819,8 @@ void gui_display(int shortcut)
 {
 	int submenus[3];
 	int opt;
-
+	pause_sound();
+	
 	memset(submenus, 0, sizeof(submenus));
 	prefs_has_changed = 0;
 
@@ -770,49 +842,32 @@ void gui_display(int shortcut)
 			save_load_state(submenus[1]);
 			break;
 		case 5:
-			uae_reset(1);
-			break;
-		case 6:
-			amiga_model_options();
-			break;
+			input_options(submenus[2]);
+			break;		
 		case 7:
-			input_options();
-			break;
+			amiga_model_options();
+			break;	
 		case 8:
 			general_options();
 			break;
-		case 9:
-			help();
+		case 9:	
+			save_configurations();
 			break;
 		case 10:
-			uae_quit();
+			uae_reset(1);
+			break;	
+		case 11:
+			help();
+			break;
+		case 12:
+			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) uae_quit();	
 			break;
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 6 || opt == 7 || opt == 8);
-
-	if (prefs_has_changed)
-	{
-		char user_options[255] = "";
-		int i;
-
-#ifdef OPTIONS_IN_HOME
-		char *home = getenv ("HOME");
-		if (home != NULL && strlen (home) < 240)
-		{
-			strcpy (user_options, home);
-			strcat (user_options, "/");
-		}
-#endif
-		strcat(user_options, OPTIONSFILENAME);
-		strcat(user_options, ".saved");
-
-		for (i = 0; i < 2; i++)
-			setup_joystick_defaults(i);
-
-		cfgfile_save(&changed_prefs, user_options, 0);
-	}
+	} while (opt == 0 || opt == 5 || opt == 7 || opt == 8 || opt == 9 || opt == 11);
+	
+	resume_sound();
 }
 
 void gui_message (const char *format,...)
