@@ -2,12 +2,15 @@
 # Makefile.in for UAE tools
 #
 
+export PATH	:=	$(DEVKITPPC)/../MinGW/bin:$(PATH)
+
+
 CC        = gcc
 LDFLAGS   =
 CFLAGS    = -I../include
 LIBRARIES =
 
-all: gencpu gencomp build68k genblitter genlinetoscr
+all: gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe
 
 install:
 
@@ -15,7 +18,7 @@ install:
 clean:
 	-rm -f *.o
 	-rm cpudefs.c
-	-rm -f gencpu gencomp genblitter build68k genlinetoscr
+	-rm -f gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe
 
 
 distclean: clean
@@ -23,22 +26,22 @@ distclean: clean
 	-rm -f Makefile sysconfig.h
 	-rm -f *.c
 
-genblitter: genblitter.o blitops.o writelog.o
-	$(CC) $(LDFLAGS) -o genblitter genblitter.o blitops.o writelog.o
-build68k: build68k.o writelog.o
-	$(CC) $(LDFLAGS) -o build68k build68k.o writelog.o
-gencpu: gencpu.o readcpu.o cpudefs.o missing.o writelog.o
-	$(CC) $(LDFLAGS) -o gencpu gencpu.o readcpu.o cpudefs.o missing.o writelog.o
-gencomp: gencomp.o readcpu.o cpudefs.o missing.o
-	$(CC) $(LDFLAGS) -o gencomp gencomp.o readcpu.o missing.o cpudefs.o writelog.o
-genlinetoscr: genlinetoscr.o
-	$(CC) $(LDFLAGS) -o genlinetoscr genlinetoscr.o
+genblitter.exe: genblitter.o blitops.o writelog.o
+	$(CC) $(LDFLAGS) -o genblitter.exe genblitter.o blitops.o writelog.o
+build68k.exe: build68k.o writelog.o
+	$(CC) $(LDFLAGS) -o build68k.exe build68k.o writelog.o
+gencpu.exe: gencpu.o readcpu.o cpudefs.o missing.o writelog.o
+	$(CC) $(LDFLAGS) -o gencpu.exe gencpu.o readcpu.o cpudefs.o missing.o writelog.o
+gencomp.exe: gencomp.o readcpu.o cpudefs.o missing.o
+	$(CC) $(LDFLAGS) -o gencomp.exe gencomp.o readcpu.o missing.o cpudefs.o writelog.o
+genlinetoscr.exe: genlinetoscr.o
+	$(CC) $(LDFLAGS) -o genlinetoscr.exe genlinetoscr.o
 
 custom.o: blit.h
 drawing.o: linetoscr.c
 
-cpudefs.c: build68k ../table68k
-	./build68k < ../table68k >cpudefs.c
+cpudefs.c: build68k.exe ../table68k
+	build68k.exe < ../table68k >cpudefs.c
 
 .c.o:
 	$(CC) $(INCLUDES) -c $(INCDIRS) $(CFLAGS) $(X_CFLAGS) $(DEBUGFLAGS) $(CFLAGS_$@) $< -o $@

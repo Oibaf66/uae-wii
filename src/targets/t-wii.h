@@ -12,11 +12,16 @@
 #define TARGET_FLOPPY_PATH      "/uae/floppies"
 #define TARGET_HARDFILE_PATH    "/uae/harddisks"
 #define TARGET_SAVESTATE_PATH   "/uae/saves"
+#define TARGET_USB_PATH   "usb:/"
+#define TARGET_SMB_PATH   "smb:/"
 
 #ifndef OPTIONSFILENAME
 # define OPTIONSFILENAME "/uae/uaerc"
 #endif
 #undef OPTIONS_IN_HOME
+#define SMBFILENAME "/uae/uaerc.smb"
+#define USERFILENAME "/uae/uaerc.user"
+#define SAVEDFILENAME "/uae/uaerc.saved"
 
 #define DEFPRTNAME "lpr"
 #define DEFSERNAME "/dev/ttyS1"

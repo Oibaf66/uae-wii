@@ -17,6 +17,13 @@ struct strlist {
     int unknown;
 };
 
+// Device Port
+enum Porttype {
+	PORT_SD,	// Load from SD card
+	PORT_USB,	// Load from USB port
+	PORT_SMB	//Load from network	
+};
+
 /* maximum number native input devices supported (single type) */
 #define MAX_INPUT_DEVICES 6
 /* maximum number of native input device's buttons and axles supported */
@@ -238,6 +245,15 @@ struct uae_prefs {
 #endif
 
     int use_wheel_input;
+	int logfile;
+#ifdef GEKKO
+	char SmbUser[32]; 
+	char SmbPwd[32];
+	char SmbShare[32]; 
+	char SmbIp[32];
+	int Port; //SD, USB or SMB
+#endif
+	
     /* input */
 
     int jport0;

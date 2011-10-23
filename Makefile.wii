@@ -45,16 +45,19 @@ OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o)) $(OBJ_DIR)/guidep/VirtualKe
 # It can be useful to switch this variable around to select individual tests which are problematic.
 TEST_SRCS	:= $(TEST_SRC_DIR)/showfont.c
 
-src/tools/linetoscr:
-	cd src/tools/ && make -f Makefile.wii
 
 # What's a full build?
 all: uae.dol
+
+src/tools/genlinetoscr.exe:
+	cd src/tools/ && make -f Makefile.wii
 
 # How to delete the intermediate files.
 clean:
 	@echo Cleaning $(OBJ_DIR)
 	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h src/sysconfig.h $(SYMLINKS)
+	@rm -f src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c
+	cd src/tools/ && make -f Makefile.wii clean
 
 $(OBJ_DIR):
 	install -d $@
@@ -64,31 +67,31 @@ src/sysconfig.h: src/sysconfig.h.wii
 
 src/machdep:
 	rm -f $@
-	cd src && ln -s md-ppc-gcc machdep
+	mkdir $@ && cd src/md-ppc-gcc && find . -maxdepth 1 -type f -exec ln '{}' ../machdep/'{}' ';' 
 
 src/osdep:
 	rm -f $@
-	cd src && ln -s od-generic osdep
+	mkdir $@ && cd src/od-generic && find . -maxdepth 1 -type f -exec ln '{}' ../osdep/'{}' ';' 
 
 src/gfxdep:
 	rm -f $@
-	cd src && ln -s gfx-sdl gfxdep
+	mkdir $@ && cd src/gfx-sdl && find . -maxdepth 1 -type f -exec ln '{}' ../gfxdep/'{}' ';' 
 
 src/joydep:
 	rm -f $@
-	cd src && ln -s jd-sdl joydep
+	mkdir $@ && cd src/jd-sdl && find . -maxdepth 1 -type f -exec ln '{}' ../joydep/'{}' ';'
 
 src/guidep:
 	rm -f $@
-	cd src && ln -s gui-sdl guidep
-
+	mkdir $@ && cd src/gui-sdl && find . -maxdepth 1 -type f -exec ln '{}' ../guidep/'{}' ';'
+	
 src/sounddep:
 	rm -f $@
-	cd src && ln -s sd-sdl sounddep
+	mkdir $@ && cd src/sd-sdl && find . -maxdepth 1 -type f -exec ln '{}' ../sounddep/'{}' ';'
 
 src/threaddep:
 	rm -f $@
-	cd src && ln -s td-sdl threaddep
+	mkdir $@ && cd src/td-sdl && find . -maxdepth 1 -type f -exec ln '{}' ../threaddep/'{}' ';'
 
 src/target.h:
 	rm -f $@
@@ -98,20 +101,20 @@ src/md-fpp.h:
 	rm -f $@
 	cd src && ln -s include/fpp-ieee.h md-fpp.h
 
-src/blit.h:	src/tools/genblitter
-		src//tools/genblitter i >$@
+src/blit.h:	src/tools/genblitter.exe
+		src/tools/genblitter.exe i >$@
 
-src/blitfunc.c: src/tools/genblitter src/blitfunc.h
-		src/tools/genblitter f >$@
+src/blitfunc.c: src/tools/genblitter.exe src/blitfunc.h
+		src/tools/genblitter.exe f >$@
 
-src/blitfunc.h: src/tools/genblitter
-		src/tools/genblitter h >$@
+src/blitfunc.h: src/tools/genblitter.exe
+		src/tools/genblitter.exe h >$@
 
-src/blittable.c:  src/tools/genblitter src/blitfunc.h
-		src/tools/genblitter t >$@
+src/blittable.c:  src/tools/genblitter.exe src/blitfunc.h
+		src/tools/genblitter.exe t >$@
 
-src/linetoscr.c:    src/tools/genlinetoscr
-		src/tools/genlinetoscr $(genlinetoscr_args) >$@
+src/linetoscr.c:    src/tools/genlinetoscr.exe
+		src/tools/genlinetoscr.exe $(genlinetoscr_args) >$@
 
 %.h: %.h.wii
 	cp $< $@
@@ -123,20 +126,20 @@ src/linetoscr.c:    src/tools/genlinetoscr
 $(LIB_DIR)/libSDL_ttf.a: $(OBJS)
 	@echo Archiving $@
 	@-mkdir -p $(dir $@)
-	@powerpc-gekko-ar crs $@ $(OBJS)
+	@powerpc-eabi-ar crs $@ $(OBJS)
 	@echo ----
 
 # How to build a DOL.
 uae.dol: uae.elf
 	@echo Creating DOL $@
 	@-mkdir -p $(dir $@)
-	#powerpc-gekko-objcopy -O binary $< $@
+	#powerpc-eabi-objcopy -O binary $< $@
 	elf2dol $< $@
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP)
-INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL
+COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP) -Wno-unused-variable
+INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
 		    -DTD_START_HEIGHT=16
@@ -145,18 +148,20 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 #unused defines; -DFDI2RAW 
 
 # Test link flags.
-LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard -ltinysmb
 
-dist: uae.dol
 
-dist: uae.dol
+dist:uae.dol
 	install -d $@/apps/uae
 	install -d $@/uae
 	install -d $@/uae/floppies
 	install -d $@/uae/roms
 	install -d $@/uae/harddisks
 	install -d $@/uae/saves
-	touch $@/uae/roms/put-your-kick-dot-rom-here
+	echo "dummy" > $@/uae/roms/put-your-kick-dot-rom-here
+	echo "dummy" > $@/uae/floppies/dummy
+	echo "dummy" > $@/uae/harddisks/dummy
+	echo "dummy" > $@/uae/saves/dummy
 	cp $< $@/apps/uae/boot.dol
 	cp meta.xml $@/apps/uae/
 	cp icon.png $@/apps/uae/
@@ -164,10 +169,18 @@ dist: uae.dol
 	cp Smaller.ttf $@/apps/uae/
 	cp README.Cloanto-Amiga_Forever $@/apps/uae/
 	cp uaerc.wii $@/uae/uaerc
-	cd $@ && tar -czf ../uae-bin.tar.gz *
+	cp uaerc.smb $@/uae/
+	cp docs/configuration.txt $@/apps/uae/
+	cp docs/Joystick_mapping.txt $@/apps/uae/
+	cd $@ && tar -czf ../uae-wii-bin.tar.gz *
+
+#---------------------------------------------------------------------------------
+run:
+	wiiload uae.dol
+
 
 # How to link an ELF.
-uae.elf: src/tools/linetoscr src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
+uae.elf: src/tools/genlinetoscr.exe src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)

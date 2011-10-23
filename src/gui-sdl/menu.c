@@ -15,13 +15,12 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "sysconfig.h"
 #include "menu.h"
 #include "VirtualKeyboard.h"
 
-#define FULL_DISPLAY_X 640
-#define FULL_DISPLAY_Y 480
 
 typedef struct
 {
@@ -103,7 +102,7 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	}
 	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
 	SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
-	menu_print_font(real_screen, 0,0,0, X+12, Y+12, text);
+	menu_print_font(real_screen, 255,255,255, X+12, Y+12, text);
 	SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
 	SDL_UpdateRect(real_screen, rc.x, rc.y, rc.w,rc.h);
 	if (duration > 0)
@@ -160,7 +159,7 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 	{
 		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
 		SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
-		menu_print_font(real_screen, 0,0,0, X+12, Y+12, text);
+		menu_print_font(real_screen, 255,255,255, X+12, Y+12, text);
 
 		if (default_opt)
 		{
@@ -178,14 +177,15 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 			brc.h=20;
 			SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x80, 0x00, 0x00));
 		}
-		menu_print_font(real_screen, 0,0,0, rc.x + rc.w/2-5*12, Y+42, "YES");
-		menu_print_font(real_screen, 0,0,0, rc.x + rc.w/2-5*12+8*12, Y+42, "NO");
-
+	
+		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12, Y+42, "YES");
+		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12+8*12, Y+42, "NO");
+		
 		SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
 		SDL_UpdateRect(real_screen, rc.x, rc.y, rc.w,rc.h);
 		SDL_UpdateRect(real_screen, brc.x, brc.y, brc.w,brc.h);
 
-		SDL_Flip(real_screen);
+		//SDL_Flip(real_screen);
 		key = menu_wait_key_press();
 		if (key & KEY_SELECT)
 		{
@@ -222,7 +222,7 @@ static int cmpstringp(const void *p1, const void *p2)
 }
 
 /* Return true if name ends with ext (for filenames) */
-static int ext_matches(const char *name, const char *ext)
+int ext_matches(const char *name, const char *ext)
 {
 	int len = strlen(name);
 	int ext_len = strlen(ext);
@@ -272,7 +272,7 @@ static const char **get_file_list(const char *base_dir)
 		snprintf(buf, 255, "%s/%s", base_dir, de->d_name);
 		if (stat(buf, &st) < 0)
 			continue;
-		if (S_ISDIR(st.st_mode))
+		if (S_ISDIR(st.st_mode)&&strcmp(".", de->d_name))
 		{
 			char *p;
 			size_t len = strlen(de->d_name) + 4;
@@ -443,7 +443,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel)
 		if (sel < 0)
 			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x40, 0x00, 0x00));
 		else
-			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x00, 0x00, 0xff));
+			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x00, 0xe7, 0xe7));
 		menu_print_font(screen, 0,0,0, p_menu->x1, p_menu->y1, p_menu->title);
 	}
 
@@ -463,12 +463,12 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel)
 				menu_print_font(screen, 0x40,0x40,0x40,
 						x_start, y_start + y, msg);
 			else if (p_menu->cur_sel == i) /* Selected - color */
-				menu_print_font(screen, 0,255,0,
+				menu_print_font(screen, 0,200,0,
 						x_start, y_start + y, msg);
 			else if (IS_SUBMENU(msg))
 			{
 				if (p_menu->cur_sel == i-1)
-					menu_print_font(screen, 0x80,0xff,0x80,
+					menu_print_font(screen, 0,200,0,
 							x_start, y_start + y, msg);
 				else
 					menu_print_font(screen, 0x40,0x40,0x40,
@@ -527,7 +527,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel)
 							r = (SDL_Rect){ x_start + (n+1) * w-1, y_start + (i+ 1 - p_menu->start_entry_visible) * ((h + h/4)) -3, (n_chars - 1) * w, 2};
 							if (p_menu->cur_sel == i-1)
 								SDL_FillRect(screen, &r,
-										SDL_MapRGB(screen->format, 0x0,0xff,0x80));
+										SDL_MapRGB(screen->format, 255,0,0));
 							else
 								SDL_FillRect(screen, &r,
 										SDL_MapRGB(screen->format, 0x40,0x40,0x40));
@@ -701,6 +701,17 @@ uint32_t menu_wait_key_press(void)
 				if (v & SDL_HAT_RIGHT)
 					keys |= KEY_RIGHT;
 			}
+			
+			Sint16 axis0 = SDL_JoystickGetAxis(joy, 0);
+			Sint16 axis1 = SDL_JoystickGetAxis(joy, 1);
+			
+			if ( axis0 < -15000 )  keys |= KEY_LEFT;
+			else if (axis0 > 15000 )  keys |= KEY_RIGHT;
+			
+			if (axis1 < -15000 )  keys |= KEY_UP;
+			else if( axis1 > 15000 )  keys |= KEY_DOWN;	
+				
+			
 			if (SDL_JoystickGetButton(joy, 0) != 0 ||      /* A */
 					SDL_JoystickGetButton(joy, 3) != 0 ||  /* 2 */
 					SDL_JoystickGetButton(joy, 9) != 0 ||  /* CA */
@@ -801,7 +812,7 @@ static int menu_select_internal(SDL_Surface *screen,
 		uint32_t keys;
 		int sel_last = p_menu->cur_sel;
 
-		SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x00, 0x80, 0x80));
+		SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
 
 		menu_draw(screen, p_menu, 0);
 		SDL_Flip(screen);
@@ -849,6 +860,7 @@ int menu_select_sized(const char *title, const char **msgs, int *submenus, int s
 {
 	menu_t menu;
 	int out;
+	/*
 	int info;
 
 	if (!strcmp(title, "Folder") || !strcmp(title, "Single File") ||
@@ -856,7 +868,7 @@ int menu_select_sized(const char *title, const char **msgs, int *submenus, int s
 		info = 0;
 	else
 		info = 1;
-
+	*/
 	menu_init_internal(&menu, title, menu_font, msgs,
 			x, y, x2, y2);
 
@@ -872,8 +884,9 @@ int menu_select_sized(const char *title, const char **msgs, int *submenus, int s
 
 int menu_select_title(const char *title, const char **msgs, int *submenus)
 {
+	SDL_FillRect(real_screen, 0, SDL_MapRGB(real_screen->format, 0, 0, 0));
 	return menu_select_sized(title, msgs, submenus, 0,
-			32, 32, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-64,
+			32, 32, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-32,
 			NULL, NULL);
 }
 
@@ -883,21 +896,29 @@ int menu_select(const char **msgs, int *submenus)
 }
 
 static const char *menu_select_file_internal(const char *dir_path,
-		int x, int y, int x2, int y2)
+		int x, int y, int x2, int y2,const char *selected_file, int which)
 {
 	const char **file_list = get_file_list(dir_path);
 	char *sel;
 	char *out;
+	char *ptr_selected_file;
 	int opt;
 	int i;
-
+	char buf[64];
+	
 	if (file_list == NULL)
 		return NULL;
 
-	opt = menu_select_sized("Select file", file_list, NULL, 0,
-			x, y, x2, y2,
-			NULL, NULL);
-
+	if (selected_file) 
+	{
+		ptr_selected_file= strrchr(selected_file,'/');
+		if (ptr_selected_file) ptr_selected_file++;
+		else ptr_selected_file = selected_file;
+		snprintf(buf,64,"df%d:%s",which, ptr_selected_file);
+		opt = menu_select_sized(buf, file_list, NULL, 0, x, y, x2, y2,NULL, NULL);
+	}
+	else opt = menu_select_sized("Select file", file_list, NULL, 0, x, y, x2, y2,NULL, NULL);
+	
 	if (opt < 0)
 		return NULL;
 	sel = strdup(file_list[opt]);
@@ -925,7 +946,7 @@ static const char *menu_select_file_internal(const char *dir_path,
         	/* Too deep recursion! */
         	if (s >= sizeof(buf))
         		return NULL;
-        	return menu_select_file(buf);
+        	return menu_select_file(buf, selected_file, which);
         }
 
 	out = (char*)malloc(strlen(dir_path) + strlen(sel) + 4);
@@ -936,6 +957,7 @@ static const char *menu_select_file_internal(const char *dir_path,
         return out;
 }
 
+/*
 const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 {
 	const char *file = menu_select_file_internal(dir_path,
@@ -946,13 +968,13 @@ const char *menu_select_file_start(const char *dir_path, const char **d64_name)
 
 	return file;
 }
-
-const char *menu_select_file(const char *dir_path)
+*/
+const char *menu_select_file(const char *dir_path,const char *selected_file, int which)
 {
 	if (dir_path == NULL)
 		dir_path = "";
 	return menu_select_file_internal(dir_path,
-			32, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32);
+			0, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32, selected_file, which);
 }
 
 static TTF_Font *read_font(const char *path)

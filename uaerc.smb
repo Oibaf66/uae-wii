@@ -1,0 +1,10 @@
+
+# SMB configuration
+user=USER
+password=PASSWORD
+share_name=FOLDER
+smb_ip=192.168.0.1
+
+
+# Enable logfile
+logfile=false

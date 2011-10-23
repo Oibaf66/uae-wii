@@ -557,7 +557,8 @@ void save_options (FILE *f, const struct uae_prefs *p, int type)
 #endif
 
 #if defined GEKKO
-    cfgfile_write (f, "wii_use_mario_kart_wheel=%s\n", p->use_wheel_input ? "yes" : "no");
+    //cfgfile_write (f, "wii_use_mario_kart_wheel=%s\n", p->use_wheel_input ? "yes" : "no");
+	cfgfile_write (f, "wii_port=%d\n", p->Port);
 #endif
 
 #ifdef FILESYS
@@ -639,7 +640,7 @@ int cfgfile_string (const char *option, const char *value, const char *name, cha
  * TODO: Collect path handling tools in one place and cleanly
  * handle platform-specific differences.
  */
-static const char *strdup_path_expand (const char *src)
+const char *strdup_path_expand (const char *src)
 {
     char *path = 0;
     unsigned int srclen, destlen;
@@ -851,10 +852,17 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 #endif
 
 #if defined GEKKO
-    if (cfgfile_yesno  (option, value, "wii_use_mario_kart_wheel", &p->use_wheel_input))
-    	return 1;
+    //if (cfgfile_yesno  (option, value, "wii_use_mario_kart_wheel", &p->use_wheel_input))
+    	//return 1;
+	if (cfgfile_intval (option, value, "wii_port", &p->Port, 1)) return 1;
+	if (cfgfile_string (option, value, "user", &p->SmbUser, 32)
+	|| cfgfile_string (option, value, "password", &p->SmbPwd,32)
+	|| cfgfile_string (option, value, "share_name", &p->SmbShare, 32)
+	|| cfgfile_string (option, value, "smb_ip", &p->SmbIp, 32)) return 1;
+	
 #endif
-
+	if (cfgfile_yesno  (option, value, "logfile", &p->logfile))
+    	return 1;
 #ifdef DRIVESOUND
     if    (cfgfile_intval (option, value, "floppy0sound", &p->dfxclick[0], 1)
 	|| cfgfile_intval (option, value, "floppy1sound", &p->dfxclick[1], 1)
@@ -1506,7 +1514,7 @@ static char *cfg_fgets (char *line, int max, FILE *fh)
     return 0;
 }
 
-static int cfgfile_load_2 (struct uae_prefs *p, const char *filename, int real, int *type)
+int cfgfile_load_2 (struct uae_prefs *p, const char *filename, int real, int *type)
 {
     int i;
     FILE *fh;
@@ -1521,7 +1529,9 @@ static int cfgfile_load_2 (struct uae_prefs *p, const char *filename, int real, 
     if (real) {
 	p->config_version = 0;
 	config_newfilesystem = 0;
+	#ifndef GEKKO
 	reset_inputdevice_config (p);
+	#endif
     }
 
     write_log ("Opening cfgfile '%s'...", filename);
@@ -2469,9 +2479,15 @@ void default_prefs (struct uae_prefs *p, int type)
     p->mountinfo = &options_mountinfo;
 #endif
 
+	p->use_wheel_input = 0;
 #ifdef GEKKO
-    p->use_wheel_input = 0;
+	strcpy (p->SmbUser,"User");
+	strcpy (p->SmbPwd, "Password");
+	strcpy (p->SmbShare, "Share");
+	strcpy (p->SmbIp, "192.168.0.1");
+	p->Port= PORT_SD;
 #endif
+	p->logfile= 0;
 
 #ifdef UAE_MINI
     default_prefs_mini (p, 0);

@@ -29,6 +29,9 @@ extern "C" {
 #define KEY_PAGEDOWN  64
 #define KEY_PAGEUP   128
 #define KEY_HELP     256
+#define FULL_DISPLAY_X 640
+#define FULL_DISPLAY_Y 480
+
 
 void menu_print_font(SDL_Surface *screen, int r, int g, int b, int x, int y, const char *msg);
 void menu_print_font64(SDL_Surface *screen, int r, int g, int b, int x, int y, const char *msg);
@@ -36,7 +39,7 @@ void menu_print_font64(SDL_Surface *screen, int r, int g, int b, int x, int y, c
 /* Various option selects */
 int menu_select_title(const char *title, const char **pp_msgs, int *p_submenus);
 int menu_select(const char **pp_msgs, int *p_submenus);
-const char *menu_select_file(const char *dir_path);
+const char *menu_select_file(const char *dir_path,const char *selected_file, int which);
 const char *menu_select_file_start(const char *dir_path, const char **d64_name);
 
 uint32_t menu_wait_key_press(void);
@@ -50,6 +53,7 @@ void menu_init(SDL_Surface *screen);
 
 int menu_is_inited(void);
 
+int ext_matches(const char *name, const char *ext);
 
 #if defined(__cplusplus)
 }
