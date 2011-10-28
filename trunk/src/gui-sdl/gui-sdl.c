@@ -39,13 +39,12 @@ static const char *main_menu_messages[] = {
 		/*05*/		"Wiimote configuration",
 		/*06*/		"^|Wiimote1|Wiimote2",
 		/*07*/		"Hardware options",
-		/*08*/		"Other options",
-		/*09*/		"Save confs",
-		/*10*/		"Reset UAE",
-		/*11*/		"Help",
-		/*12*/		"Quit",
-		/*13*/		"#1-------------------------------------",
-		/*14*/		"#21 - back,  2/A - select",
+		/*08*/		"Emulation options",
+		/*09*/		"Other options",
+		/*10*/		"Save confs",
+		/*11*/		"Reset UAE",
+		/*12*/		"Help",
+		/*13*/		"Quit",
 		NULL
 };
 
@@ -67,28 +66,28 @@ static const  char *input_messages[] = {
 		NULL,
 };
 
-static const char *amiga_model_messages[] = {
+static const char *hardware_messages[] = {
 		/*00*/		"Amiga model",
 		/*01*/		"^|A1000|A500|A600|A1200|Custom",
-		/*02*/		"  ",
-		/*03*/		"Emulation accuracy",
-		/*04*/		"^|Fast|Compatible|Cycle-exact",
-		/*05*/		"  ",
-		/*06*/		"Memory options",
-		/*07*/		"  ",
-		/*08*/		"CPU/Chipset options",
-		/*09*/		"  ",
-		/*10*/		"Change ROM",
+		/*02*/		"  ",		
+		/*03*/		"Memory options",
+		/*04*/		"  ",
+		/*05*/		"CPU/Chipset options",
+		/*06*/		"  ",
+		/*07*/		"Change ROM",
 		NULL
 };
 
 static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
 		/*01*/		"^|512K|1M|2M",
+		/*02*/		"  ",
 		/*02*/		"Slow mem",
 		/*03*/		"^|None|256K|512K|1M|1.8M",
+		/*02*/		"  ",
 		/*04*/		"Fast mem",
 		/*05*/		"^|None|1M|2M|4M|8M",
+		/*02*/		"  ",
 		/*06*/		"Zorro3 mem",
 		/*07*/		"^|None|1M|2M|4M|8M|16M|32M",		
 		NULL
@@ -114,20 +113,36 @@ static const int chipset_mask_table[] = {0, CSMASK_ECS_AGNUS,
 		CSMASK_ECS_AGNUS | CSMASK_ECS_DENISE | CSMASK_AGA};
 
 
-static const char *options_messages[] = {
+static const char *emulation_messages[] = {
+		/*03*/		"Emulation accuracy",
+		/*04*/		"^|Fast|Compatible|Cycle-exact",
 		/*00*/		"CPU to chipset speed",
 		/*01*/		"^|max|90%|80%|60%|40%|20%|0%",
 		/*02*/		"Framerate",
 		/*03*/		"^|100%|50%|33%|25%|12%|custom",
 		/*04*/		"Floppy speed",
 		/*05*/		"^|normal|turbo|400%|800%",
+		/*04*/		"Sound interpolation",
+		/*05*/		"^|none|rh|crux|sinc",
+		/*02*/		"Video system",
+		/*03*/		"^|PAL|NTSC",
+		
+		NULL
+};
+
+static const char *graphic_messages[] = {
+		
 		/*06*/		"Correct aspect",
-		/*07*/		"^|true|false",
+		/*07*/		"^|on|off",
+		/*05*/		"  ",
+		/*06*/		"Scanlines",
+		/*07*/		"^|on|off",
+		/*05*/		"  ",
 		/*08*/		"Leds",
 		/*09*/		"^|on|off",
+		/*05*/		"  ",
 		/*10*/		"Port",
-		/*11*/		"^|SD|USB|SMB",
-		
+		/*11*/		"^|SD|USB|SMB",		
 		NULL
 };
 
@@ -267,7 +282,7 @@ static void default_config(void)
 	changed_prefs.gfx_framerate = 2;
 }
 
-static int prefs_has_changed;
+//static int prefs_has_changed;
 
 static void insert_floppy(int which)
 {
@@ -314,7 +329,7 @@ static void cpu_chipset_options(void)
 	changed_prefs.cpu_level = cpu_level_table[submenus[0]];
 	changed_prefs.chipset_mask = chipset_mask_table[submenus[1]];
 
-	prefs_has_changed = 1;
+	//prefs_has_changed = 1;
 }
 
 static void memory_options(void)
@@ -345,7 +360,7 @@ static void memory_options(void)
 	changed_prefs.fastmem_size = fastmem_size_table[submenus[2]];
 	changed_prefs.z3fastmem_size = z3fastmem_size_table[submenus[3]];
 
-	prefs_has_changed = 1;
+	//prefs_has_changed = 1;
 }
 
 static int get_cpu_to_chipset_speed(void)
@@ -384,6 +399,58 @@ static int get_gfx_framerate(void)
 			SDL_arraysize(framerate_table), 5);
 
 }
+
+/* Helpers to determine the accuracy */
+static int get_emulation_accuracy(void)
+{
+	if (currprefs.cpu_compatible == 0 &&
+			currprefs.cpu_cycle_exact == 0)
+		return 0;
+	if (currprefs.cpu_compatible == 1 &&
+			currprefs.cpu_cycle_exact == 0)
+		return 1;
+	return 2;
+}
+
+static void set_emulation_accuracy(int which)
+{
+	switch (which)
+	{
+	case 1:
+		changed_prefs.cpu_compatible = 1;
+		changed_prefs.cpu_cycle_exact = 0;
+		break;
+	case 2:
+		changed_prefs.cpu_compatible = 1;
+		changed_prefs.cpu_cycle_exact = 1;
+		break;
+	case 0:
+	default:
+		changed_prefs.cpu_compatible = 0;
+		changed_prefs.cpu_cycle_exact = 0;
+		break;
+	}
+}
+
+static int get_model(void)
+{
+	if (changed_prefs.cpu_level == 1) /* 68010 - only on the A600 */
+		return 2;
+	if (changed_prefs.cpu_level == 2) /* 68020 - only on the A1200 */
+		return 3;
+	if (changed_prefs.cpu_level == 0) /* 68000 - A1000/A500 */
+	{
+		if (changed_prefs.chipmem_size == 256 * 1024) /* A1000 */
+			return 0;
+
+		/* A500 */
+		return 1;
+	}
+
+	/* Custom */
+	return 4;
+}
+
 
 static void set_Port(int which)
 {
@@ -437,36 +504,61 @@ cfgfile_save(&changed_prefs, user_options, 0);
 msgInfo("Configurations saved",3000,NULL);
 }	
 
-static void general_options(void)
+static void emulation_options(void)
 {
 	int submenus[6];
 	int opt;
+	
+	memset(submenus, 0, sizeof(submenus));
+	
+	submenus[0] = get_emulation_accuracy();
+	submenus[1] = get_cpu_to_chipset_speed();
+	submenus[2] = get_gfx_framerate();
+	submenus[3] = get_floppy_speed();
+	submenus[4] = changed_prefs.sound_interpol;
+	submenus[5] = changed_prefs.ntscmode;
+	
 
-	submenus[0] = get_cpu_to_chipset_speed();
-	submenus[1] = get_gfx_framerate();
-	submenus[2] = get_floppy_speed();
-	submenus[3] = changed_prefs.gfx_correct_aspect == 0 ? 1 : 0;
-	submenus[4] = changed_prefs.leds_on_screen == 0 ? 1 : 0;
-	submenus[5] = changed_prefs.Port;
-
-	opt = menu_select_title("General options menu",
-			options_messages, submenus);
+	opt = menu_select_title("Emulation options menu",
+			emulation_messages, submenus);
 	if (opt < 0)
 		return;
-	set_cpu_to_chipset_speed(submenus[0]);
-	set_gfx_framerate(submenus[1]);
-	set_floppy_speed(submenus[2]);
-	set_Port(submenus[5]);
-
-	changed_prefs.gfx_correct_aspect = !submenus[3];
+	/* Cycle-exact or not? */
+	set_emulation_accuracy(submenus[0]);
 	
-	/* Floppy, Power, FPS, etc etc. */
-	changed_prefs.leds_on_screen = !submenus[4];
-	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
-
-	prefs_has_changed = 1;
+	set_cpu_to_chipset_speed(submenus[1]);
+	set_gfx_framerate(submenus[2]);
+	set_floppy_speed(submenus[3]);
+	changed_prefs.sound_interpol = submenus[4];
+	changed_prefs.ntscmode = submenus[5];
+	
+	//prefs_has_changed = 1;
 }
 
+static void graphic_options(void)
+{
+	int submenus[4];
+	int opt;
+	
+	memset(submenus, 0, sizeof(submenus));
+	
+	submenus[0] = !changed_prefs.gfx_correct_aspect;
+	submenus[1] = !(changed_prefs.gfx_linedbl == 2) ;
+	submenus[2] = !changed_prefs.leds_on_screen;
+	submenus[3] = changed_prefs.Port;
+
+	opt = menu_select_title("Other options menu",
+			graphic_messages, submenus);
+	if (opt < 0)
+		return;
+
+	changed_prefs.gfx_correct_aspect = !submenus[0];
+	changed_prefs.gfx_linedbl = submenus[1] ? 1 : 2;
+	changed_prefs.leds_on_screen = !submenus[2];
+	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
+	set_Port(submenus[3]);
+	//prefs_has_changed = 1;
+}
 
 /* There are a few unfortunate header problems, so I'll do like this for now */
 struct uae_prefs;
@@ -514,8 +606,8 @@ static void input_options(int joy)
 	int i;
 
 	memset(submenus, 0, sizeof(submenus));
-	submenus[3] = changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0]== 0 ? 1 : 0;
-	submenus[4] = changed_prefs.mouse_settings[1][joy].enabled == 0 ? 1 : 0;
+	submenus[3] = !changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0];
+	submenus[4] = (changed_prefs.mouse_settings[1][joy].enabled == 0);
 
 	opt = menu_select_title("Input menu",
 			input_messages, submenus);
@@ -532,7 +624,7 @@ static void input_options(int joy)
 				currprefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 				changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 			}
-		prefs_has_changed = 1;
+		//prefs_has_changed = 1;
 		return;
 	}
 
@@ -548,7 +640,7 @@ static void input_options(int joy)
 		changed_prefs.mouse_settings[1][joy].enabled = 1;
 		currprefs.mouse_settings[1][joy].enabled = 1;
 		}
-		prefs_has_changed = 1;
+		//prefs_has_changed = 1;
 		return;
 	}
 	
@@ -577,75 +669,25 @@ static void input_options(int joy)
 		
 	setup_joystick(joy, key, sdl_key);
 	
-	prefs_has_changed = 1;
+	//prefs_has_changed = 1;
 }
 
 
-/* Helpers to determine the accuracy */
-static int get_emulation_accuracy(void)
-{
-	if (currprefs.cpu_compatible == 0 &&
-			currprefs.cpu_cycle_exact == 0)
-		return 0;
-	if (currprefs.cpu_compatible == 1 &&
-			currprefs.cpu_cycle_exact == 0)
-		return 1;
-	return 2;
-}
 
-static void set_emulation_accuracy(int which)
-{
-	switch (which)
-	{
-	case 1:
-		changed_prefs.cpu_compatible = 1;
-		changed_prefs.cpu_cycle_exact = 0;
-		break;
-	case 2:
-		changed_prefs.cpu_compatible = 1;
-		changed_prefs.cpu_cycle_exact = 1;
-		break;
-	case 0:
-	default:
-		changed_prefs.cpu_compatible = 0;
-		changed_prefs.cpu_cycle_exact = 0;
-		break;
-	}
-}
-
-static int get_model(void)
-{
-	if (changed_prefs.cpu_level == 1) /* 68010 - only on the A600 */
-		return 2;
-	if (changed_prefs.cpu_level == 2) /* 68020 - only on the A1200 */
-		return 3;
-	if (changed_prefs.cpu_level == 0) /* 68000 - A1000/A500 */
-	{
-		if (changed_prefs.chipmem_size == 256 * 1024) /* A1000 */
-			return 0;
-
-		/* A500 */
-		return 1;
-	}
-
-	/* Custom */
-	return 4;
-}
-
-static void amiga_model_options(void)
+static void hardware_options(void)
 {
 	int opt;
 	int cur_model;
-	int submenus[2];
+	int submenus[1];
 
 	do
 	{
 		cur_model = get_model();
 		submenus[0] = cur_model;
-		submenus[1] = get_emulation_accuracy();
+		
 
 		opt = menu_select_title("Hardware option menu",
-				amiga_model_messages, submenus);
+				hardware_messages, submenus);
 		if (opt < 0)
 			return;
 		if (submenus[0] != cur_model)
@@ -663,24 +705,23 @@ static void amiga_model_options(void)
 
 		switch(opt)
 		{
-		case 6:
+		case 3:
 			memory_options(); break;
-		case 8:
+		case 5:
 			cpu_chipset_options(); break;
-		case 10:
+		case 7:
 			insert_rom(); break;
 		default:
 			break;
 		}
-	} while (opt == 6 || opt == 8 || opt == 10);
+	} while (opt == 3 || opt == 5 || opt == 7);
 
 	/* Reset the Amiga if the model has changed */
 	if (cur_model != submenus[0])
 		uae_reset(1);
-	/* Cycle-exact or not? */
-	set_emulation_accuracy(submenus[1]);
+	
 
-	prefs_has_changed = 1;
+	//prefs_has_changed = 1;
 }
 
 static void save_load_state(int which)
@@ -822,7 +863,7 @@ void gui_display(int shortcut)
 	pause_sound();
 	
 	memset(submenus, 0, sizeof(submenus));
-	prefs_has_changed = 0;
+	//prefs_has_changed = 0;
 
 	do
 	{
@@ -845,27 +886,30 @@ void gui_display(int shortcut)
 			input_options(submenus[2]);
 			break;		
 		case 7:
-			amiga_model_options();
+			hardware_options();
 			break;	
 		case 8:
-			general_options();
+			emulation_options();
 			break;
-		case 9:	
+		case 9:
+			graphic_options();
+			break;	
+		case 10:	
 			save_configurations();
 			break;
-		case 10:
+		case 11:
 			uae_reset(1);
 			break;	
-		case 11:
+		case 12:
 			help();
 			break;
-		case 12:
+		case 13:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) uae_quit();	
 			break;
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 7 || opt == 8 || opt == 9 || opt == 11);
+	} while (opt == 0 || opt == 5 || opt == 7 || opt == 8 || opt == 9 || opt == 12);
 	
 	resume_sound();
 }
