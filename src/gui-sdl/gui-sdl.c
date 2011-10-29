@@ -69,12 +69,15 @@ static const  char *input_messages[] = {
 static const char *hardware_messages[] = {
 		/*00*/		"Amiga model",
 		/*01*/		"^|A1000|A500|A600|A1200|Custom",
-		/*02*/		"  ",		
-		/*03*/		"Memory options",
-		/*04*/		"  ",
-		/*05*/		"CPU/Chipset options",
-		/*06*/		"  ",
-		/*07*/		"Change ROM",
+		/*02*/		"  ",
+		/*03*/		"Video system chipset",
+		/*04*/		"^|PAL|NTSC",
+		/*05*/		"  ",
+		/*06*/		"CPU/Chipset options",
+		/*07*/		"  ",
+		/*08*/		"Memory options",
+		/*09*/		"  ",
+		/*10*/		"Change ROM",
 		NULL
 };
 
@@ -82,14 +85,14 @@ static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
 		/*01*/		"^|512K|1M|2M",
 		/*02*/		"  ",
-		/*02*/		"Slow mem",
-		/*03*/		"^|None|256K|512K|1M|1.8M",
-		/*02*/		"  ",
-		/*04*/		"Fast mem",
-		/*05*/		"^|None|1M|2M|4M|8M",
-		/*02*/		"  ",
-		/*06*/		"Zorro3 mem",
-		/*07*/		"^|None|1M|2M|4M|8M|16M|32M",		
+		/*03*/		"Slow mem",
+		/*04*/		"^|None|256K|512K|1M|1.8M",
+		/*05*/		"  ",
+		/*06*/		"Fast mem",
+		/*07*/		"^|None|1M|2M|4M|8M",
+		/*08*/		"  ",
+		/*09*/		"Zorro3 mem",
+		/*10*/		"^|None|1M|2M|4M|8M|16M|32M",		
 		NULL
 };
 
@@ -114,19 +117,16 @@ static const int chipset_mask_table[] = {0, CSMASK_ECS_AGNUS,
 
 
 static const char *emulation_messages[] = {
-		/*03*/		"Emulation accuracy",
-		/*04*/		"^|Fast|Compatible|Cycle-exact",
-		/*00*/		"CPU to chipset speed",
-		/*01*/		"^|max|90%|80%|60%|40%|20%|0%",
-		/*02*/		"Framerate",
-		/*03*/		"^|100%|50%|33%|25%|12%|custom",
-		/*04*/		"Floppy speed",
-		/*05*/		"^|normal|turbo|400%|800%",
-		/*04*/		"Sound interpolation",
-		/*05*/		"^|none|rh|crux|sinc",
-		/*02*/		"Video system",
-		/*03*/		"^|PAL|NTSC",
-		
+		/*00*/		"Emulation accuracy",
+		/*01*/		"^|Fast|Compatible|Cycle-exact",
+		/*02*/		"CPU to chipset speed",
+		/*03*/		"^|max|90%|80%|60%|40%|20%|0%",
+		/*04*/		"Framerate",
+		/*05*/		"^|100%|50%|33%|25%|12%|custom",
+		/*06*/		"Floppy speed",
+		/*07*/		"^|normal|turbo|400%|800%",
+		/*08*/		"Sound interpolation",
+		/*09*/		"^|none|rh|crux|sinc",	
 		NULL
 };
 
@@ -506,7 +506,7 @@ msgInfo("Configurations saved",3000,NULL);
 
 static void emulation_options(void)
 {
-	int submenus[6];
+	int submenus[5];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -516,9 +516,7 @@ static void emulation_options(void)
 	submenus[2] = get_gfx_framerate();
 	submenus[3] = get_floppy_speed();
 	submenus[4] = changed_prefs.sound_interpol;
-	submenus[5] = changed_prefs.ntscmode;
 	
-
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
 	if (opt < 0)
@@ -530,7 +528,6 @@ static void emulation_options(void)
 	set_gfx_framerate(submenus[2]);
 	set_floppy_speed(submenus[3]);
 	changed_prefs.sound_interpol = submenus[4];
-	changed_prefs.ntscmode = submenus[5];
 	
 	//prefs_has_changed = 1;
 }
@@ -678,13 +675,13 @@ static void hardware_options(void)
 {
 	int opt;
 	int cur_model;
-	int submenus[1];
+	int submenus[2];
 
 	do
 	{
 		cur_model = get_model();
 		submenus[0] = cur_model;
-		
+		submenus[1] = changed_prefs.ntscmode;
 
 		opt = menu_select_title("Hardware option menu",
 				hardware_messages, submenus);
@@ -702,19 +699,21 @@ static void hardware_options(void)
 				break;
 			}
 		}
-
+		
+		changed_prefs.ntscmode = submenus[1];
+		
 		switch(opt)
 		{
-		case 3:
-			memory_options(); break;
-		case 5:
+		case 6:
 			cpu_chipset_options(); break;
-		case 7:
+		case 8:
+			memory_options(); break;
+		case 10:
 			insert_rom(); break;
 		default:
 			break;
 		}
-	} while (opt == 3 || opt == 5 || opt == 7);
+	} while (opt == 6 || opt == 8 || opt == 10);
 
 	/* Reset the Amiga if the model has changed */
 	if (cur_model != submenus[0])
