@@ -120,7 +120,7 @@ static const char *emulation_messages[] = {
 		/*00*/		"Emulation accuracy",
 		/*01*/		"^|Fast|Compatible|Cycle-exact",
 		/*02*/		"CPU to chipset speed",
-		/*03*/		"^|max|90%|80%|60%|40%|20%|0%",
+		/*03*/		"^|real|max|90%|80%|60%|40%|20%|0%",
 		/*04*/		"Framerate",
 		/*05*/		"^|100%|50%|33%|25%|12%|custom",
 		/*06*/		"Floppy speed",
@@ -146,7 +146,7 @@ static const char *graphic_messages[] = {
 		NULL
 };
 
-static const int cpu_to_chipset_table[] = {-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
+static const int cpu_to_chipset_table[] = {0,-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
 static const int framerate_table[] = {1, 2, 3, 4, 8};
 
@@ -930,7 +930,7 @@ void gui_message (const char *format,...)
     		   return; /* Deep trouble! */
     	   menu_init(screen);
        }
-       msgYesNo(msg, 0, 24, 24);
+       msgInfo(msg, -1, NULL);
 
        write_log (msg);
 }

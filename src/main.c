@@ -132,7 +132,11 @@ bool InitUSB()
 	bool isMounted = fatMountSimple("usb", &__io_usbstorage);
 	
 	bool isInserted = __io_usbstorage.isInserted();
-	if (!isInserted) return false; 
+	if (!isInserted) 
+	{
+	printf("USB device not found\n\n");
+	return false;
+	}
  
 	// USB Drive may be "sleeeeping" 
 	// We need to try Mounting a few times to wake it up

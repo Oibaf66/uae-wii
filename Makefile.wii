@@ -57,6 +57,7 @@ clean:
 	@echo Cleaning $(OBJ_DIR)
 	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h src/sysconfig.h $(SYMLINKS)
 	@rm -f src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c
+	@rm -f uae.dol uae.elf
 	cd src/tools/ && make -f Makefile.wii clean
 
 $(OBJ_DIR):
@@ -173,6 +174,12 @@ dist:uae.dol
 	cp docs/configuration.txt $@/apps/uae/
 	cp docs/Joystick_mapping.txt $@/apps/uae/
 	cd $@ && tar -czf ../uae-wii-bin.tar.gz *
+	
+distsource:
+	cd .. && cp uae-wii uae-wii-v
+	cd ../uae-wii-v && find . -name ".svn" | xargs rm -rf
+	cd .. && tar -czf uae-wii-v.tar.gz uae-wii-v
+
 
 #---------------------------------------------------------------------------------
 run:

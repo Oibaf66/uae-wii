@@ -13,6 +13,9 @@ clean:
 
 dist:
 	make dist -f Makefile.wii
+	
+distsource:
+	make distsource -f Makefile.wii
 
 
 
