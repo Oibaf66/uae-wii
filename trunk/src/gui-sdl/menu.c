@@ -112,7 +112,8 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 		SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x00, 0x80, 0x00));
 		menu_print_font(real_screen, 0,0,0, FULL_DISPLAY_X/2-12, Y+42, "OK");
 		SDL_UpdateRect(real_screen, brc.x, brc.y, brc.w, brc.h);
-		menu_wait_key_press();
+		while (!(KEY_SELECT & menu_wait_key_press())) {}
+
 	}
 
 	return 1;
