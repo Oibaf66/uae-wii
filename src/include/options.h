@@ -247,6 +247,7 @@ struct uae_prefs {
     int use_wheel_input;
 	int logfile;
 #ifdef GEKKO
+	int smb_enable;
 	char SmbUser[32]; 
 	char SmbPwd[32];
 	char SmbShare[32]; 

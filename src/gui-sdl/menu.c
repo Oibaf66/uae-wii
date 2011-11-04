@@ -119,10 +119,12 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	return 1;
 }
 
-int msgKill(SDL_Rect *rc)
+/*
+void msgKill(SDL_Rect *rc)
 {
 	SDL_UpdateRect(real_screen, rc->x, rc->y, rc->w,rc->h);
 }
+*/
 
 int msgYesNo(char *text, int default_opt, int x, int y)
 {
@@ -132,9 +134,9 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 	SDL_Rect rc;
 	SDL_Rect brc;
 	uint32_t key;
-	int old;
+	//int old;
 
-	old = default_opt;
+	//old = default_opt;
 
 	if (x < 0)
 		X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12;
@@ -585,6 +587,7 @@ static void select_one(menu_t *p_menu, int sel)
 		select_next(p_menu, 0, 1);
 }
 
+/*
 static int is_submenu_title(menu_t *p_menu, int n)
 {
 	if (n+1 >= p_menu->n_entries)
@@ -592,7 +595,7 @@ static int is_submenu_title(menu_t *p_menu, int n)
 	else
 		return IS_SUBMENU(p_menu->pp_msgs[n+1]);
 }
-
+*/
 
 static void menu_init_internal(menu_t *p_menu, const char *title,
 		TTF_Font *p_font, const char **pp_msgs,
@@ -897,7 +900,7 @@ int menu_select(const char **msgs, int *submenus)
 }
 
 static const char *menu_select_file_internal(const char *dir_path,
-		int x, int y, int x2, int y2,const char *selected_file, int which)
+		int x, int y, int x2, int y2, const char *selected_file, int which)
 {
 	const char **file_list = get_file_list(dir_path);
 	char *sel;

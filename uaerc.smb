@@ -1,5 +1,6 @@
 
 # SMB configuration
+smb_enable=false
 user=USER
 password=PASSWORD
 share_name=FOLDER

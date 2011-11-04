@@ -44,7 +44,7 @@ const char *menu_select_file_start(const char *dir_path, const char **d64_name);
 
 uint32_t menu_wait_key_press(void);
 
-extern int msgKill(SDL_Rect *rc);
+extern void msgKill(SDL_Rect *rc);
 extern int msgInfo(char *text, int duration, SDL_Rect *rc);
 
 extern int msgYesNo(char *text, int def,int x, int y);
