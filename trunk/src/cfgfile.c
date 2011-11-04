@@ -855,10 +855,11 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
     //if (cfgfile_yesno  (option, value, "wii_use_mario_kart_wheel", &p->use_wheel_input))
     	//return 1;
 	if (cfgfile_intval (option, value, "wii_port", &p->Port, 1)) return 1;
-	if (cfgfile_string (option, value, "user", &p->SmbUser, 32)
-	|| cfgfile_string (option, value, "password", &p->SmbPwd,32)
-	|| cfgfile_string (option, value, "share_name", &p->SmbShare, 32)
-	|| cfgfile_string (option, value, "smb_ip", &p->SmbIp, 32)) return 1;
+	if (cfgfile_yesno  (option, value, "smb_enable", &p->smb_enable)) return 1;
+	if (cfgfile_string (option, value, "user", p->SmbUser, 32)
+	|| cfgfile_string (option, value, "password", p->SmbPwd,32)
+	|| cfgfile_string (option, value, "share_name", p->SmbShare, 32)
+	|| cfgfile_string (option, value, "smb_ip", p->SmbIp, 32)) return 1;
 	
 #endif
 	if (cfgfile_yesno  (option, value, "logfile", &p->logfile))
@@ -2481,6 +2482,7 @@ void default_prefs (struct uae_prefs *p, int type)
 
 	p->use_wheel_input = 0;
 #ifdef GEKKO
+	p->smb_enable = 0;
 	strcpy (p->SmbUser,"User");
 	strcpy (p->SmbPwd, "Password");
 	strcpy (p->SmbShare, "Share");

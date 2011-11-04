@@ -243,7 +243,7 @@ static void fix_options (void)
     if ((currprefs.gfxmem_size & (currprefs.gfxmem_size - 1)) != 0
 	|| (currprefs.gfxmem_size != 0 && (currprefs.gfxmem_size < 0x100000 || currprefs.gfxmem_size > 0x2000000)))
     {
-	write_log ("Unsupported graphics card memory size %lx!\n", currprefs.gfxmem_size);
+	write_log ("Unsupported graphics card memory size %lx!\n", (long unsigned int) currprefs.gfxmem_size);
 	currprefs.gfxmem_size = 0;
 	err = 1;
     }
@@ -497,11 +497,11 @@ static void parse_cmdline (int argc, char **argv)
     }
 }
 #endif
-
+/*
 static void parse_user_conf_file(const char *extension)
 {
-	/* FIXME! ska: This is temporary, and will be removed when you can
-	 * pass command line options in meta.xml for the homebrew channel */
+	// FIXME! ska: This is temporary, and will be removed when you can
+	// pass command line options in meta.xml for the homebrew channel
 	char user_options[255] = "";
 	char *user_argv[] = {"program", "-f", user_options};
 #ifdef OPTIONS_IN_HOME
@@ -515,11 +515,11 @@ static void parse_user_conf_file(const char *extension)
 	strcat(user_options, OPTIONSFILENAME);
 	strcat(user_options, extension);
 
-	/* Allow the user uaerc to override the default one */
-	parse_cmdline (3, user_argv);
-	/* Until here */
+	// Allow the user uaerc to override the default one
+	//parse_cmdline (3, user_argv);
+	// Until here
 }
-
+*/
 static void parse_cmdline_and_init_file (int argc, char **argv)
 {
     char *home;
@@ -1106,7 +1106,7 @@ int main (int argc, char **argv)
 	cfgfile_load (&currprefs, SMBFILENAME, 0);
 	printf("\n");
 	
-	if (networkisinit) ConnectShare(); 
+	if (networkisinit && currprefs.smb_enable) ConnectShare(); 
 		
 	sleep(3);
 	
