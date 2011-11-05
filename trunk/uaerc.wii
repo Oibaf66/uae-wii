@@ -3,17 +3,29 @@ kickstart_rom_file=/uae/roms/kick.rom
 kickstart_key_file=$(FILE_PATH)/rom.key
 floppy0=/uae/floppies/
 
-# Alters CPU speed (values are; real, max. CPU to Chipset; 1 through 20)
-# Current setting of 4 = 20% CHIPSET and 80% CPU
-cpu_speed=4
+#Examples of hardfile 
+#hardfile2=rw,DH0:/uae/harddisks/hardfile.hdf,32,1,2,512,0,
+
+#You can also use hardfile from a real usb harddisk
+#hardfile2=rw,DH0:usb:/harddisks/hardfile.hdf,32,1,2,512,0,
+
+#Examples of virtual filesystem
+#filesystem2=rw,DH0:harddir:/uae/harddir,-127
+
+
+# Alters CPU speed (values are: real, max, 1 through 20)
+# i.e. setting of 4 = 20% CHIPSET and 80% CPU
+cpu_speed=max
+
 # CPU Type (values are; 68000, 68020, 68020/68881 and 68040)
 cpu_type=68000
 
-#No need to explain
-cpu_24bit_addressing=false
 #Immediate blits helps with speed
 immediate_blits=true
+
 collision_level=playfields
+cpu_24bit_addressing=false
+
 # Emulation precision
 cpu_compatible=true
 

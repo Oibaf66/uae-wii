@@ -1100,11 +1100,13 @@ int main (int argc, char **argv)
 		printf("SD FAT subsytem initialized\n\n");
 	
 	usbismount = InitUSB();
-	networkisinit = InitNetwork();
+	
 
     default_prefs (&currprefs, 0);
 	cfgfile_load (&currprefs, SMBFILENAME, 0);
 	printf("\n");
+	
+	if (currprefs.smb_enable) networkisinit = InitNetwork();
 	
 	if (networkisinit && currprefs.smb_enable) ConnectShare(); 
 		
