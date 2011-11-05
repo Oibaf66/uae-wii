@@ -24,6 +24,7 @@ struct hardfiledata {
     char product_id[16 + 1];
     char product_rev[4 + 1];
     char device_name[256];
+	char path[256];
     /* geometry from possible RDSK block */
     unsigned int cylinders;
     unsigned int sectors;

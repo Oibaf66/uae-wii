@@ -100,7 +100,7 @@ int hdf_open (struct hardfiledata *hfd, const char *name)
 
    if ((handle = open (name, hfd->readonly ? O_RDONLY : O_RDWR)) != -1) {
 	int i;
-
+	strcpy (hfd->path, name);
 	hfd->handle = (void *) handle;
 	hfd->cache = 0;
 

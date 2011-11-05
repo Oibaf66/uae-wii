@@ -60,14 +60,14 @@
 #endif
 
 #if defined(GEKKO)
-#define R_OK 1
+
 static int wii_access (const char *pathname, int mode)
 {
 	struct stat st;
 
 	if (stat(pathname, &st) < 0)
 		return -1;
-	if (mode == R_OK && !S_ISDIR(st.st_mode))
+	if (mode == R_OK && S_ISDIR(st.st_mode))
 		return 0;
 	return -1;
 }
@@ -215,6 +215,8 @@ static void close_filesys_unit (UnitInfo *uip)
     uip->devname = 0;
     uip->rootdir = 0;
 }
+
+
 
 const char *get_filesys_unit (struct uaedev_mount_info *mountinfo, int nr,
 			      char **devname, char **volname, char **rootdir, int *readonly,
@@ -439,7 +441,7 @@ int sprintf_filesys_unit (const struct uaedev_mount_info *mountinfo, char *buffe
 		 uip[num].rootdir, uip[num].readonly ? "ro" : "");
     else
 	sprintf (buffer, "(DH%d:) Hardfile, \"%s\", size %d Mbytes", num,
-	uip[num].rootdir, uip[num].hf.size / (1024 * 1024));
+	uip[num].rootdir, (unsigned int) uip[num].hf.size / (1024 * 1024));
     return 0;
 }
 
@@ -502,12 +504,25 @@ void free_mountinfo (struct uaedev_mount_info *mip)
     mip->num_units = 0;
 }
 
+
 struct hardfiledata *get_hardfile_data (int nr)
 {
     UnitInfo *uip = current_mountinfo.ui;
     if (nr < 0 || nr >= current_mountinfo.num_units || uip[nr].volname != 0)
 	return 0;
     return &uip[nr].hf;
+}
+
+static void reopen_hdfile (struct uaedev_mount_info *mip)
+{
+    int i;
+
+    for (i = 0; i < mip->num_units; i++) {
+	UnitInfo *uip = mip->ui + i;
+	if (uip->hf.handle) 
+		hdf_open (&uip->hf, uip->hf.path);
+		//hdf_open (&uip->hf, "/uae/harddisks/hardfile.hdf");
+    }
 }
 
 /* minimal AmigaDOS definitions */
@@ -1407,7 +1422,7 @@ static uae_u32 REGPARAM2 startup_handler (TrapContext *context)
     if (i == current_mountinfo.num_units
 	|| access (current_mountinfo.ui[i].rootdir, R_OK) != 0)
     {
-	write_log ("Failed attempt to mount device\n", devname);
+	write_log ("Failed attempt to mount device %s\n", devname);
 	put_long (pkt + dp_Res1, DOS_FALSE);
 	put_long (pkt + dp_Res2, ERROR_DEVICE_NOT_MOUNTED);
 	return 1;
@@ -2617,7 +2632,7 @@ action_read (Unit *unit, dpacket packet)
 	char *buf;
 	off_t old, filesize;
 
-	write_log ("unixfs warning: Bad pointer passed for read: %08x, size %d\n", addr, size);
+	write_log ("unixfs warning: Bad pointer passed for read: %08x, size %ld\n", addr, size);
 	/* ugh this is inefficient but easy */
 
 	old = lseek (k->fd, 0, SEEK_CUR);
@@ -3101,7 +3116,7 @@ static int relock_do(Unit *unit, a_inode *a1)
         if (k1->aino == a1 && k1->fd >= 0) {
 	    wehavekeys++;
 	    close (k1->fd);
-	    write_log ("handle %p freed\n", k1->fd);
+	    write_log ("handle %d freed\n", k1->fd);
 	}
     }
     return wehavekeys;
@@ -3709,13 +3724,16 @@ static void init_filesys_diagentry (void)
     native2amiga_startup ();
 }
 
+
 void filesys_start_threads (void)
 {
     UnitInfo *uip;
     int i;
-
+	
     free_mountinfo (&current_mountinfo);
+	reopen_hdfile (&options_mountinfo);
     dup_mountinfo (&options_mountinfo, &current_mountinfo);
+	
     uip = current_mountinfo.ui;
     for (i = 0; i < current_mountinfo.num_units; i++) {
 	UnitInfo *ui = &uip[i];
@@ -4007,16 +4025,16 @@ static char *device_dupfix (uaecptr expbase, const char *devname)
 static void dump_partinfo (const char *name, int num, uaecptr pp)
 {
     uae_u32 dostype = get_long (pp + 80);
-    write_log ("RDB: '%s' dostype=%08.8X\n", name, dostype);
+    write_log ("RDB: '%s' dostype=%#8.8X\n", name, dostype);
     write_log ("BlockSize: %d, Surfaces: %d, SectorsPerBlock %d\n",
 	       get_long (pp + 20) * 4, get_long (pp + 28), get_long (pp + 32));
     write_log ("SectorsPerTrack: %d, Reserved: %d, LowCyl %d, HighCyl %d\n",
 	       get_long (pp + 36), get_long (pp + 40), get_long (pp + 52), get_long (pp + 56));
-    write_log ("Buffers: %d, BufMemType: %08.8x, MaxTransfer: %08.8x, BootPri: %d\n",
+    write_log ("Buffers: %d, BufMemType: %#8.8x, MaxTransfer: %#8.8x, BootPri: %d\n",
 	       get_long (pp + 60), get_long (pp + 64), get_long (pp + 68), get_long (pp + 76));
 }
 
-#define rdbmnt write_log ("Mounting uaehf.device %d (%d) (size=%I64u):\n", unit_no, partnum, hfd->size);
+#define rdbmnt write_log ("Mounting uaehf.device %d (%d) (size=%64llu):\n", unit_no, partnum, hfd->size);
 
 static int rdb_mount (UnitInfo *uip, int unit_no, unsigned int partnum, uaecptr parmpacket)
 {
@@ -4041,7 +4059,7 @@ static int rdb_mount (UnitInfo *uip, int unit_no, unsigned int partnum, uaecptr 
     }
     if (lastblock * hfd->blocksize > hfd->size) {
 	rdbmnt
-	write_log ("failed, too small (%d*%d > %I64u)\n", lastblock, hfd->blocksize, hfd->size);
+	write_log ("failed, too small (%d*%d > %64llu)\n", lastblock, hfd->blocksize, hfd->size);
 	return -2;
     }
     for (rdblock = 0; rdblock < lastblock; rdblock++) {
@@ -4166,11 +4184,11 @@ static int rdb_mount (UnitInfo *uip, int unit_no, unsigned int partnum, uaecptr 
     oldversion = oldrevision = -1;
     newversion = (buf[36] << 8) | buf[37];
     newrevision = (buf[38] << 8) | buf[39];
-    write_log ("RDB: RDB filesystem %08.8X version %d.%d\n", dostype, newversion, newrevision);
+    write_log ("RDB: RDB filesystem %#8.8X version %d.%d\n", dostype, newversion, newrevision);
     if (get_long (fsnode)) {
 	oldversion = get_word (fsnode + 18);
 	oldrevision = get_word (fsnode + 20);
-	write_log ("RDB: %08.8X in FileSystem.resouce version %d.%d\n", dostype, oldversion, oldrevision);
+	write_log ("RDB: %#8.8X in FileSystem.resouce version %d.%d\n", dostype, oldversion, oldrevision);
     }
     if (newversion * 65536 + newrevision <= oldversion * 65536 + oldrevision && oldversion >= 0) {
 	write_log ("RDB: fs in FileSystem.resource is newer or same, ignoring RDB filesystem\n");
@@ -4253,10 +4271,10 @@ static void dofakefilesys (UnitInfo *uip, uaecptr parmpacket)
 	strcpy (tmp + i, "FastFileSystem");
     }
     if (tmp[0] == 0) {
-	write_log ("RDB: no filesystem for dostype 0x%08.8X\n", dostype);
+	write_log ("RDB: no filesystem for dostype %#8.8X\n", dostype);
 	return;
     }
-    write_log ("RDB: fakefilesys, trying to load '%s', dostype 0x%08.8X\n", tmp, dostype);
+    write_log ("RDB: fakefilesys, trying to load '%s', dostype %#8.8X\n", tmp, dostype);
     zf = zfile_fopen (tmp,"rb");
     if (!zf) {
 	write_log ("RDB: filesys not found\n");
@@ -4272,7 +4290,7 @@ static void dofakefilesys (UnitInfo *uip, uaecptr parmpacket)
     uip->rdb_filesyssize = size;
     put_long (parmpacket + PP_FSSIZE, uip->rdb_filesyssize);
     addfakefilesys (parmpacket, dostype);
-    write_log ("HDF: faked RDB filesystem %08.8X loaded\n", dostype);
+    write_log ("HDF: faked RDB filesystem %#8.8X loaded\n", dostype);
 }
 
 static void get_new_device (int type, uaecptr parmpacket, char **devname, uaecptr *devname_amiga, int unit_no)
@@ -4288,7 +4306,7 @@ static void get_new_device (int type, uaecptr parmpacket, char **devname, uaecpt
     if (type == FILESYS_VIRTUAL)
 	write_log ("FS: mounted virtual unit %s (%s)\n", buffer, current_mountinfo.ui[unit_no].rootdir);
     else
-	write_log ("FS: mounted HDF unit %s (%04.4x-%08.8x, %s)\n", buffer,
+	write_log ("FS: mounted HDF unit %s (%#4.4x-%#8.8x, %s)\n", buffer,
 	    (uae_u32)(current_mountinfo.ui[unit_no].hf.size >> 32),
 	    (uae_u32)(current_mountinfo.ui[unit_no].hf.size),
 	    current_mountinfo.ui[unit_no].rootdir);
