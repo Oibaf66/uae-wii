@@ -884,9 +884,9 @@ uae_u8 REGPARAM2 *default_xlate (uaecptr a)
 		write_log ("Your Amiga program just did something terribly stupid %p PC=%p\n", a, m68k_getpc (&regs));
 		m68k_dumpstate (0, 0);
 		for (i = 0; i < 10; i++) {
-		    write_log ("%08.8X ", i >= 5 ? a3 : a2);
+		    write_log ("%#8.8X ", i >= 5 ? a3 : a2);
 		    for (j = 0; j < 16; j += 2) {
-			write_log (" %04.4X", get_word (i >= 5 ? a3 : a2));
+			write_log (" %#4.4X", get_word (i >= 5 ? a3 : a2));
 			if (i >= 5) a3 +=2; else a2 += 2;
 		    }
 		    write_log ("\n");
@@ -1191,7 +1191,7 @@ static int load_kickstart (void)
 	    !memcmp (kickmemory + i, kickshift2, sizeof (kickshift2)) ||
 	    !memcmp (kickmemory + i, kickshift3, sizeof (kickshift3))) {
 		kickmemory[i + 2] = 0x30;
-	        write_log ("Kickstart KickShifted @%04.4X\n", i);
+	        write_log ("Kickstart KickShifted @ %#4.4X\n", i);
 	    }
 	}
 	kickstart_fix_checksum (kickmemory, kickmem_size);

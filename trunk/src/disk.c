@@ -1676,7 +1676,7 @@ static int drive_write_pcdos (drive *drv)
 	    continue;
 	}
 	if (mark != 0xfb) {
-	    write_log ("PCDOS: track %d: unknown address mark %02.2X\n", drv->cyl * 2 + side, mark);
+	    write_log ("PCDOS: track %d: unknown address mark %#2.2X\n", drv->cyl * 2 + side, mark);
 	    continue;
 	}
 	if (sector < 0)
@@ -2133,7 +2133,7 @@ void DISK_select (uae_u8 data)
     static unsigned int step;
 
     if (disk_debug_logging > 1)
-	write_log ("%08.8X %02.2X %s", m68k_getpc (&regs), data, tobin (data));
+	write_log ("%#8.8X %#2.2X %s", m68k_getpc (&regs), data, tobin (data));
 
     lastselected = selected;
     selected = (data >> 3) & 15;
@@ -2152,7 +2152,7 @@ void DISK_select (uae_u8 data)
     }
 
     if (disk_debug_logging > 1) {
-	write_log (" %d%d%d%d% ", (selected & 1) ? 0 : 1, (selected & 2) ? 0 : 1, (selected & 4) ? 0 : 1, (selected & 8) ? 0 : 1);
+	write_log (" %d%d%d%d ", (selected & 1) ? 0 : 1, (selected & 2) ? 0 : 1, (selected & 4) ? 0 : 1, (selected & 8) ? 0 : 1);
 	if ((prevdata & 0x80) != (data & 0x80))
 	    write_log (" dskmotor %d ", (data & 0x80) ? 1 : 0);
 	if ((prevdata & 0x02) != (data & 0x02))
@@ -2294,7 +2294,7 @@ void dumpdisk (void)
 		drive_writeprotected (drv) ? "ro" : "rw", drv->mfmpos, drv->tracklen);
 	    w = word;
 	    for (j = 0; j < 15; j++) {
-		write_log ("%04.4X ", w);
+		write_log ("%#4.4X ", w);
 		for (k = 0; k < 16; k++) {
 		    w <<= 1;
 		    w |= getonebit (drv->bigmfmbuf, drv->mfmpos + j * 16 + k);
@@ -2303,7 +2303,7 @@ void dumpdisk (void)
 	    write_log ("\n");
 	}
     }
-    write_log ("side %d, dma %d, bitoffset %d, word %04.4X, dskbytr %04.4X adkcon %04.4X dsksync %04.4X\n", side, dskdmaen, bitoffset, word, dskbytr_val, adkcon, dsksync);
+    write_log ("side %d, dma %d, bitoffset %d, word %#4.4X, dskbytr %#4.4X adkcon %#4.4X dsksync %#4.4X\n", side, dskdmaen, bitoffset, word, dskbytr_val, adkcon, dsksync);
 }
 
 static void disk_dmafinished (void)
@@ -2313,7 +2313,7 @@ static void disk_dmafinished (void)
     dskdmaen = 0;
     if (disk_debug_logging > 0) {
 	unsigned int dr;
-	write_log ("disk dma finished %08.8X MFMpos=", dskpt);
+	write_log ("disk dma finished %#8.8X MFMpos=", dskpt);
 	for (dr = 0; dr < MAX_FLOPPY_DRIVES; dr++)
 	    write_log ("%d%s", floppy[dr].mfmpos, dr < MAX_FLOPPY_DRIVES - 1 ? "," : "");
 	write_log ("\n");
@@ -2596,7 +2596,7 @@ static void disk_doupdate_read (drive * drv, int floppybits)
 
 static void disk_dma_debugmsg (void)
 {
-    write_log ("LEN=%04.4X (%d) SYNC=%04.4X PT=%08.8X ADKCON=%04.4X PC=%08.8X\n",
+    write_log ("LEN=%#4.4X (%d) SYNC=%#4.4X PT=%#8.8X ADKCON=%#4.4X PC=%#8.8X\n",
 	dsklength, dsklength, (adkcon & 0x400) ? dsksync : 0xffff, dskpt, adkcon, m68k_getpc (&regs));
 }
 
@@ -2634,7 +2634,7 @@ uae_u16 DSKBYTR (unsigned int hpos)
     if (dsklen & 0x4000)
 	v |= 0x2000;
     if (disk_debug_logging > 1)
-        write_log ("DSKBYTR=%04.4X hpos=%d\n", v, hpos);
+        write_log ("DSKBYTR=%#4.4X hpos=%d\n", v, hpos);
 #ifdef DEBUGGER
     if (disk_debug_mode & DISK_DEBUG_PIO) {
 	unsigned int dr;
@@ -2921,7 +2921,7 @@ void DSKDAT (uae_u16 v)
     static int count = 0;
     if (count < 5) {
 	count++;
-	write_log ("%04.4X written to DSKDAT. Not good. PC=%08.8X", v, m68k_getpc (&regs));
+	write_log ("%#4.4X written to DSKDAT. Not good. PC=%#8.8X", v, m68k_getpc (&regs));
 	if (count == 5)
 	    write_log ("(further messages suppressed)");
 
