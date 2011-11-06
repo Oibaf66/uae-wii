@@ -2206,10 +2206,10 @@ static void dumpsync (void)
     if (cnt < 0)
 	return;
     cnt--;
-    write_log ("BEAMCON0 = %04.4X VTOTAL=%04.4X HTOTAL=%04.4X\n", new_beamcon0, vtotal, htotal);
-    write_log ("HSSTOP=%04.4X HBSTRT=%04.4X HBSTOP=%04.4X\n", hsstop, hbstrt, hbstop);
-    write_log ("VSSTOP=%04.4X VBSTRT=%04.4X VBSTOP=%04.4X\n", vsstop, vbstrt, vbstop);
-    write_log ("HSSTRT=%04.4X VSSTRT=%04.4X HCENTER=%04.4X\n", hsstrt, vsstrt, hcenter);
+    write_log ("BEAMCON0 = %#4.4X VTOTAL=%#4.4X HTOTAL=%#4.4X\n", new_beamcon0, vtotal, htotal);
+    write_log ("HSSTOP=%#4.4X HBSTRT=%#4.4X HBSTOP=%#4.4X\n", hsstop, hbstrt, hbstop);
+    write_log ("VSSTOP=%#4.4X VBSTRT=%#4.4X VBSTOP=%#4.4X\n", vsstop, vbstrt, vbstop);
+    write_log ("HSSTRT=%#4.4X VSSTRT=%#4.4X HCENTER=%#4.4X\n", hsstrt, vsstrt, hcenter);
 }
 
 /* set PAL or NTSC timing variables */
@@ -2715,7 +2715,7 @@ static void BEAMCON0 (uae_u16 v)
 	if (v != new_beamcon0) {
 	    new_beamcon0 = v;
 	    if (v & ~0x20)
-		write_log ("warning: %04.4X written to BEAMCON0\n", v);
+		write_log ("warning: %#4.4X written to BEAMCON0\n", v);
 	}
     }
 }
@@ -3450,9 +3450,9 @@ static void dump_copper (const char *error, unsigned int until_hpos)
     warned--;
     write_log("%s: vpos=%d until_hpos=%d\n",
 	error, vpos, until_hpos);
-    write_log("cvcmp=%d chcmp=%d chpos=%d cvpos=%d ci1=%04.4X ci2=%04.4X\n",
+    write_log("cvcmp=%d chcmp=%d chpos=%d cvpos=%d ci1=%#4.4X ci2=%#4.4X\n",
 	cop_state.vcmp,cop_state.hcmp,cop_state.hpos,cop_state.vpos,cop_state.saved_i1,cop_state.saved_i2);
-    write_log("cstate=%d ip=%08.8X ev_copper=%d\n",
+    write_log("cstate=%d ip=%#8.8X ev_copper=%d\n",
 	cop_state.state,cop_state.ip,eventtab[ev_copper].active);
 }
 
@@ -5138,7 +5138,7 @@ void REGPARAM2 custom_bput (uaecptr addr, uae_u32 value)
     custom_wput (addr & ~1, rval);
     if (warned < 10) {
 	if (m68k_getpc (&regs) < 0xe00000 || m68k_getpc (&regs) >= 0x10000000) {
-	    write_log ("Byte put to custom register %04.4X PC=%08.8X\n", addr, m68k_getpc (&regs));
+	    write_log ("Byte put to custom register %#4.4X PC=%#8.8X\n", addr, m68k_getpc (&regs));
 	    warned++;
 	}
     }

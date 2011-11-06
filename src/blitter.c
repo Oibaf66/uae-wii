@@ -228,10 +228,10 @@ void build_blitfilltable (void)
 
 static void blitter_dump (void)
 {
-    write_log ("APT=%08.8X BPT=%08.8X CPT=%08.8X DPT=%08.8X\n", bltapt, bltbpt, bltcpt, bltdpt);
-    write_log ("CON0=%04.4X CON1=%04.4X ADAT=%04.4X BDAT=%04.4X CDAT=%04.4X\n",
+    write_log ("APT=%#8.8X BPT=%#8.8X CPT=%#8.8X DPT=%#8.8X\n", bltapt, bltbpt, bltcpt, bltdpt);
+    write_log ("CON0=%#4.4X CON1=%#4.4X ADAT=%#4.4X BDAT=%#4.4X CDAT=%#4.4X\n",
 	bltcon0, bltcon1, blt_info.bltadat, blt_info.bltbdat, blt_info.bltcdat);
-    write_log ("AFWM=%04.4X ALWM=%04.4X AMOD=%04.4X BMOD=%04.4X CMOD=%04.4X DMOD=%04.4X\n",
+    write_log ("AFWM=%#4.4X ALWM=%#4.4X AMOD=%#4.4X BMOD=%#4.4X CMOD=%#4.4X DMOD=%#4.4X\n",
 	blt_info.bltafwm, blt_info.bltalwm,
 	blt_info.bltamod & 0xffff, blt_info.bltbmod & 0xffff, blt_info.bltcmod & 0xffff, blt_info.bltdmod & 0xffff);
 }
@@ -928,7 +928,7 @@ static void blit_bltset (unsigned int con)
 
     if (blitline) {
 	if (blt_info.hblitsize != 2)
-	    write_log ("weird hblitsize in linemode: %d vsize=%d PC%=%x\n",
+	    write_log ("weird hblitsize in linemode: %d vsize=%d PC=%x\n",
 		blt_info.hblitsize, blt_info.vblitsize, m68k_getpc (&regs));
 	blit_diag = blit_cycle_diagram_line;
     } else {

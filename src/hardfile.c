@@ -264,7 +264,7 @@ static int handle_scsi (uaecptr request, struct hardfiledata *hfd)
 	break;
 	default:
         lr = -1;
-	write_log ("UAEHF: unsupported scsi command 0x%02.2X\n", cmd);
+	write_log ("UAEHF: unsupported scsi command %#2.2X\n", cmd);
 	status = 2; /* CHECK CONDITION */
 	s[0] = 0x70;
 	s[2] = 5; /* ILLEGAL REQUEST */
@@ -492,13 +492,13 @@ static void getchs (struct hardfiledata *hfd, int *cyl, int *cylsec, int *head, 
 
 static void outofbounds (int cmd, uae_u64 offset, uae_u64 len, uae_u64 max)
 {
-    write_log ("UAEHF: cmd %d: out of bounds, %08.8X-%08.8X + %08.8X-%08.8X > %08.8X-%08.8X\n", cmd,
+    write_log ("UAEHF: cmd %d: out of bounds, %#8.8X-%#8.8X + %#8.8X-%#8.8X > %#8.8X-%#8.8X\n", cmd,
 	(uae_u32)(offset >> 32),(uae_u32)offset,(uae_u32)(len >> 32),(uae_u32)len,
 	(uae_u32)(max >> 32),(uae_u32)max);
 }
 static void unaligned (int cmd, uae_u64 offset, uae_u64 len, int blocksize)
 {
-    write_log ("UAEHF: cmd %d: unaligned access, %08.8X-%08.8X, %08.8X-%08.8X, %08.8X\n", cmd,
+    write_log ("UAEHF: cmd %d: unaligned access, %#8.8X-%#8.8X, %#8.8X-%#8.8X, %#8.8X\n", cmd,
 	(uae_u32)(offset >> 32),(uae_u32)offset,(uae_u32)(len >> 32),(uae_u32)len,
 	blocksize);
 }

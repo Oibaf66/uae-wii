@@ -905,7 +905,7 @@ static const char *menu_select_file_internal(const char *dir_path,
 	const char **file_list = get_file_list(dir_path);
 	char *sel;
 	char *out;
-	char *ptr_selected_file;
+	const char *ptr_selected_file;
 	int opt;
 	int i;
 	char buf[64];

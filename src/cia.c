@@ -427,7 +427,7 @@ void CIA_vsync_handler ()
 	    if (tod_hack_delay == 0) {
 		tod_hack_reset ();
 		tod_hack_delay = 0;
-		write_log ("TOD_HACK re-initialized CIATOD=%06.6X\n", ciaatod);
+		write_log ("TOD_HACK re-initialized CIATOD=%#6.6lX\n", ciaatod);
 	    }
 	}
 	if (tod_hack_delay == 0) {
@@ -1027,13 +1027,13 @@ void CIA_reset (void)
 
 void dumpcia (void)
 {
-    write_log ("A: CRA %02x CRB %02x ICR %02x IM %02x TA %04x (%04x) TB %04x (%04x)\n",
+    write_log ("A: CRA %02x CRB %02x ICR %02x IM %02x TA %04lx (%04lx) TB %04lx (%04lx)\n",
 	   ciaacra, ciaacrb, ciaaicr, ciaaimask, ciaata, ciaala, ciaatb, ciaalb);
-    write_log ("TOD %06x ALARM %06x %c%c\n",
+    write_log ("TOD %06lx ALARM %06lx %c%c\n",
 	ciaatod, ciaaalarm, ciaatlatch ? 'L' : ' ', ciaatodon ? ' ' : 'S');
-    write_log ("B: CRA %02x CRB %02x ICR %02x IM %02x TA %04x (%04x) TB %04x (%04x)\n",
+    write_log ("B: CRA %02x CRB %02x ICR %02x IM %02x TA %04lx (%04lx) TB %04lx (%04lx)\n",
 	   ciabcra, ciabcrb, ciaaicr, ciabimask, ciabta, ciabla, ciabtb, ciablb);
-    write_log ("TOD %06x ALARM %06x %c%c\n",
+    write_log ("TOD %06lx ALARM %06lx %c%c\n",
 	ciabtod, ciabalarm, ciabtlatch ? 'L' : ' ', ciabtodon ? ' ' : 'S');
 }
 
