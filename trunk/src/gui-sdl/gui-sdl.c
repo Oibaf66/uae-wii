@@ -126,7 +126,11 @@ static const char *emulation_messages[] = {
 		/*06*/		"Floppy speed",
 		/*07*/		"^|normal|turbo|400%|800%",
 		/*08*/		"Sound interpolation",
-		/*09*/		"^|none|rh|crux|sinc",	
+		/*09*/		"^|none|rh|crux|sinc",
+		/*10*/		"Collision level",
+		/*11*/		"^|none|sprites|playfileds|full",		
+		/*12*/		"Immediate blits",
+		/*13*/		"^|on|off",
 		NULL
 };
 
@@ -282,7 +286,6 @@ static void default_config(void)
 	changed_prefs.gfx_framerate = 2;
 }
 
-//static int prefs_has_changed;
 
 static void insert_floppy(int which)
 {
@@ -329,7 +332,6 @@ static void cpu_chipset_options(void)
 	changed_prefs.cpu_level = cpu_level_table[submenus[0]];
 	changed_prefs.chipset_mask = chipset_mask_table[submenus[1]];
 
-	//prefs_has_changed = 1;
 }
 
 static void memory_options(void)
@@ -360,7 +362,6 @@ static void memory_options(void)
 	changed_prefs.fastmem_size = fastmem_size_table[submenus[2]];
 	changed_prefs.z3fastmem_size = z3fastmem_size_table[submenus[3]];
 
-	//prefs_has_changed = 1;
 }
 
 static int get_cpu_to_chipset_speed(void)
@@ -506,7 +507,7 @@ msgInfo("Configurations saved",3000,NULL);
 
 static void emulation_options(void)
 {
-	int submenus[5];
+	int submenus[7];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -516,6 +517,8 @@ static void emulation_options(void)
 	submenus[2] = get_gfx_framerate();
 	submenus[3] = get_floppy_speed();
 	submenus[4] = changed_prefs.sound_interpol;
+	submenus[5] = changed_prefs.collision_level;
+	submenus[6] = !changed_prefs.immediate_blits;
 	
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
@@ -528,8 +531,9 @@ static void emulation_options(void)
 	set_gfx_framerate(submenus[2]);
 	set_floppy_speed(submenus[3]);
 	changed_prefs.sound_interpol = submenus[4];
+	changed_prefs.collision_level = submenus[5];	
+	changed_prefs.immediate_blits = !submenus[6];
 	
-	//prefs_has_changed = 1;
 }
 
 static void graphic_options(void)
@@ -554,7 +558,6 @@ static void graphic_options(void)
 	changed_prefs.leds_on_screen = !submenus[2];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	set_Port(submenus[3]);
-	//prefs_has_changed = 1;
 }
 
 /* There are a few unfortunate header problems, so I'll do like this for now */
@@ -621,7 +624,6 @@ static void input_options(int joy)
 				currprefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 				changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 			}
-		//prefs_has_changed = 1;
 		return;
 	}
 
@@ -637,7 +639,6 @@ static void input_options(int joy)
 		changed_prefs.mouse_settings[1][joy].enabled = 1;
 		currprefs.mouse_settings[1][joy].enabled = 1;
 		}
-		//prefs_has_changed = 1;
 		return;
 	}
 	
@@ -666,7 +667,6 @@ static void input_options(int joy)
 		
 	setup_joystick(joy, key, sdl_key);
 	
-	//prefs_has_changed = 1;
 }
 
 
@@ -720,7 +720,6 @@ static void hardware_options(void)
 		uae_reset(1);
 	
 
-	//prefs_has_changed = 1;
 }
 
 static void save_load_state(int which)
@@ -862,7 +861,6 @@ void gui_display(int shortcut)
 	pause_sound();
 	
 	memset(submenus, 0, sizeof(submenus));
-	//prefs_has_changed = 0;
 
 	do
 	{
