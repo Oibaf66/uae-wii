@@ -24,6 +24,14 @@
 #define ID_BUTTON_OFFSET 0
 #define ID_AXIS_OFFSET 32
 
+/* Uncomment for debugging output */
+//#define DEBUG
+#ifdef DEBUG
+#define DEBUG_LOG write_log
+#else
+#define DEBUG_LOG(...) do ; while(0)
+#endif
+
 extern int usbismount, smbismount;
 
 extern const char *strdup_path_expand (const char *src);
@@ -38,13 +46,14 @@ static const char *main_menu_messages[] = {
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Wiimote configuration",
 		/*06*/		"^|Wiimote1|Wiimote2",
-		/*07*/		"Hardware options",
-		/*08*/		"Emulation options",
-		/*09*/		"Other options",
-		/*10*/		"Save confs",
-		/*11*/		"Reset UAE",
-		/*12*/		"Help",
-		/*13*/		"Quit",
+		/*07*/		"Virtual keyboard",
+		/*08*/		"Hardware options",
+		/*09*/		"Emulation options",
+		/*10*/		"Other options",
+		/*11*/		"Save confs",
+		/*12*/		"Reset UAE",
+		/*13*/		"Help",
+		/*14*/		"Quit",
 		NULL
 };
 
@@ -579,7 +588,8 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 
 	//printf("Mibb: %s:%s\n", buf, key);
 	read_inputdevice_config (&changed_prefs, buf, key);
-	read_inputdevice_config (&currprefs, buf, key);
+
+	inputdevice_config_change();
 }
 
 
@@ -587,8 +597,8 @@ static void setup_joystick(int joy, const char *key, int sdl_key)
 {
 	if (!strcmp(key, "None")) 
 	{
-	currprefs.joystick_settings[1][joy].eventid[ID_BUTTON_OFFSET + sdl_key][0] = 0;
 	changed_prefs.joystick_settings[1][joy].eventid[ID_BUTTON_OFFSET + sdl_key][0] = 0;
+	inputdevice_config_change();
 	}
 	else
 	insert_keyboard_map(key, "input.1.joystick.%d.button.%d", joy, sdl_key);
@@ -621,8 +631,8 @@ static void input_options(int joy)
 			if (!joy) insert_keyboard_map("JOY2_HORIZ","input.1.joystick.%d.axis.6", 0);
 			else insert_keyboard_map("JOY1_HORIZ" ,"input.1.joystick.%d.axis.6", 1);}
 		else{
-				currprefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 				changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
+				inputdevice_config_change();
 			}
 		return;
 	}
@@ -632,17 +642,16 @@ static void input_options(int joy)
 		if (submenus[4])
 		{
 		changed_prefs.mouse_settings[1][joy].enabled = 0;
-		currprefs.mouse_settings[1][joy].enabled = 0;
 		}
 		else
 		{
 		changed_prefs.mouse_settings[1][joy].enabled = 1;
-		currprefs.mouse_settings[1][joy].enabled = 1;
 		}
+		inputdevice_config_change();
 		return;
 	}
 	
-	key = virtkbd_get_key();
+	key = virtkbd_get_key()->ev_name;
 	if (key == NULL)
 		return;
 	switch(opt)
@@ -669,6 +678,25 @@ static void input_options(int joy)
 	
 }
 
+static void virtual_keyboard(void)
+{
+	int key_code;
+	
+	virtkey_t *key =virtkbd_get_key();  
+	if (key) {key_code = key->sdl_code;} else return;
+	
+	SDL_Event event_key;
+	
+	event_key.type=SDL_KEYDOWN;
+	event_key.key.keysym.sym=key_code;
+	SDL_PushEvent(&event_key);
+	DEBUG_LOG ("Push Event: keycode %d %s\n", key_code, "SDL_KEYDOWN");
+	
+	event_key.type=SDL_KEYUP;
+	SDL_PushEvent(&event_key);
+	DEBUG_LOG ("Push Event: keycode %d %s\n", key_code, "SDL_KEYUP");
+	
+}	
 
 
 static void hardware_options(void)
@@ -881,32 +909,35 @@ void gui_display(int shortcut)
 			break;
 		case 5:
 			input_options(submenus[2]);
-			break;		
+			break;
 		case 7:
-			hardware_options();
+			virtual_keyboard();
 			break;	
 		case 8:
+			hardware_options();
+			break;	
+		case 9:
 			emulation_options();
 			break;
-		case 9:
+		case 10:
 			graphic_options();
 			break;	
-		case 10:	
+		case 11:	
 			save_configurations();
 			break;
-		case 11:
+		case 12:
 			uae_reset(1);
 			break;	
-		case 12:
+		case 13:
 			help();
 			break;
-		case 13:
+		case 14:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) uae_quit();	
 			break;
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 7 || opt == 8 || opt == 9 || opt == 12);
+	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 13);
 	
 	resume_sound();
 }

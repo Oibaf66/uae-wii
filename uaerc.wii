@@ -58,7 +58,6 @@ sound_output=normal
 sound_frequency=32000
 sound_latency=200
 
-sdl.map_raw_keys=true
 
 input.config=1
 
@@ -164,3 +163,6 @@ floppy0type=0
 floppy1type=0
 floppy2type=-1
 floppy3type=-1
+
+# Set keyboard language. Possible values are de, dk, es, us, se, fr, it 
+kbd_lang=us
