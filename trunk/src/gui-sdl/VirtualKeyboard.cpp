@@ -16,16 +16,14 @@
 #include "VirtualKeyboard.h"
 
 
-struct virtkey;
-
 class VirtualKeyboard
 {
 public:
 	VirtualKeyboard(SDL_Surface *screen, TTF_Font *font);
-	const char* get_key();
+	struct virtkey* get_key();
 
 private:
-	struct virtkey *get_key_internal();
+	struct virtkey* get_key_internal();
 	void draw();
 	void select_next(int dx, int dy);
 	void toggle_shift();
@@ -38,35 +36,30 @@ private:
 	char buf[255];
 };
 
-typedef struct virtkey
-{
-	const char *name;
-	const char *ev_name;
-	bool is_done;
-} virtkey_t;
 
-#define K(name) \
-  { name, "KEY_"name, false }
-#define N(name, key_name) \
-  { name, "KEY_"key_name, false }
+
+#define K(name, sdl_code) \
+  { name, "KEY_"name, sdl_code, false }
+#define N(name, key_name, sdl_code) \
+  { name, "KEY_"key_name, sdl_code, false }
 #define D(name) \
-  { name, "None", true }
+  { name, "None", 0, true }
 #define KNL() \
-  { NULL, NULL, false }
+  { NULL, NULL, 0, false }
 #define NJ(name, joy_name) \
-  { name, joy_name, false }  
+  { name, joy_name, 0, false }
 
 #define KEY_COLS 14
 #define KEY_ROWS 8
 
 static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
-  N("Esc", "ESC"), KNL(), K("F1"),K("F2"),K("F3"),K("F4"),K("F5"),K("F6"),K("F7"),K("F8"),K("F9"),K("F10"), N("Del","DEL"),N("Help", "HELP"),
-  N("~`","BACKQUOTE"),KNL(),K("1"), K("2"), K("3"), K("4"), K("5"), K("6"), K("7"), K("8"), K("9"), K("0"), N("-", "SUB"),N("+", "PLUS"),
-  N("Tab", "TAB"), KNL(), K("Q"), K("W"), K("E"), K("R"), K("T"), K("Y"), K("U"), K("I"), K("O"), K("P"),N("[", "LEFTBRACKET"),N("]","RIGHTBRACKET"),
-  N("Sft","SHIFT_LEFT"),KNL(), K("A"), K("S"), K("D"), K("F"), K("G"), K("H"), K("J"), K("K"), K("L"), N(":;", "SEMICOLON"), N("@#", "??"), N("Sft", "SHIFT_RIGHT"),
-  N("Ctrl","CTRL"),KNL(),K("Z"),K("X"), K("C"), K("V"), K("B"), K("N"), K("M"),N("<,", "COMMA"),N(">.", "PERIOD"), N("\\","KEY_BACKSLASH"), N("/", "SLASH"),N("Ret", "RETURN"),
-  N("Alt","ALT_LEFT"),KNL(), N("Amg","AMIGA_LEFT"),KNL(),N("space", "SPACE"),KNL(),KNL(),KNL(), N("Up", "CURSOR_UP"),KNL(),KNL(),N("Amg","AMIGA_RIGHT"),KNL(),N("Alt","ALT_RIGHT"), 
-  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft", "CURSOR_LEFT"),KNL(), N("Dwn", "CURSOR_DOWN"), KNL(), N("Rgt", "CURSOR_RIGHT"),KNL(), N("Enter", "ENTER"),KNL(),
+  N("Esc","ESC",27), KNL(), K("F1",282),K("F2",283),K("F3",284),K("F4",285),K("F5",286),K("F6",287),K("F7",288),K("F8",289),K("F9",290),K("F10",291), N("BS","BACKSPACE",8),N("Help", "HELP",277),
+  N("~`","BACKQUOTE",96),KNL(),K("1",49),K("2",50), K("3",51), K("4",52), K("5",53), K("6",54), K("7",55), K("8",56), K("9",57), K("0",48), N("-","SUB",45),N("=","EQUALS",61),
+  N("Tab", "TAB", 9), KNL(), K("Q",113), K("W",119), K("E",101), K("R",114), K("T",116), K("Y",121), K("U",117), K("I",105), K("O",111), K("P",112),N("[","LEFTBRACKET",91),N("]","RIGHTBRACKET",93),
+  N("Ctrl","CTRL",306),KNL(), K("A",97), K("S",115), K("D",100), K("F",102), K("G",103), K("H",104), K("J",106), K("K",107), K("L",108),N(":;","SEMICOLON",59),N("'","SINGLEQUOTE",96),N("Ret","RETURN",13),
+  N("Sft","SHIFT_LEFT",304),KNL(),K("Z",122),K("X",120),K("C",99), K("V",118), K("B",98), K("N",110), K("M",109),N("<,","COMMA",44),N(">.","PERIOD",46), N("/","SLASH",47),N("\\","KEY_BACKSLASH",92), N("Sft","SHIFT_RIGHT",303),
+  N("Alt","ALT_LEFT",308),KNL(), N("Amg","AMIGA_LEFT",310),KNL(),N("space", "SPACE",32),KNL(),KNL(),KNL(),N("Up","CURSOR_UP",273),KNL(),KNL(),N("Amg","AMIGA_RIGHT",309),KNL(),N("Alt","ALT_RIGHT",307), 
+  D("None"), KNL(), KNL(), KNL(), KNL(), KNL(), N("Lft","CURSOR_LEFT",276),KNL(), N("Dwn","CURSOR_DOWN",274), KNL(), N("Rgt", "CURSOR_RIGHT",275),KNL(), N("Enter","ENTER",271),KNL(),
   NJ("Fire","JOY_FIRE_BUTTON"),KNL(),KNL(),NJ("Joy 2nd button","JOY_2ND_BUTTON"),KNL(),KNL(),KNL(),KNL(),KNL(),NJ("Joy 3rd button","JOY_3RD_BUTTON"),KNL(),KNL(),KNL(),KNL()
 };
 
@@ -176,7 +169,7 @@ struct virtkey *VirtualKeyboard::get_key_internal()
 	return NULL;
 }
 
-const char* VirtualKeyboard::get_key()
+struct virtkey* VirtualKeyboard::get_key()
 {
 	virtkey_t *key;
 	SDL_Rect rect = {32, 32, FULL_DISPLAY_X-64, FULL_DISPLAY_Y-96};
@@ -184,10 +177,8 @@ const char* VirtualKeyboard::get_key()
 	SDL_FillRect(this->screen, &rect, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
 	
 	key = this->get_key_internal();
-	if (key == NULL)
-		return NULL;
 
-	return key->ev_name;
+	return key;
 }
 
 /* C interface */
@@ -197,7 +188,7 @@ void virtkbd_init(SDL_Surface *surf, TTF_Font *fnt)
 	virtual_keyboard = new VirtualKeyboard(surf, fnt);
 }
 
-const char *virtkbd_get_key(void)
+struct virtkey *virtkbd_get_key(void)
 {
 	return virtual_keyboard->get_key();
 }
