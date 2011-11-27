@@ -155,9 +155,10 @@ LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libog
 dist:uae.dol
 	install -d $@/apps/uae
 	install -d $@/uae
-	install -d $@/uae/floppies
 	install -d $@/uae/roms
+	install -d $@/uae/floppies
 	install -d $@/uae/harddisks
+	install -d $@/uae/harddir
 	install -d $@/uae/saves
 	echo "dummy" > $@/uae/roms/put-your-kick-dot-rom-here
 	echo "dummy" > $@/uae/floppies/dummy
