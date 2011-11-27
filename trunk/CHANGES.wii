@@ -1,3 +1,10 @@
+version 7:
+		*Fixed Hardfile and virtual filesystem support  
+		*Added virtual keyboard  
+		*Added several menu options (immediate blits, collision level, real CPU speed, scanlines, ntsc and sound)
+		*Menu reorganization
+		*Other small improvements  
+
 version 6:
 		*(build) Update to devkitpro r24 and libogc 1.8.8
 		* Added SMB support 
