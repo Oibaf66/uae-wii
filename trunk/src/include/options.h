@@ -253,6 +253,8 @@ struct uae_prefs {
 	char SmbShare[32]; 
 	char SmbIp[32];
 	int Port; //SD, USB or SMB
+	int rumble;
+	int gfx_correct_ratio;
 #endif
 	
     /* input */

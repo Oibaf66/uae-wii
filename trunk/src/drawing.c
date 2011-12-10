@@ -1046,7 +1046,11 @@ static void init_aspect_maps (void)
 	native_lines_per_amiga_line = ((double)gfxvidinfo.height
 				       * (currprefs.gfx_lores ? 320 : 640)
 				       / (currprefs.gfx_linedbl ? 512 : 256)
-				       / gfxvidinfo.width);
+				       / gfxvidinfo.width
+#ifdef GEKKO
+											*currprefs.gfx_correct_ratio/100
+#endif		   
+	);				   
     else
 	native_lines_per_amiga_line = 1;
 

@@ -178,7 +178,7 @@ dist:uae.dol
 	cd $@ && tar -czf ../uae-wii-bin.tar.gz *
 	
 distsource:
-	cd .. && cp uae-wii uae-wii-v
+	cd .. && cp -r uae-wii uae-wii-v
 	cd ../uae-wii-v && find . -name ".svn" | xargs rm -rf
 	cd .. && tar -czf uae-wii-v.tar.gz uae-wii-v
 
