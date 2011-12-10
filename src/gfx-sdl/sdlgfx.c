@@ -1369,7 +1369,11 @@ int check_prefs_changed_gfx (void)
 	    && changed_prefs.gfx_xcenter        == currprefs.gfx_xcenter
 	    && changed_prefs.gfx_ycenter        == currprefs.gfx_ycenter
 	    && changed_prefs.gfx_afullscreen    == currprefs.gfx_afullscreen
-	    && changed_prefs.gfx_pfullscreen    == currprefs.gfx_pfullscreen) {
+	    && changed_prefs.gfx_pfullscreen    == currprefs.gfx_pfullscreen
+		#ifdef GEKKO 
+		&& changed_prefs.gfx_correct_ratio  == currprefs.gfx_correct_ratio
+		#endif
+		) {
 	return 0;
     }
 
@@ -1391,6 +1395,9 @@ int check_prefs_changed_gfx (void)
     currprefs.gfx_ycenter	 = changed_prefs.gfx_ycenter;
     currprefs.gfx_afullscreen	 = changed_prefs.gfx_afullscreen;
     currprefs.gfx_pfullscreen	 = changed_prefs.gfx_pfullscreen;
+	#ifdef GEKKO 
+	currprefs.gfx_correct_ratio  = changed_prefs.gfx_correct_ratio;
+	#endif
 
 #ifdef PICASSO96
     if (!screen_is_picasso)

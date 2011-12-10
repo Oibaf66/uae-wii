@@ -36,6 +36,8 @@ extern int usbismount, smbismount;
 
 extern const char *strdup_path_expand (const char *src);
 
+int gui_is_active;
+
 static void default_config(void);
 
 static const char *main_menu_messages[] = {
@@ -112,7 +114,7 @@ static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 
 
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
-		/*01*/		"^|68000|68010|68020|68030|68040|68060",
+		/*01*/		"^|68000|68010|68020|68020/68881|68040|68060",
 		/*02*/		"  ",
 		/*03*/		"Chipset type",
 		/*04*/		"^|OCS|ECS AGNUS|ECS|AGA",
@@ -145,20 +147,24 @@ static const char *emulation_messages[] = {
 
 static const char *graphic_messages[] = {
 		
-		/*06*/		"Correct aspect",
+		/*00*/		"Correct aspect",
+		/*01*/		"^|off|100%|95%|93%|90%|custom",
+		/*02*/		"  ",
+		/*03*/		"Scanlines",
+		/*04*/		"^|on|off",
+		/*05*/		"  ",
+		/*06*/		"Leds",
 		/*07*/		"^|on|off",
-		/*05*/		"  ",
-		/*06*/		"Scanlines",
-		/*07*/		"^|on|off",
-		/*05*/		"  ",
-		/*08*/		"Leds",
-		/*09*/		"^|on|off",
-		/*05*/		"  ",
-		/*10*/		"Port",
-		/*11*/		"^|SD|USB|SMB",		
+		/*08*/		"  ",
+		/*09*/		"Port",
+		/*10*/		"^|SD|USB|SMB",
+		/*11*/		"  ",
+		/*12*/		"Rumble",
+		/*13*/		"^|on|off",
 		NULL
 };
 
+static const int correct_aspect_table[] = {0,100,95,93,90};
 static const int cpu_to_chipset_table[] = {0,-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
 static const int framerate_table[] = {1, 2, 3, 4, 8};
@@ -398,7 +404,7 @@ static void set_floppy_speed(int which)
 static void set_gfx_framerate(int which)
 {
 	/* Custom setting - don't touch! */
-	if (which > SDL_arraysize(framerate_table))
+	if (which > SDL_arraysize(framerate_table)-1)
 		return;
 	changed_prefs.gfx_framerate = framerate_table[which];
 }
@@ -408,6 +414,24 @@ static int get_gfx_framerate(void)
 	return find_index_by_val(changed_prefs.gfx_framerate, framerate_table,
 			SDL_arraysize(framerate_table), 5);
 
+}
+
+static void set_gfx_aspect_ratio(int which)
+{
+	if (!which) {changed_prefs.gfx_correct_aspect = 0; return;}
+	/* Custom setting or correct aspect off - don't touch! */
+	if (which > SDL_arraysize(correct_aspect_table)-1)
+		return;
+	changed_prefs.gfx_correct_aspect = 1;
+	changed_prefs.gfx_correct_ratio = correct_aspect_table[which];
+}
+
+static int get_gfx_aspect_ratio(void)
+{	
+	if (!changed_prefs.gfx_correct_aspect) return 0; 
+	else
+		return find_index_by_val(changed_prefs.gfx_correct_ratio, correct_aspect_table,
+			SDL_arraysize(correct_aspect_table), 5);
 }
 
 /* Helpers to determine the accuracy */
@@ -547,26 +571,30 @@ static void emulation_options(void)
 
 static void graphic_options(void)
 {
-	int submenus[4];
+	int submenus[5];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
 	
-	submenus[0] = !changed_prefs.gfx_correct_aspect;
+	
+	submenus[0] = get_gfx_aspect_ratio();
 	submenus[1] = !(changed_prefs.gfx_linedbl == 2) ;
 	submenus[2] = !changed_prefs.leds_on_screen;
 	submenus[3] = changed_prefs.Port;
+	submenus[4] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			graphic_messages, submenus);
 	if (opt < 0)
 		return;
 
-	changed_prefs.gfx_correct_aspect = !submenus[0];
+	set_gfx_aspect_ratio(submenus[0]);
 	changed_prefs.gfx_linedbl = submenus[1] ? 1 : 2;
 	changed_prefs.leds_on_screen = !submenus[2];
-	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	set_Port(submenus[3]);
+	changed_prefs.rumble = !submenus[4];
+	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
+	currprefs.rumble = changed_prefs.rumble;
 }
 
 /* There are a few unfortunate header problems, so I'll do like this for now */
@@ -886,6 +914,7 @@ void gui_display(int shortcut)
 {
 	int submenus[3];
 	int opt;
+	gui_is_active=1;
 	pause_sound();
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -932,7 +961,8 @@ void gui_display(int shortcut)
 			help();
 			break;
 		case 14:
-			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) uae_quit();	
+			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) 
+				{currprefs.rumble=0; uae_quit();}	
 			break;
 		default:
 			break;
@@ -940,6 +970,7 @@ void gui_display(int shortcut)
 	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 13);
 	
 	resume_sound();
+	gui_is_active=0;
 }
 
 void gui_message (const char *format,...)

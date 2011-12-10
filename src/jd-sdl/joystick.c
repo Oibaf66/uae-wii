@@ -15,6 +15,13 @@
 #include "inputdevice.h"
 #include <SDL.h>
 
+#if defined(GEKKO)
+# include <ogc/system.h>
+# include <wiiuse/wpad.h> 
+#endif
+
+extern int gui_is_active;
+
 static unsigned int nr_joysticks;
 static int initialized;
 
@@ -26,6 +33,55 @@ struct joyinfo {
 
 static struct joyinfo joys[MAX_INPUT_DEVICES];
 
+//Wiimote Rumble
+#ifdef GEKKO
+void Rumble(unsigned int nr, unsigned int i, int bs)
+{
+		static Uint32 last_ticks[MAX_INPUT_DEVICES];
+		Uint32 cur_ticks;
+		static bool rumble_on[MAX_INPUT_DEVICES];
+		static bool fire_pressed[MAX_INPUT_DEVICES];
+		static int joystickbutton_fire[MAX_INPUT_DEVICES]={-1,-1,-1,-1,-1,-1};
+		int kc;
+		
+		cur_ticks = SDL_GetTicks();
+		
+		kc = currprefs.joystick_settings[1][nr].eventid[i][0];
+		
+			if (bs && (kc == INPUTEVENT_JOY2_FIRE_BUTTON || kc == INPUTEVENT_JOY1_FIRE_BUTTON) && !rumble_on[nr] && !fire_pressed[nr])  
+			{			
+				WPAD_Rumble(nr, true);
+				last_ticks[nr]= cur_ticks;
+				rumble_on[nr]=true;	
+				fire_pressed[nr]=true;
+				joystickbutton_fire[nr]=i;
+			}
+		
+			if (joystickbutton_fire[nr] == i)
+			{
+				if (!bs && (kc == INPUTEVENT_JOY2_FIRE_BUTTON || kc == INPUTEVENT_JOY1_FIRE_BUTTON) && rumble_on[nr] && fire_pressed[nr])
+				{			
+					rumble_on[nr]=true;	
+					fire_pressed[nr]=false;
+				}
+			
+				if (((cur_ticks - last_ticks[nr] > 120) && rumble_on[nr] && !fire_pressed[nr]) \
+				||(!bs && (kc == INPUTEVENT_JOY2_FIRE_BUTTON || kc == INPUTEVENT_JOY1_FIRE_BUTTON) && !rumble_on[nr] && fire_pressed[nr]))
+				{
+					WPAD_Rumble(nr, false);
+					rumble_on[nr]=false;
+					fire_pressed[nr]=false;
+					joystickbutton_fire[nr]=-1;
+				}
+				if ((cur_ticks - last_ticks[nr] > 120) && rumble_on[nr] && fire_pressed[nr])
+				{
+					WPAD_Rumble(nr, false);
+					rumble_on[nr]=false;
+					fire_pressed[nr]=true;	
+				}
+			}		
+}		
+#endif
 
 static void read_joy (unsigned int nr)
 {
@@ -66,6 +122,9 @@ static void read_joy (unsigned int nr)
     for (i = 0; i < num; i++) {
 	int bs = SDL_JoystickGetButton (joy, i) ? 1 : 0;
 	setjoybuttonstate (nr, i, bs);
+	#ifdef GEKKO
+	if (!gui_is_active && currprefs.rumble) Rumble (nr,i, bs);
+	#endif
     }
 }
 
