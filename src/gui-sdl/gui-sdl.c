@@ -642,6 +642,7 @@ static void input_options(int joy)
 	int submenus[5];
 	int opt;
 	int i;
+	struct virtkey *virtualkey;
 
 	memset(submenus, 0, sizeof(submenus));
 	submenus[3] = !changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0];
@@ -679,9 +680,11 @@ static void input_options(int joy)
 		return;
 	}
 	
-	key = virtkbd_get_key()->ev_name;
-	if (key == NULL)
+	virtualkey = virtkbd_get_key();
+	if (virtualkey == NULL)
 		return;
+	key = virtualkey->ev_name;
+	
 	switch(opt)
 		{
 		case 0: /* wiimote */

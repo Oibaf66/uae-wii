@@ -107,7 +107,7 @@ void VirtualKeyboard::draw()
 
 			menu_print_font(this->screen, r, g, b,
 					x * key_w + border_x, y * key_h + border_y,
-					what);
+					what, 20);
 		}
 	}
 }
