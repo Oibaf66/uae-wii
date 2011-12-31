@@ -2,8 +2,8 @@
   <app version="1">
     <name>UAE</name>
     <coder>Simon Kagstrom</coder>
-    <version>7</version>
-    <release_date>20111127</release_date>
+    <version>8</version>
+    <release_date>20111231</release_date>
     <short_description>Amiga emulator</short_description>
     <long_description>UAE is an Amiga emulator written by Bernd Schmidt et al, see http://amigaemulator.org. The port to Wii was done by Simon Kagstrom, with help from Christopher Follett, "Knitax" and Fabio Olimpieri (Oibaf)</long_description>
   </app>
