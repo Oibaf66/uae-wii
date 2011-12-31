@@ -1,3 +1,11 @@
+version 8:
+		* Added rumble support  
+		* Added configurable aspect ratio
+		* Reduced font size of list file menu
+		* Utf8 font support
+
+		-- Fabio Olimpieri <fabio.olimpieri@tin.it>, Dec 31 CEST 2011
+
 version 7:
 		* Fixed Hardfile and virtual filesystem support  
 		* Added virtual keyboard  
