@@ -186,6 +186,10 @@ int init_sound (void)
     uae_sem_wait (&sound_init_sem);
     SDL_PauseAudio (0);
 
+	#ifdef DRIVESOUND
+	driveclick_init();
+	#endif
+
     return have_sound;
 }
 

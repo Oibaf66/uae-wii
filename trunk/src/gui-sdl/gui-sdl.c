@@ -149,18 +149,16 @@ static const char *graphic_messages[] = {
 		
 		/*00*/		"Correct aspect",
 		/*01*/		"^|off|100%|95%|93%|90%|custom",
-		/*02*/		"  ",
-		/*03*/		"Scanlines",
-		/*04*/		"^|on|off",
-		/*05*/		"  ",
-		/*06*/		"Leds",
+		/*02*/		"Scanlines",
+		/*03*/		"^|on|off",
+		/*04*/		"Leds",
+		/*05*/		"^|on|off",
+		/*06*/		"Floppy sound",
 		/*07*/		"^|on|off",
-		/*08*/		"  ",
-		/*09*/		"Port",
-		/*10*/		"^|SD|USB|SMB",
-		/*11*/		"  ",
-		/*12*/		"Rumble",
-		/*13*/		"^|on|off",
+		/*08*/		"Port",
+		/*09*/		"^|SD|USB|SMB",
+		/*10*/		"Rumble",
+		/*11*/		"^|on|off",
 		NULL
 };
 
@@ -538,6 +536,25 @@ cfgfile_save(&changed_prefs, user_options, 0);
 msgInfo("Configurations saved",3000,NULL);
 }	
 
+int get_dfxclick(void)
+{
+	int sounddf_on = 0; 
+	int i;
+
+	for (i=0; i < 4; i++)
+	 if (changed_prefs.dfxclick[i]&&(changed_prefs.dfxtype[i]>=0)) sounddf_on =1;
+	
+	return sounddf_on;
+}
+
+void set_dfxclick(int sounddf_on)
+{
+	int i;
+	for (i=0; i < 4; i++)
+	 if ((changed_prefs.dfxtype[i]>=0)&&(changed_prefs.dfxclick[i]!=sounddf_on))
+	    changed_prefs.dfxclick[i] = sounddf_on;
+}
+
 static void emulation_options(void)
 {
 	int submenus[7];
@@ -571,7 +588,7 @@ static void emulation_options(void)
 
 static void graphic_options(void)
 {
-	int submenus[5];
+	int submenus[6];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -580,8 +597,9 @@ static void graphic_options(void)
 	submenus[0] = get_gfx_aspect_ratio();
 	submenus[1] = !(changed_prefs.gfx_linedbl == 2) ;
 	submenus[2] = !changed_prefs.leds_on_screen;
-	submenus[3] = changed_prefs.Port;
-	submenus[4] = !changed_prefs.rumble;
+	submenus[3] = !get_dfxclick();
+	submenus[4] = changed_prefs.Port;
+	submenus[5] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			graphic_messages, submenus);
@@ -591,8 +609,9 @@ static void graphic_options(void)
 	set_gfx_aspect_ratio(submenus[0]);
 	changed_prefs.gfx_linedbl = submenus[1] ? 1 : 2;
 	changed_prefs.leds_on_screen = !submenus[2];
-	set_Port(submenus[3]);
-	changed_prefs.rumble = !submenus[4];
+	set_dfxclick(!submenus[3]);
+	set_Port(submenus[4]);
+	changed_prefs.rumble = !submenus[5];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
 }

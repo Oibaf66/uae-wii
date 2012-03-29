@@ -56,6 +56,7 @@ src/tools/genlinetoscr.exe:
 clean:
 	@echo Cleaning $(OBJ_DIR)
 	@rm -rf $(OBJS) $(OBJ_DIR) src/machdep src/target.h src/md-fpp.h src/sysconfig.h $(SYMLINKS)
+	@rm -rf dist
 	@rm -f src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c
 	@rm -f uae.dol uae.elf
 	cd src/tools/ && make -f Makefile.wii clean
@@ -143,7 +144,7 @@ COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP) -Wno-u
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
-		    -DTD_START_HEIGHT=16
+		    -DTD_START_HEIGHT=16 -DDRIVESOUND
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
 #unused defines; -DFDI2RAW 
@@ -181,6 +182,7 @@ distsource:
 	cd .. && cp -r uae-wii uae-wii-v
 	cd ../uae-wii-v && find . -name ".svn" | xargs rm -rf
 	cd .. && tar -czf uae-wii-v.tar.gz uae-wii-v
+	cd .. && rm -fr uae-wii-v
 
 
 #---------------------------------------------------------------------------------

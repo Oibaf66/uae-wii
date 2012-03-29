@@ -22,7 +22,7 @@
 
 extern int gui_is_active;
 
-static unsigned int nr_joysticks;
+unsigned int nr_joysticks;
 static int initialized;
 
 struct joyinfo {
@@ -31,7 +31,7 @@ struct joyinfo {
     unsigned int buttons;
 };
 
-static struct joyinfo joys[MAX_INPUT_DEVICES];
+struct joyinfo joys[MAX_INPUT_DEVICES];
 
 //Wiimote Rumble
 #ifdef GEKKO

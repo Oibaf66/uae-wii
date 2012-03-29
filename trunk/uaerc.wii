@@ -170,5 +170,13 @@ floppy1type=0
 floppy2type=-1
 floppy3type=-1
 
+# Enable floppy sound
+floppy0sound=1
+floppy1sound=1
+floppy_volume=33
+floppy0soundext=/uae/wave/
+floppy1soundext=/uae/wave/
+
+
 # Set keyboard language. Possible values are de, dk, es, us, se, fr, it 
 kbd_lang=us
