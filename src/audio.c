@@ -21,16 +21,17 @@
 #include "custom_private.h"
 #include "newcpu.h"
 #include "gensound.h"
+#include "driveclick.h"
 #include "sounddep/sound.h"
 #include "events.h"
 #include "audio.h"
 #include "savestate.h"
-#include "driveclick.h"
 #ifdef AVIOUTPUT
 # include "avioutput.h"
 #endif
 #include "sinctable.h"
 #include "gui.h" /* for gui_ledstate */
+
 
 #define MAX_EV ~0ul
 //#define DEBUG_AUDIO

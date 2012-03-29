@@ -21,6 +21,14 @@
 #include "menu.h"
 #include "VirtualKeyboard.h"
 
+struct joyinfo {
+    SDL_Joystick *joy;
+    unsigned int axles;
+    unsigned int buttons;
+};
+
+extern unsigned int nr_joysticks;
+extern struct joyinfo joys[];
 
 typedef struct
 {
@@ -269,7 +277,7 @@ static const char **get_file_list(const char *base_dir)
 	{
 		char buf[255];
 		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ", ".ipf", ".IPF", ".fdi", ".FDI",
-				".sav", ".SAV", ".uss", ".USS", ".rom", ".ROM", NULL};
+				".sav", ".SAV", ".uss", ".USS", ".rom", ".ROM", ".zip",".ZIP",".dms", ".DMS",NULL};
 		struct stat st;
 
 		snprintf(buf, 255, "%s/%s", base_dir, de->d_name);
@@ -687,8 +695,8 @@ uint32_t menu_wait_key_press(void)
 		static int joy_keys_last;
 
 		/* Wii-specific, sorry */
-		for (nr = 0; nr < SDL_NumJoysticks(); nr++) {
-			joy = SDL_JoystickOpen(nr);
+		for (nr = 0; nr < nr_joysticks; nr++) {
+			joy = joys[nr].joy;
 			if (!joy)
 				continue;
 

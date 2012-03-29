@@ -21,6 +21,9 @@ extern void reset_sound (void);
 STATIC_INLINE void check_sound_buffers (void)
 {
     if ((char *)sndbufpt - (char *)sndbuffer >= sndbufsize) {
+	#ifdef DRIVESOUND
+	driveclick_mix ((uae_s16*)sndbuffer, sndbufsize >> 1);
+	#endif
 	finish_sound_buffer ();
 	sndbufpt = sndbuffer;
     }
