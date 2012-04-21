@@ -144,10 +144,10 @@ COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP) -Wno-u
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
-		    -DTD_START_HEIGHT=16 -DDRIVESOUND
+		    -DTD_START_HEIGHT=16 -DDRIVESOUND 
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
-#unused defines; -DFDI2RAW 
+#unused defines; -DCAPS (to enable ipf file) -DFDI2RAW (to enable DFI file)
 
 # Test link flags.
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard -ltinysmb
@@ -161,6 +161,7 @@ dist:uae.dol
 	install -d $@/uae/harddisks
 	install -d $@/uae/harddir
 	install -d $@/uae/saves
+	install -d $@/uae/wave
 	echo "dummy" > $@/uae/roms/put-your-kick-dot-rom-here
 	echo "dummy" > $@/uae/floppies/dummy
 	echo "dummy" > $@/uae/harddisks/dummy
@@ -176,6 +177,7 @@ dist:uae.dol
 	cp uaerc.smb $@/uae/
 	cp docs/configuration.txt $@/apps/uae/
 	cp docs/Joystick_mapping.txt $@/apps/uae/
+	cp src/resource/*.wav $@/uae/wave
 	cd $@ && tar -czf ../uae-wii-bin.tar.gz *
 	
 distsource:

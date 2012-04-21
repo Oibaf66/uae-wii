@@ -90,7 +90,7 @@ static int loadsample (const char *path, struct drvsample *ds)
 	write_log ("driveclick: can't open '%s'\n", path);
 	return 0;
     }
-	// ("driveclick: loading '%s'\n", path);
+	// write_log("driveclick: loading '%s'\n", path);
     zfile_fseek (f, 0, SEEK_END);
     size = zfile_ftell (f);
     buf = malloc (size);
@@ -223,7 +223,7 @@ void driveclick_init (void)
 		}
 	    drvs[i][DS_CLICK].pos = drvs[i][DS_CLICK].len;
 	    drvs[i][DS_SNATCH].pos = drvs[i][DS_SNATCH].len;
-	    vv += currprefs.dfxclick[i];
+	    vv += abs (currprefs.dfxclick[i]);
 
 	}
     }

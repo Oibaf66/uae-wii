@@ -170,7 +170,7 @@ floppy1type=0
 floppy2type=-1
 floppy3type=-1
 
-# Enable floppy sound
+# Enable floppy sound - set floppysound to -1 to load wave file - set to 0 to disable
 floppy0sound=1
 floppy1sound=1
 floppy_volume=33
