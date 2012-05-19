@@ -178,7 +178,7 @@ dist:uae.dol
 	cp docs/configuration.txt $@/apps/uae/
 	cp docs/Joystick_mapping.txt $@/apps/uae/
 	cp src/resource/*.wav $@/uae/wave
-	cd $@ && tar -czf ../uae-wii-bin.tar.gz *
+	cd $@ && tar -czf ../uae-wii-vx-bin.tar.gz *
 	
 distsource:
 	cd .. && cp -r uae-wii uae-wii-v
