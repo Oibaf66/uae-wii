@@ -1,3 +1,10 @@
+version 9.1:
+		* (build) Compiled against libogc 1.8.11 and SDL-Wii r101
+		* Fixed full resolution in 576i video mode
+		
+		-- Fabio Olimpieri <fabio.olimpieri@tin.it>, Dec 27 CEST 2012
+
+
 version 9:
 		* Added dms and zip support  
 		* Added drive sound
