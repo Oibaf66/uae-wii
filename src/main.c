@@ -493,6 +493,7 @@ static void parse_cmdline (int argc, char **argv)
 		if (parse_cmdline_option (&currprefs, argv[i][1], (char*)arg) && extra_arg)
 		    i++;
 	    }
+		else strncpy (currprefs.df[0], argv[1], 255); currprefs.df[0][255] = 0; //Load the argument without - in df0
 	}
     }
 }
@@ -561,10 +562,11 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
 #endif
     }
 	
-    parse_cmdline (argc, argv);
     
 	cfgfile_load (&currprefs, SAVEDFILENAME, 0);
 	cfgfile_load (&currprefs, USERFILENAME, 0);
+	
+	parse_cmdline (argc, argv);
 
     fix_options ();
 }

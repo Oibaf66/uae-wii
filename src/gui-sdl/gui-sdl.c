@@ -435,11 +435,11 @@ static int get_gfx_aspect_ratio(void)
 /* Helpers to determine the accuracy */
 static int get_emulation_accuracy(void)
 {
-	if (currprefs.cpu_compatible == 0 &&
-			currprefs.cpu_cycle_exact == 0)
+	if (changed_prefs.cpu_compatible == 0 &&
+			changed_prefs.cpu_cycle_exact == 0)
 		return 0;
-	if (currprefs.cpu_compatible == 1 &&
-			currprefs.cpu_cycle_exact == 0)
+	if (changed_prefs.cpu_compatible == 1 &&
+			changed_prefs.cpu_cycle_exact == 0)
 		return 1;
 	return 2;
 }
