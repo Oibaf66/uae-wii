@@ -229,7 +229,7 @@ static int cmpstringp(const void *p1, const void *p2)
 		return -1;
 	if (*p1_s != '[' && *p2_s == '[')
 		return 1;
-	return strcmp(* (char * const *) p1, * (char * const *) p2);
+	return strcasecmp(* (char * const *) p1, * (char * const *) p2);
 }
 
 /* Return true if name ends with ext (for filenames) */

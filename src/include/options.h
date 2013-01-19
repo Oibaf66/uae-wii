@@ -19,6 +19,7 @@ struct strlist {
 
 // Device Port
 enum Porttype {
+	PORT_DEFAULT,	// Load from device of dol file
 	PORT_SD,	// Load from SD card
 	PORT_USB,	// Load from USB port
 	PORT_SMB	//Load from network	
