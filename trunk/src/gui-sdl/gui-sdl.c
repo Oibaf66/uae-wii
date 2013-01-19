@@ -32,7 +32,7 @@
 #define DEBUG_LOG(...) do ; while(0)
 #endif
 
-extern int usbismount, smbismount;
+extern int usbismount, smbismount, sdismount;
 
 extern const char *strdup_path_expand (const char *src);
 
@@ -156,7 +156,7 @@ static const char *graphic_messages[] = {
 		/*06*/		"Floppy sound",
 		/*07*/		"^|on|off",
 		/*08*/		"Port",
-		/*09*/		"^|SD|USB|SMB",
+		/*09*/		"^|DEFAULT|SD|USB|SMB",
 		/*10*/		"Rumble",
 		/*11*/		"^|on|off",
 		NULL
@@ -488,10 +488,18 @@ static void set_Port(int which)
 {
 	switch (which)
 	{
-	case PORT_SD:
+	case PORT_DEFAULT:
 		prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
 		changed_prefs.Port = which;
 		currprefs.Port = changed_prefs.Port;
+		break;
+	case PORT_SD:
+		if (sdismount) {
+		prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_SD_PATH));
+		changed_prefs.Port = which;
+		currprefs.Port = changed_prefs.Port;}
+		else
+			msgInfo("SD is not mounted",3000,NULL);
 		break;
 	case PORT_USB:
 		if (usbismount) {

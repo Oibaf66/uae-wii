@@ -78,6 +78,7 @@ struct gui_info gui_data;
 bool usbismount = false;
 bool networkisinit = false;
 bool smbismount = false; 
+bool sdismount = false; 
 
 #if defined(GEKKO)
 
@@ -1092,14 +1093,26 @@ int main (int argc, char **argv)
 	printf("\x1b[2;0H");
 
 	//initialize libfat library
-	if (!fatInitDefault())
-	{ 
-		printf("Couldn't initialize SD fat subsytem\n");
+	if (fatInitDefault())
+		printf("FAT subsytem initialized\n\n");
+	else
+		{
+		printf("Couldn't initialize FAT subsytem\n\n");
 		sleep(3);
 		exit(0);
-	}
-	else
+		}
+		
+	DIR *dp;
+    
+	dp = opendir ("sd:/");
+	if (dp) sdismount = 1; else sdismount = 0;
+	
+	if (sdismount)
 		printf("SD FAT subsytem initialized\n\n");
+	else
+		printf("Couldn't initialize SD fat subsytem\n\n");
+ 	
+	if (sdismount) closedir (dp);
 	
 	usbismount = InitUSB();
 	

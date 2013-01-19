@@ -2495,7 +2495,7 @@ void default_prefs (struct uae_prefs *p, int type)
 	strcpy (p->SmbPwd, "Password");
 	strcpy (p->SmbShare, "Share");
 	strcpy (p->SmbIp, "192.168.0.1");
-	p->Port= PORT_SD;
+	p->Port= PORT_DEFAULT;
 	p->rumble= 0;
 	p->gfx_correct_ratio = 100;
 #endif

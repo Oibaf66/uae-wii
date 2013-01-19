@@ -12,6 +12,7 @@
 #define TARGET_FLOPPY_PATH      "/uae/floppies"
 #define TARGET_HARDFILE_PATH    "/uae/harddisks"
 #define TARGET_SAVESTATE_PATH   "/uae/saves"
+#define TARGET_SD_PATH   "sd:/"
 #define TARGET_USB_PATH   "usb:/"
 #define TARGET_SMB_PATH   "smb:/"
 
