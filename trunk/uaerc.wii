@@ -138,6 +138,16 @@ input.1.joystick.0.button.19=SPC_ENTERGUI
 #input.1.joystick.1.button.7=JOY2_2ND_BUTTON
 #input.1.joystick.1.button.11=JOY2_2ND_BUTTON
 
+#GAME PAD 1
+input.1.joystick.4.disabled=0
+input.1.joystick.4.axis.0=JOY2_HORIZ
+input.1.joystick.4.axis.1=JOY2_VERT
+#input.1.joystick.4.axis.2=JOY2_HORIZ
+#input.1.joystick.4.axis.3=JOY2_VERT
+input.1.joystick.4.button.0=JOY2_FIRE_BUTTON
+input.1.joystick.4.button.7=SPC_ENTERGUI
+#input.1.joystick.4.button.1=JOY2_2ND_BUTTON
+
 
 # Graphic configuration
 
