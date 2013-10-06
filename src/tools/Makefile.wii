@@ -2,7 +2,7 @@
 # Makefile.in for UAE tools
 #
 
-export PATH	:=	$(DEVKITPPC)/../MinGW/bin:$(PATH)
+export PATH	:=	$(DEVKITPPC)/../MinGW/bin:$(PATH):.
 
 
 CC        = gcc
