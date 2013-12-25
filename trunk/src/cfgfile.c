@@ -698,6 +698,19 @@ static int cfgfile_path (const char *option, const char *value, const char *key)
     return 0;
 }
 
+static int cfgfile_path_noexpand (const char *option, const char *value, const char *key)
+{
+    if (strcmp (option, key) == 0) {
+	const char *path = strdup (value);
+
+	if (path)
+	    prefs_set_attr (key, path);
+
+	return 1;
+    }
+    return 0;
+}
+
 static int getintval (char **p, int *result, int delim)
 {
     char *value = *p;
@@ -784,8 +797,13 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 	    /* We special case the various path options here.  */
 	    if (cfgfile_path (option, value, "rom_path"))
 		return 1;
-	    if (cfgfile_path (option, value, "floppy_path"))
+		#ifdef GEKKO
+	    if (cfgfile_path_noexpand (option, value, "floppy_path"))
 		return 1;
+		#else
+		if (cfgfile_path (option, value, "floppy_path"))
+		return 1;
+		#endif
 	    if (cfgfile_path (option, value, "hardfile_path"))
 		return 1;
 #ifdef SAVESTATE
@@ -2444,7 +2462,11 @@ void default_prefs (struct uae_prefs *p, int type)
 #endif
 
     prefs_set_attr ("rom_path",       strdup_path_expand (TARGET_ROM_PATH));
-    prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
+#ifdef GEKKO	
+    prefs_set_attr ("floppy_path",    strdup(TARGET_FLOPPY_PATH)); //We don't want / at the end of path
+#else	
+	prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
+#endif	
     prefs_set_attr ("hardfile_path",  strdup_path_expand (TARGET_HARDFILE_PATH));
 #ifdef SAVESTATE
     prefs_set_attr ("savestate_path", strdup_path_expand (TARGET_SAVESTATE_PATH));
