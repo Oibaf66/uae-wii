@@ -101,14 +101,18 @@ static const char *memory_messages[] = {
 		/*07*/		"^|None|1M|2M|4M|8M",
 		/*08*/		"  ",
 		/*09*/		"Zorro3 mem",
-		/*10*/		"^|None|1M|2M|4M|8M|16M|32M",		
+		/*10*/		"^|None|1M|2M|4M|8M|16M",
+		/*11*/		"  ",
+		/*12*/		"Picasso96 mem",
+		/*13*/		"^|None|1M|2M|4M|8M|16M",
 		NULL
 };
 
 static const int chipmem_size_table[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
 static const int slowmem_size_table[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
 static const int fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024 };	
-static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024, 32768 * 1024};	
+static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024};
+static const int picasso96_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024};	
 
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
@@ -360,9 +364,7 @@ static void cpu_chipset_options(void)
 
 static void memory_options(void)
 {
-	//FOL - GFXCard no point in this yet, until GFX and HDD are working properly, we can then use Picasso screen modes.
-	//const int gfxcard_size[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024 };
-	int submenus[4], opt;
+	int submenus[5], opt;
 
 	memset(submenus, 0, sizeof(submenus));
 
@@ -375,6 +377,8 @@ static void memory_options(void)
 			SDL_arraysize(fastmem_size_table), 0);
 	submenus[3] = find_index_by_val(changed_prefs.z3fastmem_size, z3fastmem_size_table,
 			SDL_arraysize(z3fastmem_size_table), 0);
+	submenus[4] = find_index_by_val(changed_prefs.gfxmem_size, picasso96_size_table,
+			SDL_arraysize(picasso96_size_table), 0);		
 
 	opt = menu_select_title("Memory options menu",
 			memory_messages, submenus);
@@ -385,6 +389,7 @@ static void memory_options(void)
 	changed_prefs.bogomem_size = slowmem_size_table[submenus[1]];
 	changed_prefs.fastmem_size = fastmem_size_table[submenus[2]];
 	changed_prefs.z3fastmem_size = z3fastmem_size_table[submenus[3]];
+	changed_prefs.gfxmem_size = picasso96_size_table[submenus[4]];
 
 }
 
