@@ -124,12 +124,6 @@ src/linetoscr.c:    src/tools/genlinetoscr.exe
 %.c: %.c.wii
 	cp $< $@
 
-# How to build a library.
-$(LIB_DIR)/libSDL_ttf.a: $(OBJS)
-	@echo Archiving $@
-	@-mkdir -p $(dir $@)
-	@powerpc-eabi-ar crs $@ $(OBJS)
-	@echo ----
 
 # How to build a DOL.
 uae.dol: uae.elf
@@ -200,7 +194,7 @@ uae.elf: src/tools/genlinetoscr.exe src/blit.h src/blitfunc.c src/blitfunc.h src
 	#keep elf for debugging
 	#cp $@ /tmp/elf
 
-# How to compile C file (SDL library).
+# How to compile C file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
