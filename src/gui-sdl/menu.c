@@ -916,6 +916,7 @@ static const char *menu_select_file_internal(const char *dir_path,
 	char *sel;
 	char *out;
 	const char *ptr_selected_file;
+	char *updir;
 	int opt;
 	int i;
 	char buf[64];
@@ -944,6 +945,21 @@ static const char *menu_select_file_internal(const char *dir_path,
 
 	if (!sel)
 		return NULL;
+	
+	if (!strcmp(sel,"[..]")) //selected "[..]"
+	{
+		free((void*)sel);
+		updir=strrchr(dir_path,'/');
+		if (updir!=NULL)  // found "/"
+		{
+			*updir=0; //trunk dir_path at last /
+			if (strrchr(dir_path,'/')==NULL) {*updir='/'; *(updir+1)=0;} //check if it was root
+		}
+		
+		return menu_select_file(dir_path, selected_file, which);
+	}		
+
+		
         /* If this is a folder, enter it recursively */
         if (sel[0] == '[')
         {

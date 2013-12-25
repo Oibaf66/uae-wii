@@ -34,8 +34,6 @@
 
 extern int usbismount, smbismount, sdismount;
 
-extern const char *strdup_path_expand (const char *src);
-
 int gui_is_active;
 
 static void default_config(void);
@@ -139,7 +137,7 @@ static const char *emulation_messages[] = {
 		/*08*/		"Sound interpolation",
 		/*09*/		"^|none|rh|crux|sinc",
 		/*10*/		"Collision level",
-		/*11*/		"^|none|sprites|playfileds|full",		
+		/*11*/		"^|none|sprites|playfields|full",		
 		/*12*/		"Immediate blits",
 		/*13*/		"^|on|off",
 		NULL
@@ -256,7 +254,7 @@ static void A600_config(void)
 	const char *roms[] = {"amiga-os-205.rom", "kick205.rom", NULL};
 	default_config();
 
-	changed_prefs.cpu_level = 1; //68010
+	changed_prefs.cpu_level = 0; //68000
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
@@ -303,14 +301,27 @@ static void default_config(void)
 static void insert_floppy(int which)
 {
 	const char *selected_file=changed_prefs.df[which];
-	const char *name = menu_select_file(prefs_get_attr("floppy_path"), selected_file, which);
-
+	char *name;
+	char *ptr_file_name;
+	char dir[255];
+	strncpy(dir,prefs_get_attr("floppy_path"),255);
+	name = (char *) menu_select_file(dir, selected_file, which);
+	
 	if (name != NULL)
 	{
-		if (strcmp(name, "None") == 0)
+		ptr_file_name = strrchr(name,'/');
+		if (ptr_file_name) ptr_file_name++; else ptr_file_name = name;
+		if (strcmp(ptr_file_name, "None") == 0)
 			changed_prefs.df[which][0] = '\0';
-		else
-			strcpy (changed_prefs.df[which], name);
+		else strcpy(changed_prefs.df[which], name);
+			
+		ptr_file_name = strrchr(name,'/');
+		if (ptr_file_name)
+			{
+				*ptr_file_name=0; //extract the dir from the path
+				if (strrchr(name,'/')==NULL) {*ptr_file_name='/'; *(ptr_file_name+1)=0;} //check if it was root
+			}
+		prefs_set_attr("floppy_path", strdup(name));
 		free((void*)name);
 	}
 }
@@ -466,19 +477,16 @@ static void set_emulation_accuracy(int which)
 
 static int get_model(void)
 {
-	if (changed_prefs.cpu_level == 1) /* 68010 - only on the A600 */
-		return 2;
-	if (changed_prefs.cpu_level == 2) /* 68020 - only on the A1200 */
+	
+	if ((changed_prefs.chipset_mask&CSMASK_AGA)&&(changed_prefs.cpu_level == 2)) /* A1200 */
 		return 3;
-	if (changed_prefs.cpu_level == 0) /* 68000 - A1000/A500 */
-	{
-		if (changed_prefs.chipmem_size == 256 * 1024) /* A1000 */
-			return 0;
-
-		/* A500 */
+	if ((changed_prefs.chipset_mask&CSMASK_ECS_DENISE)&&(changed_prefs.cpu_level == 0)) /* A600 */
+		return 2;
+	if ((changed_prefs.chipset_mask&CSMASK_ECS_AGNUS)&&(changed_prefs.cpu_level == 0)) /* A500 */
 		return 1;
-	}
-
+	if ((changed_prefs.chipset_mask == 0)&&(changed_prefs.cpu_level == 0)) /* A1000 */
+		return 0;
+		
 	/* Custom */
 	return 4;
 }
@@ -489,13 +497,13 @@ static void set_Port(int which)
 	switch (which)
 	{
 	case PORT_DEFAULT:
-		prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
+		prefs_set_attr ("floppy_path",    strdup(TARGET_FLOPPY_PATH));
 		changed_prefs.Port = which;
 		currprefs.Port = changed_prefs.Port;
 		break;
 	case PORT_SD:
 		if (sdismount) {
-		prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_SD_PATH));
+		prefs_set_attr ("floppy_path",    strdup(TARGET_SD_PATH));
 		changed_prefs.Port = which;
 		currprefs.Port = changed_prefs.Port;}
 		else
@@ -503,7 +511,7 @@ static void set_Port(int which)
 		break;
 	case PORT_USB:
 		if (usbismount) {
-			prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_USB_PATH));
+			prefs_set_attr ("floppy_path",    strdup(TARGET_USB_PATH));
 			changed_prefs.Port = which;
 			currprefs.Port = changed_prefs.Port;}
 		else
@@ -511,7 +519,7 @@ static void set_Port(int which)
 		break;
 	case PORT_SMB:
 		if (smbismount) {
-			prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_SMB_PATH));
+			prefs_set_attr ("floppy_path",    strdup(TARGET_SMB_PATH));
 			changed_prefs.Port = which;
 			currprefs.Port = changed_prefs.Port;}
 		else
