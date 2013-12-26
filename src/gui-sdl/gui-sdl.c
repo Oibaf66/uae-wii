@@ -46,9 +46,9 @@ static const char *main_menu_messages[] = {
 		/*04*/		"#1-------------------------------------",
 		/*05*/		"Wiimote configuration",
 		/*06*/		"^|Wiimote1|Wiimote2",
-		/*07*/		"Virtual keyboard",
-		/*08*/		"Hardware options",
-		/*09*/		"Emulation options",
+		/*07*/		"Hardware options",
+		/*08*/		"Emulation options",
+		/*09*/		"Audio options",
 		/*10*/		"Other options",
 		/*11*/		"Save confs",
 		/*12*/		"Reset UAE",
@@ -138,29 +138,44 @@ static const char *emulation_messages[] = {
 		/*05*/		"^|100%|50%|33%|25%|12%|custom",
 		/*06*/		"Floppy speed",
 		/*07*/		"^|normal|turbo|400%|800%",
-		/*08*/		"Sound interpolation",
-		/*09*/		"^|none|rh|crux|sinc",
-		/*10*/		"Collision level",
-		/*11*/		"^|none|sprites|playfields|full",		
-		/*12*/		"Immediate blits",
-		/*13*/		"^|on|off",
+		/*08*/		"Collision level",
+		/*09*/		"^|none|sprites|playfields|full",		
+		/*10*/		"Immediate blits",
+		/*11*/		"^|on|off",
 		NULL
 };
 
-static const char *graphic_messages[] = {
+static const char *audio_messages[] = {
+		/*00*/		"Sound ouput",
+		/*01*/		"^|none|normal|exact",
+		/*02*/		"  ",
+		/*03*/		"Sound stereo separation",
+		/*04*/		"^|0|3|6|9|12",
+		/*05*/		"  ",
+		/*06*/		"Sound interpolation",
+		/*07*/		"^|none|rh|crux|sinc",
+		/*08*/		"  ",
+		/*09*/		"Floppy sound",
+		/*10*/		"^|on|off",
+		NULL
+};
+
+static const char *other_messages[] = {
 		
 		/*00*/		"Correct aspect",
 		/*01*/		"^|off|100%|95%|93%|90%|custom",
-		/*02*/		"Scanlines",
-		/*03*/		"^|on|off",
-		/*04*/		"Leds",
-		/*05*/		"^|on|off",
-		/*06*/		"Floppy sound",
+		/*02*/		"  ",
+		/*03*/		"Scanlines",
+		/*04*/		"^|on|off",
+		/*05*/		"  ",
+		/*06*/		"Leds",
 		/*07*/		"^|on|off",
-		/*08*/		"Port",
-		/*09*/		"^|DEFAULT|SD|USB|SMB",
-		/*10*/		"Rumble",
-		/*11*/		"^|on|off",
+		/*08*/		"  ",
+		/*09*/		"Port",
+		/*10*/		"^|DEFAULT|SD|USB|SMB",
+		/*11*/		"  ",
+		/*12*/		"Rumble",
+		/*13*/		"^|on|off",
 		NULL
 };
 
@@ -274,7 +289,7 @@ static void A1000_config(void)
 
 	changed_prefs.cpu_level = 0; //68000
 	changed_prefs.fastmem_size = 0; //OFF
-	changed_prefs.chipmem_size = 256 * 1024; //512
+	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
 	changed_prefs.chipset_mask = 0; //OCS
 
@@ -578,7 +593,7 @@ void set_dfxclick(int sounddf_on)
 
 static void emulation_options(void)
 {
-	int submenus[7];
+	int submenus[6];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -587,9 +602,8 @@ static void emulation_options(void)
 	submenus[1] = get_cpu_to_chipset_speed();
 	submenus[2] = get_gfx_framerate();
 	submenus[3] = get_floppy_speed();
-	submenus[4] = changed_prefs.sound_interpol;
-	submenus[5] = changed_prefs.collision_level;
-	submenus[6] = !changed_prefs.immediate_blits;
+	submenus[4] = changed_prefs.collision_level;
+	submenus[5] = !changed_prefs.immediate_blits;
 	
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
@@ -601,15 +615,38 @@ static void emulation_options(void)
 	set_cpu_to_chipset_speed(submenus[1]);
 	set_gfx_framerate(submenus[2]);
 	set_floppy_speed(submenus[3]);
-	changed_prefs.sound_interpol = submenus[4];
-	changed_prefs.collision_level = submenus[5];	
-	changed_prefs.immediate_blits = !submenus[6];
+	changed_prefs.collision_level = submenus[4];	
+	changed_prefs.immediate_blits = !submenus[5];
 	
 }
 
-static void graphic_options(void)
+static void audio_options(void)
 {
-	int submenus[6];
+	
+	int submenus[4];
+	int opt;
+	
+	memset(submenus, 0, sizeof(submenus));
+	
+	submenus[0] = changed_prefs.produce_sound-1;
+	submenus[1] = changed_prefs.sound_stereo_separation/3;
+	submenus[2] = changed_prefs.sound_interpol;
+	submenus[3] = !get_dfxclick();
+	
+	opt = menu_select_title("Audio options menu",
+			audio_messages, submenus);
+	if (opt < 0)
+		return;
+	
+	changed_prefs.produce_sound = submenus[0]+1;
+	changed_prefs.sound_stereo_separation = submenus[1]*3;
+	changed_prefs.sound_interpol = submenus[2];
+	set_dfxclick(!submenus[3]);
+}
+
+static void other_options(void)
+{
+	int submenus[5];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -618,21 +655,19 @@ static void graphic_options(void)
 	submenus[0] = get_gfx_aspect_ratio();
 	submenus[1] = !(changed_prefs.gfx_linedbl == 2) ;
 	submenus[2] = !changed_prefs.leds_on_screen;
-	submenus[3] = !get_dfxclick();
-	submenus[4] = changed_prefs.Port;
-	submenus[5] = !changed_prefs.rumble;
+	submenus[3] = changed_prefs.Port;
+	submenus[4] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
-			graphic_messages, submenus);
+			other_messages, submenus);
 	if (opt < 0)
 		return;
 
 	set_gfx_aspect_ratio(submenus[0]);
 	changed_prefs.gfx_linedbl = submenus[1] ? 1 : 2;
 	changed_prefs.leds_on_screen = !submenus[2];
-	set_dfxclick(!submenus[3]);
-	set_Port(submenus[4]);
-	changed_prefs.rumble = !submenus[5];
+	set_Port(submenus[3]);
+	changed_prefs.rumble = !submenus[4];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
 }
@@ -962,7 +997,7 @@ void gui_display(int shortcut)
 	
 	memset(submenus, 0, sizeof(submenus));
 
-	do
+	if (shortcut==-1) do //Enter Menu
 	{
 		opt = menu_select_title("Main menu", main_menu_messages, submenus);
 		notice_screen_contents_lost ();
@@ -983,16 +1018,16 @@ void gui_display(int shortcut)
 			input_options(submenus[2]);
 			break;
 		case 7:
-			virtual_keyboard();
-			break;	
-		case 8:
 			hardware_options();
 			break;	
-		case 9:
+		case 8:
 			emulation_options();
 			break;
+		case 9:
+			audio_options();
+			break;	
 		case 10:
-			graphic_options();
+			other_options();
 			break;	
 		case 11:	
 			save_configurations();
@@ -1011,6 +1046,8 @@ void gui_display(int shortcut)
 			break;
 		}
 	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 13);
+	
+	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
 	resume_sound();
 	gui_is_active=0;

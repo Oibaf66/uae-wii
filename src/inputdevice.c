@@ -1190,6 +1190,9 @@ void inputdevice_handle_inputcode (void)
     case AKS_SWITCHINTERPOL:
 	switch_audio_interpol ();
     break;
+	case AKS_VIRTUAL_KEYBOARD:
+	gui_display (6);
+    break;
     }
 }
 

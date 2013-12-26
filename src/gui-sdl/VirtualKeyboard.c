@@ -16,38 +16,28 @@
 #include "VirtualKeyboard.h"
 
 
-class VirtualKeyboard
-{
-public:
-	VirtualKeyboard(SDL_Surface *screen, TTF_Font *font);
-	struct virtkey* get_key();
+static	struct virtkey* get_key_internal();
+static	void draw();
+static	void select_next(int dx, int dy);
 
-private:
-	struct virtkey* get_key_internal();
-	void draw();
-	void select_next(int dx, int dy);
-	void toggle_shift();
+static	SDL_Surface *screen;
+static	TTF_Font *font;
+static	int sel_x;
+static	int sel_y;
 
-	SDL_Surface *screen;
-	TTF_Font *font;
-	int sel_x;
-	int sel_y;
-
-	char buf[255];
-};
-
+static	char buf[255];
 
 
 #define K(name, sdl_code) \
-  { name, "KEY_"name, sdl_code, false }
+  { name, "KEY_"name, sdl_code, 0 }
 #define N(name, key_name, sdl_code) \
-  { name, "KEY_"key_name, sdl_code, false }
+  { name, "KEY_"key_name, sdl_code, 0 }
 #define D(name) \
-  { name, "None", 0, true }
+  { name, "None", 0, 1 }
 #define KNL() \
-  { NULL, NULL, 0, false }
+  { NULL, NULL, 0, 0 }
 #define NJ(name, joy_name) \
-  { name, joy_name, 0, false }
+  { name, joy_name, 0, 0 }
 
 #define KEY_COLS 14
 #define KEY_ROWS 8
@@ -63,33 +53,27 @@ static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   NJ("Fire","JOY_FIRE_BUTTON"),KNL(),KNL(),NJ("Joy 2nd button","JOY_2ND_BUTTON"),KNL(),KNL(),KNL(),KNL(),KNL(),NJ("Joy 3rd button","JOY_3RD_BUTTON"),KNL(),KNL(),KNL(),KNL()
 };
 
-VirtualKeyboard::VirtualKeyboard(SDL_Surface *screen, TTF_Font *font)
-{
-	this->screen = screen;
-	this->font = font;
-	this->sel_x = 0;
-	this->sel_y = 0;
 
-	memset(this->buf, 0, sizeof(this->buf));
-}
-
-void VirtualKeyboard::draw()
+void draw()
 {
-	int screen_w = this->screen->w;
-	int screen_h = this->screen->h;
+	int screen_w = screen->w;
+	int screen_h = screen->h;
 	int key_w = 36;
 	int key_h = 36;
 	int border_x = (screen_w - (key_w * KEY_COLS)) / 2;
 	int border_y = (screen_h - (key_h * KEY_ROWS)) / 2;
+	int y;
+	int x;
+	
 	SDL_Rect bg_rect = {border_x, border_y,
 			key_w * KEY_COLS, key_h * KEY_ROWS};
 
-	SDL_FillRect(this->screen, &bg_rect,
+	SDL_FillRect(screen, &bg_rect,
 			SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
 
-	for (int y = 0; y < KEY_ROWS; y++ )
+	for (y = 0; y < KEY_ROWS; y++ )
 	{
-		for (int x = 0; x < KEY_COLS; x++ )
+		for (x = 0; x < KEY_COLS; x++ )
 		{
 			int which = y * KEY_COLS + x;
 			virtkey_t key = keys[which];
@@ -102,28 +86,28 @@ void VirtualKeyboard::draw()
 
 			if ( key.is_done )
 				r = 255;
-			if ( (x == this->sel_x && y == this->sel_y))
+			if ( (x == sel_x && y == sel_y))
 				g = 200;
 
-			menu_print_font(this->screen, r, g, b,
+			menu_print_font(screen, r, g, b,
 					x * key_w + border_x, y * key_h + border_y,
 					what, 20);
 		}
 	}
 }
 
-void VirtualKeyboard::select_next(int dx, int dy)
+void select_next(int dx, int dy)
 {
-	int next_x = (this->sel_x + dx) % KEY_COLS;
-	int next_y = (this->sel_y + dy) % KEY_ROWS;
+	int next_x = (sel_x + dx) % KEY_COLS;
+	int next_y = (sel_y + dy) % KEY_ROWS;
 	virtkey_t key;
 
 	if (next_x < 0)
 		next_x = KEY_COLS + next_x;
 	if (next_y < 0)
 		next_y = KEY_ROWS + next_y;
-	this->sel_x = next_x;
-	this->sel_y = next_y;
+	sel_x = next_x;
+	sel_y = next_y;
 
 	key = keys[ next_y * KEY_COLS + next_x ];
 
@@ -131,36 +115,36 @@ void VirtualKeyboard::select_next(int dx, int dy)
 	if (key.name == NULL)
 	{
 		if (dy != 0) /* Look left */
-			this->select_next(-1, 0);
+			select_next(-1, 0);
 		else
-			this->select_next(dx, dy);
+			select_next(dx, dy);
 	}
 }
 
-struct virtkey *VirtualKeyboard::get_key_internal()
+struct virtkey *get_key_internal()
 {
 	while(1)
 	{
 		uint32_t k;
 
-		this->draw();
-		SDL_Flip(this->screen);
+		draw();
+		SDL_Flip(screen);
 
 		k = menu_wait_key_press();
 
 		if (k & KEY_UP)
-			this->select_next(0, -1);
+			select_next(0, -1);
 		else if (k & KEY_DOWN)
-			this->select_next(0, 1);
+			select_next(0, 1);
 		else if (k & KEY_LEFT)
-			this->select_next(-1, 0);
+			select_next(-1, 0);
 		else if (k & KEY_RIGHT)
-			this->select_next(1, 0);
+			select_next(1, 0);
 		else if (k & KEY_ESCAPE)
 			return NULL;
 		else if (k & KEY_SELECT)
 		{
-			virtkey_t *key = &keys[ this->sel_y * KEY_COLS + this->sel_x ];
+			virtkey_t *key = &keys[ sel_y * KEY_COLS + sel_x ];
 
 			return key;
 		}
@@ -169,26 +153,25 @@ struct virtkey *VirtualKeyboard::get_key_internal()
 	return NULL;
 }
 
-struct virtkey* VirtualKeyboard::get_key()
+struct virtkey* virtkbd_get_key(void)
 {
 	virtkey_t *key;
-	SDL_Rect rect = {32, 32, FULL_DISPLAY_X-64, FULL_DISPLAY_Y-96};
+	SDL_Rect rect = {56, 80, FULL_DISPLAY_X-104, FULL_DISPLAY_Y-176};
 
-	SDL_FillRect(this->screen, &rect, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+	SDL_FillRect(screen, &rect, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
 	
-	key = this->get_key_internal();
+	key = get_key_internal();
 
 	return key;
 }
 
-/* C interface */
-static VirtualKeyboard *virtual_keyboard;
+
 void virtkbd_init(SDL_Surface *surf, TTF_Font *fnt)
 {
-	virtual_keyboard = new VirtualKeyboard(surf, fnt);
+	sel_x = 0;
+	sel_y = 0;
+	screen = surf;
+	font = fnt;
+	memset(buf, 0, sizeof(buf));
 }
 
-struct virtkey *virtkbd_get_key(void)
-{
-	return virtual_keyboard->get_key();
-}
