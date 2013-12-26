@@ -23,34 +23,37 @@ floppy0=/uae/floppies/
 # i.e. setting of 4 = 20% CHIPSET and 80% CPU
 cpu_speed=max
 
-# CPU Type (values are; 68000, 68020, 68020/68881 and 68040)
+# CPU Type (values are: 68000, 68010, 68020, 68020/68881, 68040 and 68060)
 cpu_type=68000
+
+#Use the 32 bit Motorola CPU 68020 version
+cpu_24bit_addressing=false
 
 #Immediate blits helps with speed
 immediate_blits=true
 
 collision_level=playfields
 
-#Use the 32 bit Motorola CPU 68020 version
-cpu_24bit_addressing=false
-
 # Emulation precision
 cpu_compatible=true
+cpu_cycle_exact=false
 
-# Chipset type (values are; ocs, ecs_agnus, ecs, aga)
+# Chipset type (values are: ocs, ecs_agnus, ecs_denise, ecs, aga)
 chipset=ecs_agnus
 
-# Slow Memory (Values are; 0 = 0MB, 1 = 256KB, 2 = 512KB, 3 = 1MB and 4 = 1.7MB)
+# Slow Memory (Values are: 0 = 0MB, 1 = 256KB, 2 = 512KB, 3 = 1MB and 4 = 1.7MB)
 bogomem_size=2
-# Chip Memory (Values are; 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
+# Chip Memory (Values are: 0 = 0MB, 1 = 512KB, 2 = 1MB, 3 = 1.5MB and 4 = 2MB)
 chipmem_size=1
-# Fast Memory (Values are; 0 = 0MB, 4 = 2MB and 8 = 8MB)
+# Fast Memory (Values are: 0 = 0MB, 4 = 2MB and 8 = 8MB)
 fastmem_size=0
-# Accellerator Memory (Values are; 1MB, 2MB, 4MB, 8MB, 16MB and 32MB)
+# Accellerator Memory (Values are: 1, 2, 4, 8, 16 and 32 which are MB)
 z3mem_size=0
+# Picasso96 Memory (Values are between 0 and 32 which are MB)
+gfxcard_size=0
 
 # Floppy speed, can cause incompatbility with certain floppy loaders
-# (Values are; 0 = Turbo, 100 = Standard and 800 = 800% faster)
+# (Values are: 0 = Turbo, 100 = Standard and 800 = 800% faster)
 floppy_speed=100
 
 show_leds=true
@@ -61,9 +64,8 @@ sound_frequency=32000
 sound_latency=200
 
 
-input.config=1
-
 # Keyboard setup
+input.config=1
 input.1.keyboard.0.button.96=SPC_ENTERGUI
 
 # Mouse emulated by Wiimote 1
@@ -72,20 +74,19 @@ input.1.mouse.0.axis.0=MOUSE1_HORIZ
 input.1.mouse.0.axis.1=MOUSE1_VERT
 input.1.mouse.0.axis.2=MOUSE1_WHEEL
 
-# Mouse emulated by Wiimote 2 - disabled by default since Wii SDL uses  wiimote 1 only
+# Mouse 2 disabled by default since Wii SDL uses wiimote 1 only
 input.1.mouse.1.disabled=1
 
-# Mouse Left Button - Wimote 'A'
+# Mouse Left Button - Wimote 1 button 'A'
 input.1.mouse.0.button.0=JOY1_FIRE_BUTTON
 
-# Mouse Right Button - Wimote 'B'
+# Mouse Right Button - Wimote 1 button 'B'
 input.1.mouse.0.button.1=JOY1_2ND_BUTTON
 
-# Mouse Middle Button - Wimote ?
-input.1.mouse.0.button.2=JOY1_3RD_BUTTON
+# Mouse Middle Button not emulated by Wii SDL 
+#input.1.mouse.0.button.2=JOY1_3RD_BUTTON
 
-
-# Joystick configuration. Wiimote 1 is both mouse and joystick 2, with
+# Joystick configuration. Wiimote 1 is both mouse 1 and joystick 2, with
 # the mouse buttons being the A and B keys. Wiimote 2 is Joystick 1 only
 # See http://wiibrew.org/wiki/SDL for the button numbers
 
@@ -95,8 +96,6 @@ input.1.joystick.0.axis.0=JOY2_HORIZ
 input.1.joystick.0.axis.1=JOY2_VERT
 input.1.joystick.0.axis.2=JOY2_HORIZ
 input.1.joystick.0.axis.3=JOY2_VERT
-input.1.joystick.0.axis.4=JOY2_HORIZ
-input.1.joystick.0.axis.5=JOY2_VERT
 # The "hat" on the wiimote (dpad)
 input.1.joystick.0.axis.9=JOY2_HORIZ
 input.1.joystick.0.axis.10=JOY2_VERT
@@ -107,8 +106,6 @@ input.1.joystick.1.axis.0=JOY1_HORIZ
 input.1.joystick.1.axis.1=JOY1_VERT
 input.1.joystick.1.axis.2=JOY1_HORIZ
 input.1.joystick.1.axis.3=JOY1_VERT
-input.1.joystick.1.axis.4=JOY1_HORIZ
-input.1.joystick.1.axis.5=JOY1_VERT
 # The "hat" on the wiimote (dpad)
 input.1.joystick.1.axis.9=JOY1_HORIZ
 input.1.joystick.1.axis.10=JOY1_VERT
@@ -120,25 +117,30 @@ input.1.joystick.1.button.3=JOY1_FIRE_BUTTON
 input.1.joystick.1.button.9=JOY1_FIRE_BUTTON
 
 # Home button
-input.1.joystick.1.button.6=SPC_ENTERGUI
-input.1.joystick.1.button.19=SPC_ENTERGUI
 input.1.joystick.0.button.6=SPC_ENTERGUI
 input.1.joystick.0.button.19=SPC_ENTERGUI
+input.1.joystick.1.button.6=SPC_ENTERGUI
+input.1.joystick.1.button.19=SPC_ENTERGUI
 
-# Joy 2nd Button: 'Z' on nunchunk and 'x' Classic Controller - Uncomment if you want to use them
+# "+" button
+input.1.joystick.0.button.5=SPC_VIRTUAL_KEYBOARD
+input.1.joystick.0.button.18=SPC_VIRTUAL_KEYBOARD
+input.1.joystick.1.button.5=SPC_VIRTUAL_KEYBOARD
+input.1.joystick.1.button.18=SPC_VIRTUAL_KEYBOARD
+
+# Joy 2nd Button: 'Z' on nunchunk and 'x' Classic Controller - Delete # if you want to use them
 #input.1.joystick.0.button.7=JOY2_2ND_BUTTON
 #input.1.joystick.0.button.11=JOY2_2ND_BUTTON
 #input.1.joystick.1.button.7=JOY2_2ND_BUTTON
 #input.1.joystick.1.button.11=JOY2_2ND_BUTTON
 
-
-#Joy1 3rd Button: 'C' on nunchunk and 'y' on Classic Controller - Uncomment if you want to use them
+#Joy1 3rd Button: 'C' on nunchunk and 'y' on Classic Controller - Delete # if you want to use them
 #input.1.joystick.0.button.8=JOY2_3RD_BUTTON
 #input.1.joystick.0.button.12=JOY2_3RD_BUTTON
 #input.1.joystick.1.button.7=JOY2_2ND_BUTTON
 #input.1.joystick.1.button.11=JOY2_2ND_BUTTON
 
-#GAME PAD 1
+#GAME PAD 1 as Joystick 2
 input.1.joystick.4.disabled=0
 input.1.joystick.4.axis.0=JOY2_HORIZ
 input.1.joystick.4.axis.1=JOY2_VERT
@@ -148,10 +150,17 @@ input.1.joystick.4.button.0=JOY2_FIRE_BUTTON
 input.1.joystick.4.button.7=SPC_ENTERGUI
 #input.1.joystick.4.button.1=JOY2_2ND_BUTTON
 
+#GAME PAD 2 as Joystick 1
+input.1.joystick.5.disabled=0 
+input.1.joystick.5.axis.0=JOY1_HORIZ
+input.1.joystick.5.axis.1=JOY1_VERT
+input.1.joystick.5.button.0=JOY1_FIRE_BUTTON 
+input.1.joystick.5.button.7=SPC_ENTERGUI 
+
 
 # Graphic configuration
 
-# Necessary to get the relative coordinates from mouse emulated with wiimote
+# Necessary to get the relative coordinates from mouse emulated with wiimote IR pointer
 gfx_fullscreen_amiga=true
 
 # Set the screen dimensions
@@ -163,14 +172,13 @@ gfx_center_horizontal=true
 gfx_center_vertical=true
 gfx_vsync=false
 
-# Set true to adapt the Amiga screen to Wii screen 
+# Set true to adapt the Amiga screen to Wii SDL screen (640X480) 
 gfx_correct_aspect=false
 
 # Set the screen correct % ratio when gfx_correct_aspect is true - possible values 80-100
 gfx_correct_ratio=93
 
-
-# Set the framerate
+# Set the framerate (Values are between 1 and 20)
 gfx_framerate=2
 
 # Enable 2 floppies

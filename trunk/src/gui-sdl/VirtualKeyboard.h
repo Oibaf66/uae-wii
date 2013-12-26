@@ -20,13 +20,5 @@ typedef struct virtkey
 	int is_done;
 } virtkey_t;
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 extern void virtkbd_init(SDL_Surface *surf, TTF_Font *fnt);
 extern struct virtkey *virtkbd_get_key(void);
-
-#if defined(__cplusplus)
-};
-#endif
