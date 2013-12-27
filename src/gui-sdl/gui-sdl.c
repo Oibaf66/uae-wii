@@ -136,6 +136,8 @@ static const char *emulation_messages[] = {
 		/*03*/		"^|real|max|90%|80%|60%|40%|20%|0%",
 		/*04*/		"Framerate",
 		/*05*/		"^|100%|50%|33%|25%|12%|custom",
+		/*04*/		"Refresh rate (Hz)",
+		/*05*/		"^|off|10|20|30|40|50|60",
 		/*06*/		"Floppy speed",
 		/*07*/		"^|normal|turbo|400%|800%",
 		/*08*/		"Collision level",
@@ -150,13 +152,16 @@ static const char *audio_messages[] = {
 		/*01*/		"^|none|normal|exact",
 		/*02*/		"  ",
 		/*03*/		"Sound stereo separation",
-		/*04*/		"^|0|3|6|9|12",
+		/*04*/		"^|0|20%|40%|60%|80%|100%",
 		/*05*/		"  ",
-		/*06*/		"Sound interpolation",
-		/*07*/		"^|none|rh|crux|sinc",
+		/*06*/		"Sound stereo delay",
+		/*07*/		"^|0|2|4|6|8|10",
 		/*08*/		"  ",
-		/*09*/		"Floppy sound",
-		/*10*/		"^|on|off",
+		/*09*/		"Sound interpolation",
+		/*10*/		"^|none|rh|crux|sinc",
+		/*11*/		"  ",
+		/*12*/		"Floppy sound",
+		/*13*/		"^|on|off",
 		NULL
 };
 
@@ -593,7 +598,7 @@ void set_dfxclick(int sounddf_on)
 
 static void emulation_options(void)
 {
-	int submenus[6];
+	int submenus[7];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -601,37 +606,44 @@ static void emulation_options(void)
 	submenus[0] = get_emulation_accuracy();
 	submenus[1] = get_cpu_to_chipset_speed();
 	submenus[2] = get_gfx_framerate();
-	submenus[3] = get_floppy_speed();
-	submenus[4] = changed_prefs.collision_level;
-	submenus[5] = !changed_prefs.immediate_blits;
+	submenus[3] = changed_prefs.gfx_refreshrate/10;
+	submenus[4] = get_floppy_speed();
+	submenus[5] = changed_prefs.collision_level;
+	submenus[6] = !changed_prefs.immediate_blits;
 	
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
 	if (opt < 0)
 		return;
+	
+	if ((submenus[3] != changed_prefs.gfx_refreshrate/10)&&(currprefs.gfx_vsync==0))
+		msgInfo("You must set gfx_vsync=true in uaerc file",3000,0);
+		
+	
 	/* Cycle-exact or not? */
 	set_emulation_accuracy(submenus[0]);
-	
 	set_cpu_to_chipset_speed(submenus[1]);
 	set_gfx_framerate(submenus[2]);
-	set_floppy_speed(submenus[3]);
-	changed_prefs.collision_level = submenus[4];	
-	changed_prefs.immediate_blits = !submenus[5];
+	changed_prefs.gfx_refreshrate = submenus[3]*10;
+	set_floppy_speed(submenus[4]);
+	changed_prefs.collision_level = submenus[5];	
+	changed_prefs.immediate_blits = !submenus[6];
 	
 }
 
 static void audio_options(void)
 {
 	
-	int submenus[4];
+	int submenus[5];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
 	
 	submenus[0] = changed_prefs.produce_sound-1;
-	submenus[1] = changed_prefs.sound_stereo_separation/3;
-	submenus[2] = changed_prefs.sound_interpol;
-	submenus[3] = !get_dfxclick();
+	submenus[1] = changed_prefs.sound_stereo_separation/2;
+	submenus[2] = changed_prefs.sound_mixed_stereo/2;
+	submenus[3] = changed_prefs.sound_interpol;
+	submenus[4] = !get_dfxclick();
 	
 	opt = menu_select_title("Audio options menu",
 			audio_messages, submenus);
@@ -639,9 +651,10 @@ static void audio_options(void)
 		return;
 	
 	changed_prefs.produce_sound = submenus[0]+1;
-	changed_prefs.sound_stereo_separation = submenus[1]*3;
-	changed_prefs.sound_interpol = submenus[2];
-	set_dfxclick(!submenus[3]);
+	changed_prefs.sound_stereo_separation = submenus[1]*2;
+	changed_prefs.sound_mixed_stereo = submenus[2]*2;
+	changed_prefs.sound_interpol = submenus[3];
+	set_dfxclick(!submenus[4]);
 }
 
 static void other_options(void)

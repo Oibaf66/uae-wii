@@ -5554,8 +5554,10 @@ void check_prefs_changed_custom (void)
 
     if (currprefs.chipset_mask != changed_prefs.chipset_mask ||
 	currprefs.gfx_vsync != changed_prefs.gfx_vsync ||
-	currprefs.ntscmode != changed_prefs.ntscmode) {
+	currprefs.ntscmode != changed_prefs.ntscmode ||
+	currprefs.gfx_refreshrate != changed_prefs.gfx_refreshrate){
 	currprefs.gfx_vsync = changed_prefs.gfx_vsync;
+	currprefs.gfx_refreshrate = changed_prefs.gfx_refreshrate;
 	currprefs.chipset_mask = changed_prefs.chipset_mask;
 	if (currprefs.ntscmode != changed_prefs.ntscmode) {
 	    currprefs.ntscmode = changed_prefs.ntscmode;
