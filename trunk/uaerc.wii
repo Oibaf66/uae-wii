@@ -170,7 +170,9 @@ gfx_width_fullscreen=640
 gfx_height_fullscreen=480
 gfx_center_horizontal=true
 gfx_center_vertical=true
-gfx_vsync=false
+
+# This enables double buffer and refresh rate setting 
+gfx_vsync=true
 
 # Set true to adapt the Amiga screen to Wii SDL screen (640X480) 
 gfx_correct_aspect=false
