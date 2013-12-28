@@ -59,13 +59,13 @@ static const char *main_menu_messages[] = {
 
 static const  char *input_messages[] = {
 		/*00*/		"Bind key to Wiimote",
-		/*01*/		"^|1|2|-|+",
+		/*01*/		"^|1|2|-",
 		/*02*/		"  ",
 		/*03*/		"Bind key to Nunchuk",
 		/*04*/		"^|Z|C",
 		/*05*/		"  ",
 		/*06*/		"Bind key to Classic",
-		/*07*/		"^|a|b|x|y|L|R|Zl|Zr|-|+",
+		/*07*/		"^|a|b|x|y|L|R|Zl|Zr|-",
 		/*08*/		"  ",
 		/*09*/		"Mario kart wheel (horizontal only)",
 		/*10*/		"^|On|Off",
@@ -136,14 +136,14 @@ static const char *emulation_messages[] = {
 		/*03*/		"^|real|max|90%|80%|60%|40%|20%|0%",
 		/*04*/		"Framerate",
 		/*05*/		"^|100%|50%|33%|25%|12%|custom",
-		/*04*/		"Refresh rate (Hz)",
-		/*05*/		"^|off|10|20|30|40|50|60",
-		/*06*/		"Floppy speed",
-		/*07*/		"^|normal|turbo|400%|800%",
+		/*06*/		"Refresh rate (Hz)",
+		/*07*/		"^|off|10|20|30|40|50|60",		
 		/*08*/		"Collision level",
 		/*09*/		"^|none|sprites|playfields|full",		
 		/*10*/		"Immediate blits",
 		/*11*/		"^|on|off",
+		/*12*/		"Blitter cycle exact",
+		/*13*/		"^|on|off",
 		NULL
 };
 
@@ -167,20 +167,18 @@ static const char *audio_messages[] = {
 
 static const char *other_messages[] = {
 		
-		/*00*/		"Correct aspect",
-		/*01*/		"^|off|100%|95%|93%|90%|custom",
-		/*02*/		"  ",
-		/*03*/		"Scanlines",
-		/*04*/		"^|on|off",
-		/*05*/		"  ",
+		/*00*/		"Floppy speed",
+		/*01*/		"^|normal|turbo|400%|800%",
+		/*02*/		"Correct aspect ratio",
+		/*03*/		"^|off|100%|95%|93%|90%|custom",
+		/*04*/		"Scanlines",
+		/*05*/		"^|on|off",
 		/*06*/		"Leds",
 		/*07*/		"^|on|off",
-		/*08*/		"  ",
-		/*09*/		"Port",
-		/*10*/		"^|DEFAULT|SD|USB|SMB",
-		/*11*/		"  ",
-		/*12*/		"Rumble",
-		/*13*/		"^|on|off",
+		/*08*/		"Port",
+		/*09*/		"^|DEFAULT|SD|USB|SMB",
+		/*10*/		"Rumble",
+		/*11*/		"^|on|off",
 		NULL
 };
 
@@ -607,9 +605,9 @@ static void emulation_options(void)
 	submenus[1] = get_cpu_to_chipset_speed();
 	submenus[2] = get_gfx_framerate();
 	submenus[3] = changed_prefs.gfx_refreshrate/10;
-	submenus[4] = get_floppy_speed();
-	submenus[5] = changed_prefs.collision_level;
-	submenus[6] = !changed_prefs.immediate_blits;
+	submenus[4] = changed_prefs.collision_level;
+	submenus[5] = !changed_prefs.immediate_blits;
+	submenus[6] = !changed_prefs.blitter_cycle_exact;
 	
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
@@ -625,10 +623,9 @@ static void emulation_options(void)
 	set_cpu_to_chipset_speed(submenus[1]);
 	set_gfx_framerate(submenus[2]);
 	changed_prefs.gfx_refreshrate = submenus[3]*10;
-	set_floppy_speed(submenus[4]);
-	changed_prefs.collision_level = submenus[5];	
-	changed_prefs.immediate_blits = !submenus[6];
-	
+	changed_prefs.collision_level = submenus[4];	
+	changed_prefs.immediate_blits = !submenus[5];
+	changed_prefs.blitter_cycle_exact = !submenus[6];
 }
 
 static void audio_options(void)
@@ -659,28 +656,29 @@ static void audio_options(void)
 
 static void other_options(void)
 {
-	int submenus[5];
+	int submenus[6];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
 	
-	
-	submenus[0] = get_gfx_aspect_ratio();
-	submenus[1] = !(changed_prefs.gfx_linedbl == 2) ;
-	submenus[2] = !changed_prefs.leds_on_screen;
-	submenus[3] = changed_prefs.Port;
-	submenus[4] = !changed_prefs.rumble;
+	submenus[0] = get_floppy_speed();
+	submenus[1] = get_gfx_aspect_ratio();
+	submenus[2] = !(changed_prefs.gfx_linedbl == 2) ;
+	submenus[3] = !changed_prefs.leds_on_screen;
+	submenus[4] = changed_prefs.Port;
+	submenus[5] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			other_messages, submenus);
 	if (opt < 0)
 		return;
 
-	set_gfx_aspect_ratio(submenus[0]);
-	changed_prefs.gfx_linedbl = submenus[1] ? 1 : 2;
-	changed_prefs.leds_on_screen = !submenus[2];
-	set_Port(submenus[3]);
-	changed_prefs.rumble = !submenus[4];
+	set_floppy_speed(submenus[0]);
+	set_gfx_aspect_ratio(submenus[1]);
+	changed_prefs.gfx_linedbl = submenus[2] ? 1 : 2;
+	changed_prefs.leds_on_screen = !submenus[3];
+	set_Port(submenus[4]);
+	changed_prefs.rumble = !submenus[5];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
 }
