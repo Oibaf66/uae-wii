@@ -234,16 +234,19 @@ static void update_68k_cycles (void)
 void check_prefs_changed_cpu (void)
 {
     if (currprefs.cpu_level != changed_prefs.cpu_level
+	|| currprefs.address_space_24 != changed_prefs.address_space_24
 	|| currprefs.cpu_compatible != changed_prefs.cpu_compatible
-	|| currprefs.cpu_cycle_exact != changed_prefs.cpu_cycle_exact) {
+	|| currprefs.cpu_cycle_exact != changed_prefs.cpu_cycle_exact
+	|| currprefs.blitter_cycle_exact != changed_prefs.blitter_cycle_exact) {
 
 	if (!currprefs.cpu_compatible && changed_prefs.cpu_compatible)
 	    fill_prefetch_slow (&regs);
 
 	currprefs.cpu_level = changed_prefs.cpu_level;
+	currprefs.address_space_24 = changed_prefs.address_space_24;
 	currprefs.cpu_compatible = changed_prefs.cpu_compatible;
 	currprefs.cpu_cycle_exact = changed_prefs.cpu_cycle_exact;
-	currprefs.blitter_cycle_exact = changed_prefs.cpu_cycle_exact;
+	currprefs.blitter_cycle_exact = changed_prefs.blitter_cycle_exact;
 	build_cpufunctbl ();
 
 	/* Force opcode handler loop to exit. We don't want it to
@@ -2268,11 +2271,13 @@ const uae_u8 *restore_cpu (const uae_u8 *src)
     }
 
     flags = restore_u32 ();
-    changed_prefs.address_space_24 = 0;
-    if (flags & CPUTYPE_EC)
+    changed_prefs.address_space_24 = 0; //32 bit address space
+	if (model < 68020)
+	changed_prefs.address_space_24 = 1; //model 68000 and 68010 always 24 bit
+    if ((flags & CPUTYPE_EC)&&(model == 68020))
 	changed_prefs.address_space_24 = 1;
     if (model > 68000)
-	changed_prefs.cpu_compatible = 0;
+	changed_prefs.cpu_compatible = changed_prefs.cpu_cycle_exact = 0;
     currprefs.cpu_level = changed_prefs.cpu_level;
     currprefs.address_space_24 = changed_prefs.address_space_24;
     currprefs.cpu_compatible = changed_prefs.cpu_compatible;

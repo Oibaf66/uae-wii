@@ -20,6 +20,7 @@
 #include "menu.h"
 #include "VirtualKeyboard.h"
 #include "sounddep/sound.h"
+#include "inputdevice.h"
 
 #define ID_BUTTON_OFFSET 0
 #define ID_AXIS_OFFSET 32
@@ -51,8 +52,8 @@ static const char *main_menu_messages[] = {
 		/*09*/		"Audio options",
 		/*10*/		"Other options",
 		/*11*/		"Save confs",
-		/*12*/		"Reset UAE",
-		/*13*/		"Help",
+		/*12*/		"Load confs",
+		/*13*/		"Reset UAE",
 		/*14*/		"Quit",
 		NULL
 };
@@ -92,7 +93,7 @@ static const char *hardware_messages[] = {
 
 static const char *memory_messages[] = {
 		/*00*/		"Chip mem",
-		/*01*/		"^|512K|1M|2M",
+		/*01*/		"^|512K|1M|2M|4M|8M",
 		/*02*/		"  ",
 		/*03*/		"Slow mem",
 		/*04*/		"^|None|256K|512K|1M|1.8M",
@@ -101,25 +102,28 @@ static const char *memory_messages[] = {
 		/*07*/		"^|None|1M|2M|4M|8M",
 		/*08*/		"  ",
 		/*09*/		"Zorro3 mem",
-		/*10*/		"^|None|1M|2M|4M|8M|16M",
+		/*10*/		"^|None|1M|2M|4M|8M",
 		/*11*/		"  ",
 		/*12*/		"Picasso96 mem",
 		/*13*/		"^|None|1M|2M|4M|8M|16M",
 		NULL
 };
 
-static const int chipmem_size_table[] = { 512 * 1024, 1024 * 1024, 2048 * 1024 };
+static const int chipmem_size_table[] = { 512 * 1024, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024};
 static const int slowmem_size_table[] = { 0, 256 * 1024, 512 * 1024, 1024 * 1024, 1792 * 1024 };
 static const int fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024 };	
-static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024};
+static const int z3fastmem_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024};
 static const int picasso96_size_table[] = { 0, 1024 * 1024, 2048 * 1024, 4096 * 1024, 8192 * 1024, 16384 * 1024};	
 
 static const char *cpu_chipset_messages[] = {
 		/*00*/		"CPU type",
 		/*01*/		"^|68000|68010|68020|68020/68881|68040|68060",
 		/*02*/		"  ",
-		/*03*/		"Chipset type",
-		/*04*/		"^|OCS|ECS AGNUS|ECS|AGA",
+		/*03*/		"CPU address space",
+		/*04*/		"^|24 bit|32 bit",
+		/*05*/		"  ",
+		/*06*/		"Chipset type",
+		/*07*/		"^|OCS|ECS AGNUS|ECS|AGA",
 		NULL
 };
 
@@ -130,7 +134,7 @@ static const int chipset_mask_table[] = {0, CSMASK_ECS_AGNUS,
 
 
 static const char *emulation_messages[] = {
-		/*00*/		"Emulation accuracy",
+		/*00*/		"CPU emulation accuracy",
 		/*01*/		"^|Fast|Compatible|Cycle-exact",
 		/*02*/		"CPU to chipset speed",
 		/*03*/		"^|real|max|90%|80%|60%|40%|20%|0%",
@@ -182,31 +186,221 @@ static const char *other_messages[] = {
 		NULL
 };
 
+static const char *save_conf_messages[] = {
+		/*00*/		"Save conf file to load at start up (uaerc.saved)",
+		/*01*/		" ",
+		/*02*/		"Save confs file 1",
+		/*03*/		" ",
+		/*04*/		"Save confs file 2",
+		/*05*/		" ",
+		/*06*/		"Save confs file 3",
+		/*07*/		" ",
+		/*08*/		"Save confs file 4",
+		/*09*/		" ",
+		/*10*/		"Save confs file 5",
+		/*11*/		" ",
+		/*12*/		"Delete uaerc.saved",
+		NULL
+};
+
+static const char *load_conf_messages[] = {
+		/*00*/		"Load default conf file (uaerc)",
+		/*01*/		" ",
+		/*02*/		"Load confs file 1",
+		/*03*/		" ",
+		/*04*/		"Load confs file 2",
+		/*05*/		" ",
+		/*06*/		"Load confs file 3",
+		/*07*/		" ",
+		/*08*/		"Load confs file 4",
+		/*09*/		" ",
+		/*10*/		"Load confs file 5",
+		NULL
+};
+
 static const int correct_aspect_table[] = {0,100,95,93,90};
 static const int cpu_to_chipset_table[] = {0,-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
 static const int framerate_table[] = {1, 2, 3, 4, 8};
 
-
+/*
 static const char *help_messages[] = {
-		/*00*/		"#2HOME enters the menu system, where arrow keys",
-		/*01*/		"#2and nunchuck are used to navigate up and down.",
-		/*02*/		"#2You can bind keyboard keys to the wiimote",
-		/*03*/		"#2buttons in the 'keyboard bindings' menu and",
-		/*04*/		"#2change emulation options in the hardware menu.",
-		/*05*/		"#2 ",
-		/*06*/		"#2Kickstart roms should be named kick.rom,",
-		/*07*/		"#2kick10.rom, kick12.rom, kick13.rom, kick20.rom,",
-		/*08*/		"#2kick30.rom, and kick31.rom for different Amiga",
-		/*09*/		"#2models selectable in the Amiga menu.",
-		/*10*/		"#2 ",
-		/*11*/		"#2More information is available on the wiki:",
-		/*12*/		"#2   http://wiibrew.org/wiki/UAE_Wii",
-		/*13*/		"#2 ",
-		/*14*/		"OK",
+		*00*		"#2HOME enters the menu system, where arrow keys",
+		*01*		"#2and nunchuck are used to navigate up and down.",
+		*02*		"#2You can bind keyboard keys to the wiimote",
+		*03*		"#2buttons in the 'keyboard bindings' menu and",
+		*04*		"#2change emulation options in the hardware menu.",
+		*05*		"#2 ",
+		*06*		"#2Kickstart roms should be named kick.rom,",
+		*07*		"#2kick10.rom, kick12.rom, kick13.rom, kick20.rom,",
+		*08*		"#2kick30.rom, and kick31.rom for different Amiga",
+		*09*		"#2models selectable in the Amiga menu.",
+		*10*		"#2 ",
+		*11*		"#2More information is available on the wiki:",
+		*12*		"#2   http://wiibrew.org/wiki/UAE_Wii",
+		*13*		"#2 ",fixe
+		*14*		"OK",
 		NULL,
 };
+*/
 
+void fix_options_menu_sdl (int printmsg)
+{
+	if ((changed_prefs.cpu_level < 2)&&(changed_prefs.address_space_24==0))
+	{
+	changed_prefs.address_space_24 = 1;	
+		if (printmsg) msgInfo ("With 68000/68010 address space is 24 bit",3000, NULL);
+	}
+	if ((changed_prefs.cpu_level >= 4)&&(changed_prefs.address_space_24==1))
+	{	
+	changed_prefs.address_space_24 = 0;
+		if (printmsg) msgInfo ("With 68040/060 address space is 32 bit",3000, NULL);
+	} 
+	
+	if ((changed_prefs.cpu_level != 0)&&(changed_prefs.cpu_compatible == 1))
+	{	
+	changed_prefs.cpu_compatible = 0;
+		if (printmsg) msgInfo (" Compatible emulation only for 68000 ",3000, NULL);	 
+	}
+	
+	if ((changed_prefs.cpu_level != 0)&&(changed_prefs.cpu_cycle_exact == 1))
+	{	
+	changed_prefs.cpu_cycle_exact = 0;		
+		if (printmsg) msgInfo (" Cycle-exact emulation only for 68000 ",3000, NULL);	 
+	}
+	
+	if ((changed_prefs.chipmem_size & (changed_prefs.chipmem_size - 1)) != 0
+	|| changed_prefs.chipmem_size < 0x40000
+	|| changed_prefs.chipmem_size > 0x800000)
+    {
+	changed_prefs.chipmem_size = 0x80000;
+		if (printmsg) msgInfo ("Unsupported chipmem size",3000, NULL);
+    }
+	
+	if ((changed_prefs.chipmem_size > 0x80000) && (!(changed_prefs.chipset_mask & CSMASK_ECS_AGNUS)))
+	{
+	changed_prefs.chipmem_size = 0x80000;
+		if (printmsg) msgInfo ("No more than 512KB chipmem  OCS",3000, NULL);
+    }
+	
+	if ((changed_prefs.bogomem_size > 0x100000) && ((changed_prefs.chipset_mask & CSMASK_AGA)))
+	{
+	changed_prefs.bogomem_size = 0x100000;
+		if (printmsg) msgInfo ("No more than 1MB slowmem with AGA",3000, NULL);
+    }
+	
+    if ((changed_prefs.fastmem_size & (changed_prefs.fastmem_size - 1)) != 0
+	|| (changed_prefs.fastmem_size != 0 && (changed_prefs.fastmem_size < 0x100000 || changed_prefs.fastmem_size > 0x800000)))
+    {
+	changed_prefs.fastmem_size = 0;
+		if (printmsg) msgInfo ("Unsupported fastmem size",3000, NULL);
+    }
+	
+    if ((changed_prefs.gfxmem_size & (changed_prefs.gfxmem_size - 1)) != 0
+	|| (changed_prefs.gfxmem_size != 0 && (changed_prefs.gfxmem_size < 0x100000 || changed_prefs.gfxmem_size > 0x2000000)))
+    {
+		if (printmsg) msgInfo ("Unsupported graphics card memory size",3000, NULL);
+	changed_prefs.gfxmem_size = 0;
+    }
+	
+    if ((changed_prefs.z3fastmem_size & (changed_prefs.z3fastmem_size - 1)) != 0
+	|| (changed_prefs.z3fastmem_size != 0 && (changed_prefs.z3fastmem_size < 0x100000 || changed_prefs.z3fastmem_size > 0x20000000)))
+    {
+	changed_prefs.z3fastmem_size = 0;
+		if (printmsg) msgInfo ("Unsupported Zorro III fastmem size",3000, NULL);
+    }
+	
+    if (changed_prefs.address_space_24 && (changed_prefs.gfxmem_size != 0)) {
+	changed_prefs.gfxmem_size = 0;
+		if (printmsg) msgInfo ("Can't use graphic mem with 24 bit address",3000, NULL);
+	}
+	
+	if (changed_prefs.address_space_24 && (changed_prefs.z3fastmem_size != 0)) {
+	changed_prefs.z3fastmem_size = 0;
+		if (printmsg) msgInfo (" Can't use Zorro III with 24 bit address ",3000, NULL);
+    }
+	
+    if (changed_prefs.bogomem_size != 0 && changed_prefs.bogomem_size != 0x80000 && changed_prefs.bogomem_size != 0x100000 && changed_prefs.bogomem_size != 0x1C0000)
+    {
+	changed_prefs.bogomem_size = 0;
+		if (printmsg) msgInfo ("Unsupported slowmem size",3000, NULL);
+    }
+
+    if (changed_prefs.chipmem_size > 0x200000 && changed_prefs.fastmem_size != 0) {
+		if (printmsg) msgInfo ("Can't use fastmem and more than 2MB chipmem",3000, NULL);
+	changed_prefs.fastmem_size = 0;
+    }
+	
+    if (changed_prefs.produce_sound < 0 || changed_prefs.produce_sound > 3) {
+		if (printmsg) msgInfo ("Value must be within 0..3",3000, NULL);
+	changed_prefs.produce_sound = 0;
+    }
+
+    if (changed_prefs.cpu_level < 2 && changed_prefs.z3fastmem_size > 0) {
+		if (printmsg) msgInfo ("Z3 fast memory requires 68020 emulation",3000, NULL);
+	changed_prefs.z3fastmem_size = 0;
+    }
+	
+    if (changed_prefs.gfxmem_size > 0 && (changed_prefs.cpu_level < 2 || changed_prefs.address_space_24)) {
+		if (printmsg) msgInfo ("Picasso96 requires 68020 emulation",3000, NULL);
+	changed_prefs.gfxmem_size = 0;
+    }
+	
+#ifndef BSDSOCKET
+    if (changed_prefs.socket_emu) {
+		if (printmsg) msgInfo ("Compile-time option of BSDSOCKET was not enabled. You can't use bsd-socket emulation",3000, NULL);
+	changed_prefs.socket_emu = 0;
+    }
+#endif
+
+    if (changed_prefs.nr_floppies < 0 || changed_prefs.nr_floppies > 4) {
+		if (printmsg) msgInfo ("Invalid number of floppies. Using 4.",3000, NULL);
+	changed_prefs.nr_floppies = 4;
+	changed_prefs.dfxtype[0] = 0;
+	changed_prefs.dfxtype[1] = 0;
+	changed_prefs.dfxtype[2] = 0;
+	changed_prefs.dfxtype[3] = 0;
+    }
+
+    if (changed_prefs.collision_level < 0 || changed_prefs.collision_level > 3) {
+		if (printmsg) msgInfo ("Invalid collision support level. Using Sprite level.",3000, NULL);
+	changed_prefs.collision_level = 1;
+    }
+	
+    fixup_prefs_dimensions (&changed_prefs);
+
+#ifdef CPU_68000_ONLY
+    changed_prefs.cpu_level = 0;
+#endif
+#ifndef CPUEMU_0
+    changed_prefs.cpu_compatible = 1;
+    changed_prefs.address_space_24 = 1;
+#endif
+#if !defined(CPUEMU_5) && !defined (CPUEMU_6)
+    changed_prefs.cpu_compatible = 0;
+    changed_prefs.address_space_24 = 0;
+#endif
+#if !defined (CPUEMU_6)
+    changed_prefs.cpu_cycle_exact = changed_prefs.blitter_cycle_exact = 0;
+#endif
+#ifndef AGA
+    changed_prefs.chipset_mask &= ~CSMASK_AGA;
+#endif
+#ifndef AUTOCONFIG
+    changed_prefs.z3fastmem_size = 0;
+    changed_prefs.fastmem_size = 0;
+    changed_prefs.gfxmem_size = 0;
+#endif
+#if !defined (BSDSOCKET)
+    changed_prefs.socket_emu = 0;
+#endif
+#if !defined (SCSIEMU)
+    changed_prefs.scsi = 0;
+#ifdef _WIN32
+    changed_prefs.win32_aspi = 0;
+#endif
+#endif
+}
 
 static int find_index_by_val(int val, const int vec[], int vec_size, int default_val)
 {
@@ -263,6 +457,7 @@ static void A500_config(void)
 	default_config();
 
 	changed_prefs.cpu_level = 0; //68000
+	changed_prefs.address_space_24 = 1;
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 512 * 1024; //512
@@ -277,6 +472,7 @@ static void A600_config(void)
 	default_config();
 
 	changed_prefs.cpu_level = 0; //68000
+	changed_prefs.address_space_24 = 1;	
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 1024; //1024
 	changed_prefs.bogomem_size = 0; //OFF
@@ -291,6 +487,7 @@ static void A1000_config(void)
 	default_config();
 
 	changed_prefs.cpu_level = 0; //68000
+	changed_prefs.address_space_24 = 1;	
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 512 * 1024; //512
 	changed_prefs.bogomem_size = 0; //OFF
@@ -305,6 +502,7 @@ static void A1200_config(void)
 	default_config();
 
 	changed_prefs.cpu_level = 2; //68020
+	changed_prefs.address_space_24 = 0;	
 	changed_prefs.fastmem_size = 0; //OFF
 	changed_prefs.chipmem_size = 1024 * 2048; //2048
 	changed_prefs.bogomem_size = 0;
@@ -364,11 +562,12 @@ static void insert_rom(void)
 
 static void cpu_chipset_options(void)
 {
-	int submenus[2], opt;
+	int submenus[3], opt;
 
 	submenus[0] = find_index_by_val(changed_prefs.cpu_level, cpu_level_table,
 			SDL_arraysize(cpu_level_table), 0);
-	submenus[1] = find_index_by_val(changed_prefs.chipset_mask, chipset_mask_table,
+	submenus[1] = !changed_prefs.address_space_24;		
+	submenus[2] = find_index_by_val(changed_prefs.chipset_mask, chipset_mask_table,
 			SDL_arraysize(chipset_mask_table), 0);
 
 	opt = menu_select_title("CPU/Chipset options menu",
@@ -376,8 +575,10 @@ static void cpu_chipset_options(void)
 	if (opt < 0)
 		return;
 	changed_prefs.cpu_level = cpu_level_table[submenus[0]];
-	changed_prefs.chipset_mask = chipset_mask_table[submenus[1]];
-
+	changed_prefs.address_space_24 = !submenus[1];
+	changed_prefs.chipset_mask = chipset_mask_table[submenus[2]];
+	
+	fix_options_menu_sdl(1);
 }
 
 static void memory_options(void)
@@ -408,7 +609,14 @@ static void memory_options(void)
 	changed_prefs.fastmem_size = fastmem_size_table[submenus[2]];
 	changed_prefs.z3fastmem_size = z3fastmem_size_table[submenus[3]];
 	changed_prefs.gfxmem_size = picasso96_size_table[submenus[4]];
-
+	
+	fix_options_menu_sdl(1);
+	
+	if (changed_prefs.chipmem_size != currprefs.chipmem_size ||
+	changed_prefs.bogomem_size != currprefs.bogomem_size||
+	changed_prefs.fastmem_size != currprefs.fastmem_size||
+	changed_prefs.z3fastmem_size != currprefs.z3fastmem_size||
+	changed_prefs.gfxmem_size != currprefs.gfxmem_size) uae_reset(1);
 }
 
 static int get_cpu_to_chipset_speed(void)
@@ -487,7 +695,7 @@ static void set_emulation_accuracy(int which)
 		changed_prefs.cpu_cycle_exact = 0;
 		break;
 	case 2:
-		changed_prefs.cpu_compatible = 1;
+		changed_prefs.cpu_compatible = 0;
 		changed_prefs.cpu_cycle_exact = 1;
 		break;
 	case 0:
@@ -503,9 +711,9 @@ static int get_model(void)
 	
 	if ((changed_prefs.chipset_mask&CSMASK_AGA)&&(changed_prefs.cpu_level == 2)) /* A1200 */
 		return 3;
-	if ((changed_prefs.chipset_mask&CSMASK_ECS_DENISE)&&(changed_prefs.cpu_level == 0)) /* A600 */
+	if ((changed_prefs.chipset_mask&CSMASK_ECS_DENISE)&&(changed_prefs.chipset_mask&CSMASK_ECS_AGNUS)&&!(changed_prefs.chipset_mask&CSMASK_AGA)&&(changed_prefs.cpu_level == 0)) /* A600 */
 		return 2;
-	if ((changed_prefs.chipset_mask&CSMASK_ECS_AGNUS)&&(changed_prefs.cpu_level == 0)) /* A500 */
+	if ((changed_prefs.chipset_mask&CSMASK_ECS_AGNUS)&&!(changed_prefs.chipset_mask&CSMASK_AGA)&&!(changed_prefs.chipset_mask&CSMASK_ECS_DENISE)&&(changed_prefs.cpu_level == 0)) /* A500 */
 		return 1;
 	if ((changed_prefs.chipset_mask == 0)&&(changed_prefs.cpu_level == 0)) /* A1000 */
 		return 0;
@@ -553,10 +761,67 @@ static void set_Port(int which)
 	}	
 }
 
-static void save_configurations(void)
+static void save_configurations(const char *ext)
 {
 char user_options[255] = "";
-int i;
+
+if (ext==NULL) return;
+
+#ifdef OPTIONS_IN_HOME
+char *home = getenv ("HOME");
+
+if (home != NULL && strlen (home) < 240)
+{
+	strcpy (user_options, home);
+	strcat (user_options, "/");
+}
+#endif
+
+strcat(user_options, OPTIONSFILENAME);
+strcat(user_options, ext);
+
+cfgfile_save(&changed_prefs, user_options, 0);
+msgInfo("Configurations saved",3000,NULL);
+}
+
+static int load_configurations(const char *ext)
+{
+char user_options[255] = "";
+FILE* optionfile; 
+
+if (ext==NULL) return (1);
+
+#ifdef OPTIONS_IN_HOME
+char *home = getenv ("HOME");
+
+if (home != NULL && strlen (home) < 240)
+{
+	strcpy (user_options, home);
+	strcat (user_options, "/");
+}
+#endif
+
+strcat(user_options, OPTIONSFILENAME);
+if (strcmp(ext, "default")) strcat(user_options, ext); //not uarec file
+
+optionfile = fopen (user_options, "r");
+    
+if (!optionfile) {msgInfo("File not found",3000,NULL);return 1;}
+	
+msgInfo("Configurations loaded",2500,NULL);
+default_prefs (&changed_prefs, 0);
+cfgfile_load(&changed_prefs, user_options, 0);
+fix_options_menu_sdl(0);
+currprefs.Port = changed_prefs.Port;
+currprefs.leds_on_screen = changed_prefs.leds_on_screen;
+currprefs.rumble = changed_prefs.rumble;
+
+return 0;
+}
+
+static void delete_conf_file()
+{
+char user_options[255] = "";
 
 #ifdef OPTIONS_IN_HOME
 char *home = getenv ("HOME");
@@ -571,9 +836,11 @@ if (home != NULL && strlen (home) < 240)
 strcat(user_options, OPTIONSFILENAME);
 strcat(user_options, ".saved");
 
-cfgfile_save(&changed_prefs, user_options, 0);
-msgInfo("Configurations saved",3000,NULL);
-}	
+unlink (user_options);
+
+msgInfo("File deleted",3000,NULL);
+}
+
 
 int get_dfxclick(void)
 {
@@ -626,6 +893,8 @@ static void emulation_options(void)
 	changed_prefs.collision_level = submenus[4];	
 	changed_prefs.immediate_blits = !submenus[5];
 	changed_prefs.blitter_cycle_exact = !submenus[6];
+	
+	fix_options_menu_sdl(1);
 }
 
 static void audio_options(void)
@@ -652,6 +921,8 @@ static void audio_options(void)
 	changed_prefs.sound_mixed_stereo = submenus[2]*2;
 	changed_prefs.sound_interpol = submenus[3];
 	set_dfxclick(!submenus[4]);
+	
+	fix_options_menu_sdl(1);
 }
 
 static void other_options(void)
@@ -681,6 +952,79 @@ static void other_options(void)
 	changed_prefs.rumble = !submenus[5];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
+	
+	fix_options_menu_sdl(1);
+}
+
+static void save_conf_file_menu(void)
+{
+	int opt;
+
+	opt = menu_select_title("Configuration file save menu",
+			save_conf_messages, NULL);
+	if (opt < 0)
+		return;
+	
+	switch(opt)
+		{
+		case 0:
+			save_configurations(".saved");
+			break;
+		case 2:
+			save_configurations(".user1");
+			break;
+		case 4:
+			save_configurations(".user2");
+			break;
+		case 6:
+			save_configurations(".user3");
+			break;	
+		case 8:
+			save_configurations(".user4");
+			break;
+		case 10:
+			save_configurations(".user5");
+			break;	
+		case 12:
+			delete_conf_file();
+			break;	
+		default:
+			break;
+		}
+}
+
+static void load_conf_file_menu(void)
+{
+	int opt;
+
+	opt = menu_select_title("Configuration file load menu",
+			load_conf_messages, NULL);
+	if (opt < 0)
+		return;
+	
+	switch(opt)
+		{
+		case 0:
+			if(!load_configurations("default")) uae_reset(1);
+			break;
+		case 2:
+			if(!load_configurations(".user1")) uae_reset(1);
+			break;
+		case 4:
+			if(!load_configurations(".user2")) uae_reset(1);
+			break;
+		case 6:
+			if(!load_configurations(".user3")) uae_reset(1);
+			break;	
+		case 8:
+			if(!load_configurations(".user4")) uae_reset(1);
+			break;
+		case 10:
+			if(!load_configurations(".user5")) uae_reset(1);
+			break;	
+		default:
+			break;
+		}
 }
 
 /* There are a few unfortunate header problems, so I'll do like this for now */
@@ -858,13 +1202,13 @@ static void hardware_options(void)
 		default:
 			break;
 		}
-	} while (opt == 6 || opt == 8 || opt == 10);
+	} while (opt == 6);
 
-	/* Reset the Amiga if the model has changed */
-	if (cur_model != submenus[0])
+	fix_options_menu_sdl(0);
+
+	/* Reset the Amiga if the model or ROM has changed */
+	if ((cur_model != submenus[0])||(strcmp (currprefs.romfile, changed_prefs.romfile)))
 		uae_reset(1);
-	
-
 }
 
 static void save_load_state(int which)
@@ -912,13 +1256,13 @@ static void save_load_state(int which)
 		break;
 	}
 }
-
+/*
 static void help(void)
 {
 	menu_select_title("UAE-wii help",
 			help_messages, NULL);
 }
-
+*/
 void gui_init (int argc, char **argv)
 {
 }
@@ -1041,14 +1385,14 @@ void gui_display(int shortcut)
 			other_options();
 			break;	
 		case 11:	
-			save_configurations();
+			save_conf_file_menu();
 			break;
-		case 12:
-			uae_reset(1);
+		case 12:	
+			load_conf_file_menu();
 			break;	
 		case 13:
-			help();
-			break;
+			uae_reset(1);
+			break;	
 		case 14:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) 
 				{currprefs.rumble=0; uae_quit();}	
@@ -1056,7 +1400,7 @@ void gui_display(int shortcut)
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 13);
+	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10);
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
