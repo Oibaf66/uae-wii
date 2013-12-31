@@ -219,9 +219,43 @@ static void fixup_prefs_joysticks (struct uae_prefs *prefs)
     }
 }
 
-static void fix_options (void)
+void fix_options (void)
 {
     int err = 0;
+	
+	if ((currprefs.cpu_level < 2)&&(currprefs.address_space_24==0))
+	{
+	currprefs.address_space_24 = 1;	
+	write_log ("With 68000/68010 address space is always 24 bit\n");
+	err = 1;
+	}
+	if ((currprefs.cpu_level >= 4)&&(currprefs.address_space_24==1))
+	{	
+	currprefs.address_space_24 = 0;
+	write_log("With 68040/060 address space is always 32 bit\n");
+	err = 1;
+	} 
+	
+	if ((currprefs.cpu_level != 0)&&(currprefs.cpu_compatible == 1))
+	{		 
+	currprefs.cpu_compatible = 0;
+	write_log ("Compatible emulation is available only for 68000\n");
+	err = 1;
+	}
+	
+	if ((currprefs.cpu_level != 0)&&(currprefs.cpu_cycle_exact == 1))
+	{			 
+	currprefs.cpu_cycle_exact = 0;
+	write_log ("Cycle-exact emulation is available only for 68000\n");
+	err = 1;
+	}
+
+	if ((currprefs.bogomem_size > 0x100000) && ((currprefs.chipset_mask & CSMASK_AGA)))
+	{
+	currprefs.bogomem_size = 0x100000;
+	write_log ("No more than 1MB slowmem with AGA\n");
+	err = 1;
+    }
 
     if ((currprefs.chipmem_size & (currprefs.chipmem_size - 1)) != 0
 	|| currprefs.chipmem_size < 0x40000

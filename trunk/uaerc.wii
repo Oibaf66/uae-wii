@@ -26,8 +26,8 @@ cpu_speed=max
 # CPU Type (values are: 68000, 68010, 68020, 68020/68881, 68040 and 68060)
 cpu_type=68000
 
-#Use the 32 bit Motorola CPU 68020 version
-cpu_24bit_addressing=false
+#68000 has 24 bit address space
+cpu_24bit_addressing=true
 
 #Immediate blits helps with speed
 immediate_blits=true
