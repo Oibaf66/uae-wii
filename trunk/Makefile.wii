@@ -134,7 +134,7 @@ uae.dol: uae.elf
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O3 -G8 -mrvl -Wall -D__inline__=__inline__ $(MACHDEP) -Wno-unused-variable
+COMMON_FLAGS	:= -g -O3 $(MACHDEP) -Wall -Wno-unused -Wno-format
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
