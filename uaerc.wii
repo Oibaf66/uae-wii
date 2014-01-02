@@ -19,24 +19,11 @@ floppy0=/uae/floppies/
 #filesystem2=rw,DH0:harddir:/uae/harddir,-127
 
 
-# Alters CPU speed (values are: real, max, 1 through 20)
-# i.e. setting of 4 = 20% CHIPSET and 80% CPU
-cpu_speed=max
-
 # CPU Type (values are: 68000, 68010, 68020, 68020/68881, 68040 and 68060)
 cpu_type=68000
 
 #68000 has 24 bit address space
 cpu_24bit_addressing=true
-
-#Immediate blits helps with speed
-immediate_blits=true
-
-collision_level=playfields
-
-# Emulation precision
-cpu_compatible=true
-cpu_cycle_exact=false
 
 # Chipset type (values are: ocs, ecs_agnus, ecs_denise, ecs, aga)
 chipset=ecs_agnus
@@ -52,17 +39,78 @@ z3mem_size=0
 # Picasso96 Memory (Values are between 0 and 32 which are MB)
 gfxcard_size=0
 
+# Emulation precision
+cpu_compatible=true
+cpu_cycle_exact=false
+
+# Alters CPU speed (values are: real, max, 1 through 20)
+# i.e. setting of 4 = 20% CHIPSET and 80% CPU
+cpu_speed=max
+
+#Immediate blits helps with speed
+immediate_blits=true
+
+collision_level=playfields
+
+# Enable 2 floppies
+floppy0type=0
+floppy1type=0
+floppy2type=-1
+floppy3type=-1
+
+# Enable floppy sound
+floppy0sound=1
+floppy1sound=1
+floppy2sound=1
+floppy3sound=1
+floppy_volume=33
+floppy0soundext=/uae/wave/
+floppy1soundext=/uae/wave/
+floppy2soundext=/uae/wave/
+floppy3soundext=/uae/wave/
+
 # Floppy speed, can cause incompatbility with certain floppy loaders
 # (Values are: 0 = Turbo, 100 = Standard and 800 = 800% faster)
 floppy_speed=100
 
-show_leds=true
+
 
 # Sound configuration
 sound_output=normal
 sound_frequency=32000
 sound_latency=200
 
+# Graphic configuration
+
+# Necessary to get the relative coordinates from mouse emulated with wiimote IR pointer
+gfx_fullscreen_amiga=true
+
+# Set the screen dimensions
+gfx_width_windowed=640
+gfx_height_windowed=480
+gfx_width_fullscreen=640
+gfx_height_fullscreen=480
+gfx_center_horizontal=true
+gfx_center_vertical=true
+
+# Vsync along with full screen enables double buffer and refresh rate setting
+# Vsync false is a bit more fast
+gfx_vsync=true
+
+# Set true to adapt the Amiga screen to Wii SDL screen (640X480) 
+gfx_correct_aspect=false
+
+# Set the screen correct % ratio when gfx_correct_aspect is true - possible values 80-100
+gfx_correct_ratio=93
+
+# Set the framerate (Values are between 1 and 20)
+gfx_framerate=2
+
+# Enable the on-screen leds
+show_leds=true
+
+# Set keyboard language. Possible values are de, dk, es, us, se, fr, it 
+kbd_lang=us
 
 # Keyboard setup
 input.config=1
@@ -157,46 +205,3 @@ input.1.joystick.5.axis.1=JOY1_VERT
 input.1.joystick.5.button.0=JOY1_FIRE_BUTTON 
 input.1.joystick.5.button.7=SPC_ENTERGUI 
 
-
-# Graphic configuration
-
-# Necessary to get the relative coordinates from mouse emulated with wiimote IR pointer
-gfx_fullscreen_amiga=true
-
-# Set the screen dimensions
-gfx_width_windowed=640
-gfx_height_windowed=480
-gfx_width_fullscreen=640
-gfx_height_fullscreen=480
-gfx_center_horizontal=true
-gfx_center_vertical=true
-
-# This enables double buffer and refresh rate setting 
-gfx_vsync=true
-
-# Set true to adapt the Amiga screen to Wii SDL screen (640X480) 
-gfx_correct_aspect=false
-
-# Set the screen correct % ratio when gfx_correct_aspect is true - possible values 80-100
-gfx_correct_ratio=93
-
-# Set the framerate (Values are between 1 and 20)
-gfx_framerate=2
-
-# Enable 2 floppies
-#nr_floppies=2
-floppy0type=0
-floppy1type=0
-floppy2type=-1
-floppy3type=-1
-
-# Enable floppy sound - set floppysound to -1 to load wave file - set to 0 to disable
-floppy0sound=1
-floppy1sound=1
-floppy_volume=33
-floppy0soundext=/uae/wave/
-floppy1soundext=/uae/wave/
-
-
-# Set keyboard language. Possible values are de, dk, es, us, se, fr, it 
-kbd_lang=us

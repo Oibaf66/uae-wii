@@ -26,8 +26,8 @@
 #define ID_AXIS_OFFSET 32
 
 /* Uncomment for debugging output */
-//#define DEBUG
-#ifdef DEBUG
+//#define DEBUG_VK
+#ifdef DEBUG_VK
 #define DEBUG_LOG write_log
 #else
 #define DEBUG_LOG(...) do ; while(0)
@@ -173,16 +173,18 @@ static const char *other_messages[] = {
 		
 		/*00*/		"Floppy speed",
 		/*01*/		"^|normal|turbo|400%|800%",
-		/*02*/		"Correct aspect ratio",
-		/*03*/		"^|off|100%|95%|93%|90%|custom",
-		/*04*/		"Scanlines",
-		/*05*/		"^|on|off",
-		/*06*/		"Leds",
+		/*02*/		"Number of floppies",
+		/*03*/		"^| 0 | 1 | 2 | 3 | 4 ",
+		/*04*/		"Correct aspect ratio",
+		/*05*/		"^|off|100%|95%|93%|90%|custom",
+		/*06*/		"Scanlines",
 		/*07*/		"^|on|off",
-		/*08*/		"Port",
-		/*09*/		"^|DEFAULT|SD|USB|SMB",
-		/*10*/		"Rumble",
-		/*11*/		"^|on|off",
+		/*08*/		"Leds",
+		/*09*/		"^|on|off",
+		/*10*/		"Port",
+		/*11*/		"^|DEFAULT|SD|USB|SMB",
+		/*12*/		"Rumble",
+		/*13*/		"^|on|off",
 		NULL
 };
 
@@ -280,7 +282,7 @@ void fix_options_menu_sdl (int printmsg)
 	if ((changed_prefs.chipmem_size > 0x80000) && (!(changed_prefs.chipset_mask & CSMASK_ECS_AGNUS)))
 	{
 	changed_prefs.chipmem_size = 0x80000;
-		if (printmsg) msgInfo ("No more than 512KB chipmem  OCS",3000, NULL);
+		if (printmsg) msgInfo ("No more than 512KB chipmem with OCS",3000, NULL);
     }
 	
 	if ((changed_prefs.bogomem_size > 0x100000) && ((changed_prefs.chipset_mask & CSMASK_AGA)))
@@ -352,15 +354,6 @@ void fix_options_menu_sdl (int printmsg)
 	changed_prefs.socket_emu = 0;
     }
 #endif
-
-    if (changed_prefs.nr_floppies < 0 || changed_prefs.nr_floppies > 4) {
-		if (printmsg) msgInfo ("Invalid number of floppies. Using 4.",3000, NULL);
-	changed_prefs.nr_floppies = 4;
-	changed_prefs.dfxtype[0] = 0;
-	changed_prefs.dfxtype[1] = 0;
-	changed_prefs.dfxtype[2] = 0;
-	changed_prefs.dfxtype[3] = 0;
-    }
 
     if (changed_prefs.collision_level < 0 || changed_prefs.collision_level > 3) {
 		if (printmsg) msgInfo ("Invalid collision support level. Using Sprite level.",3000, NULL);
@@ -641,6 +634,33 @@ static void set_floppy_speed(int which)
 	changed_prefs.floppy_speed = floppy_table[which];
 }
 
+static int get_dfxclick(void);
+static void set_dfxclick(int);
+
+static int get_floppy_number(void)
+{
+	int i;
+
+	for (i=0; (changed_prefs.dfxtype[i]!=-1) && (i<4); i++);
+
+	return i;
+	
+}
+
+static void set_floppy_number(int which)
+{
+	int i;
+	
+	set_dfxclick (get_dfxclick()); //Trick to be sure that all floppies have sound on or off
+
+	for (i=0; i<4; i++)
+	{
+	if (which == 0) changed_prefs.dfxtype[i] = -1; //disable all floppies
+	if (i<which) changed_prefs.dfxtype[i] = 0; //3.5 inches double-density
+	else changed_prefs.dfxtype[i] = -1; //disable floppy
+	}
+}
+
 static void set_gfx_framerate(int which)
 {
 	/* Custom setting - don't touch! */
@@ -842,23 +862,22 @@ msgInfo("File deleted",3000,NULL);
 }
 
 
-int get_dfxclick(void)
+static int get_dfxclick(void)
 {
 	int sounddf_on = 0; 
 	int i;
 
-	for (i=0; i < 4; i++)
-	 if (changed_prefs.dfxclick[i]&&(changed_prefs.dfxtype[i]>=0)) sounddf_on =1;
+	sounddf_on = (changed_prefs.dfxclick[0]!=0)||(changed_prefs.dfxclick[1]!=0)||
+	(changed_prefs.dfxclick[2]!=0)||(changed_prefs.dfxclick[3]!=0);
 	
 	return sounddf_on;
 }
 
-void set_dfxclick(int sounddf_on)
+static void set_dfxclick(int sounddf_on)
 {
 	int i;
 	for (i=0; i < 4; i++)
-	 if ((changed_prefs.dfxtype[i]>=0)&&(changed_prefs.dfxclick[i]!=sounddf_on))
-	    changed_prefs.dfxclick[i] = sounddf_on;
+	    changed_prefs.dfxclick[i] = sounddf_on; //Floppy sounds are all off or all on
 }
 
 static void emulation_options(void)
@@ -927,17 +946,20 @@ static void audio_options(void)
 
 static void other_options(void)
 {
-	int submenus[6];
-	int opt;
+	int submenus[7];
+	int opt, floppy_n;
 	
 	memset(submenus, 0, sizeof(submenus));
 	
+	floppy_n=get_floppy_number();
+	
 	submenus[0] = get_floppy_speed();
-	submenus[1] = get_gfx_aspect_ratio();
-	submenus[2] = !(changed_prefs.gfx_linedbl == 2) ;
-	submenus[3] = !changed_prefs.leds_on_screen;
-	submenus[4] = changed_prefs.Port;
-	submenus[5] = !changed_prefs.rumble;
+	submenus[1] = floppy_n;
+	submenus[2] = get_gfx_aspect_ratio();
+	submenus[3] = !(changed_prefs.gfx_linedbl == 2) ;
+	submenus[4] = !changed_prefs.leds_on_screen;
+	submenus[5] = changed_prefs.Port;
+	submenus[6] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			other_messages, submenus);
@@ -945,15 +967,18 @@ static void other_options(void)
 		return;
 
 	set_floppy_speed(submenus[0]);
-	set_gfx_aspect_ratio(submenus[1]);
-	changed_prefs.gfx_linedbl = submenus[2] ? 1 : 2;
-	changed_prefs.leds_on_screen = !submenus[3];
-	set_Port(submenus[4]);
-	changed_prefs.rumble = !submenus[5];
+	set_floppy_number(submenus[1]);
+	set_gfx_aspect_ratio(submenus[2]);
+	changed_prefs.gfx_linedbl = submenus[3] ? 1 : 2;
+	changed_prefs.leds_on_screen = !submenus[4];
+	set_Port(submenus[5]);
+	changed_prefs.rumble = !submenus[6];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
 	
 	fix_options_menu_sdl(1);
+	
+	if (floppy_n != submenus[1]) uae_reset(1);
 }
 
 static void save_conf_file_menu(void)
