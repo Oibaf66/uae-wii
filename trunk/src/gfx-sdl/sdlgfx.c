@@ -658,9 +658,11 @@ static void sdl_flush_screen_flip (struct vidbuf_description *gfxinfo, int first
 {
     frame_time_t start_time;
     frame_time_t sleep_time;
-
-    SDL_BlitSurface (display,0,screen,0);
-
+	//For WII it is not necessary to create a RGB surface and blit it on the video surface
+#ifndef GEKKO 
+	SDL_BlitSurface (display,0,screen,0);
+#endif
+	
     start_time = uae_gethrtime ();
 
     SDL_Flip (screen);
@@ -957,6 +959,7 @@ static int graphics_subinit (void)
 	DEBUG_LOG ("Fullscreen?    : %d\n", fullscreen);
 	DEBUG_LOG ("Mouse grabbed? : %d\n", mousegrab);
 	DEBUG_LOG ("HW surface?    : %d\n", is_hwsurface);
+	DEBUG_LOG ("Double buffer? : %d\n", vsync);
 	DEBUG_LOG ("Must lock?     : %d\n", SDL_MUSTLOCK (screen));
 	DEBUG_LOG ("Bytes per Pixel: %d\n", screen->format->BytesPerPixel);
 	DEBUG_LOG ("Bytes per Line : %d\n", screen->pitch);
@@ -975,9 +978,13 @@ static int graphics_subinit (void)
 
 
         if (vsync) {
-	    display = SDL_CreateRGBSurface(SDL_HWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
+#ifdef GEKKO
+		display = screen;
+#else
+		//For WII it is not necessary to create a RGB surface and blit it on the video surface
+		display = SDL_CreateRGBSurface(SDL_HWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
 					  screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, 0);
-
+#endif
 	    gfxvidinfo.flush_screen = sdl_flush_screen_flip;
 	} else {
 	    display = screen;
