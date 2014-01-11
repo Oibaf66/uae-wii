@@ -174,6 +174,10 @@ void close_sound (void)
     uae_sem_destroy (&sound_init_sem);
     uae_sem_destroy (&callback_done_sem);
     have_sound = 0;
+	
+	#ifdef DRIVESOUND
+	driveclick_free();
+	#endif
 }
 
 int init_sound (void)
@@ -195,13 +199,20 @@ int init_sound (void)
 
 void pause_sound (void)
 {
-    SDL_PauseAudio (1);
+	
+	SDL_PauseAudio (1);
+    clearbuffer();
+    if (in_callback) {
+	closing_sound = 1;
+	uae_sem_post (&data_available_sem);
+    }
 }
 
 void resume_sound (void)
 {
     clearbuffer();
     SDL_PauseAudio (0);
+	closing_sound = 0;
 }
 
 void reset_sound (void)
