@@ -1,9 +1,9 @@
  /*
   * UAE - The Un*x Amiga Emulator
   *
-  * Interface to the Tcl/Tk GUI
+  * WII Interface
   *
-  * Copyright 1996 Bernd Schmidt
+  * Copyright 2014 Fabio Olimpieri
   */
 
 #include <sys/types.h>
@@ -864,8 +864,7 @@ msgInfo("File deleted",3000,NULL);
 
 static int get_dfxclick(void)
 {
-	int sounddf_on = 0; 
-	int i;
+	int sounddf_on = 0;
 
 	sounddf_on = (changed_prefs.dfxclick[0]!=0)||(changed_prefs.dfxclick[1]!=0)||
 	(changed_prefs.dfxclick[2]!=0)||(changed_prefs.dfxclick[3]!=0);
@@ -1096,7 +1095,6 @@ static void input_options(int joy)
 	const char *key;
 	int submenus[5];
 	int opt;
-	int i;
 	struct virtkey *virtualkey;
 
 	memset(submenus, 0, sizeof(submenus));
@@ -1159,6 +1157,19 @@ static void input_options(int joy)
 			
 	if (!strcmp(key,"JOY_3RD_BUTTON"))
 			key= joy ? "JOY1_3RD_BUTTON": "JOY2_3RD_BUTTON";
+	
+	if (!strcmp(key,"JOY_LEFT"))
+			key= joy ? "JOY1_LEFT": "JOY2_LEFT";
+	
+	if (!strcmp(key,"JOY_RIGHT"))
+			key= joy ? "JOY1_RIGHT": "JOY2_RIGHT";
+			
+	if (!strcmp(key,"JOY_UP"))
+			key= joy ? "JOY1_UP": "JOY2_UP";
+			
+	if (!strcmp(key,"JOY_DOWN"))
+			key= joy ? "JOY1_DOWN": "JOY2_DOWN";
+			
 		
 	setup_joystick(joy, key, sdl_key);
 	

@@ -74,7 +74,6 @@ floppy3soundext=/uae/wave/
 floppy_speed=100
 
 
-
 # Sound configuration
 sound_output=normal
 sound_frequency=32000

@@ -144,11 +144,13 @@ CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 #unused defines; -DCAPS (to enable ipf file) -DFDI2RAW (to enable DFI file)
 
 # Test link flags.
-LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard -ltinysmb
+LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lSDL_image -lpng -ljpeg -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard -ltinysmb
 
 
 dist:uae.dol
 	install -d $@/apps/uae
+	install -d $@/apps/uae/docs
+	install -d $@/apps/uae/images/
 	install -d $@/uae
 	install -d $@/uae/roms
 	install -d $@/uae/floppies
@@ -166,11 +168,12 @@ dist:uae.dol
 	cp icon.png $@/apps/uae/
 	cp FreeMono.ttf $@/apps/uae/
 	cp Smaller.ttf $@/apps/uae/
-	cp README.Cloanto-Amiga_Forever $@/apps/uae/
+	cp README.Cloanto-Amiga_Forever $@/apps/uae/docs/
+	cp images/kb_amiga.png $@/apps/uae/images/
 	cp uaerc.wii $@/uae/uaerc
 	cp uaerc.smb $@/uae/
-	cp docs/configuration.txt $@/apps/uae/
-	cp docs/Joystick_mapping.txt $@/apps/uae/
+	cp docs/configuration.txt $@/apps/uae/docs/
+	cp docs/Joystick_mapping.txt $@/apps/uae/docs/
 	cp src/resource/*.wav $@/uae/wave
 	cd $@ && tar -czf ../uae-wii-vx-bin.tar.gz *
 	

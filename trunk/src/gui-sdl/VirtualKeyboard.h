@@ -1,9 +1,10 @@
 /*********************************************************************
  *
  * Copyright (C) 2009,  Simon Kagstrom
+ * Copyright (C) 2014,  Fabio Olimpieri
  *
  * Filename:      VirtualKeyboard.c
- * Author:        Simon Kagstrom <simon.kagstrom@gmail.com>
+ * Author:        Simon Kagstrom <simon.kagstrom@gmail.com>, Fabio Olimpieri
  * Description:   A virtual keyboard
  *
  * $Id$
@@ -20,5 +21,16 @@ typedef struct virtkey
 	int is_done;
 } virtkey_t;
 
-extern void virtkbd_init(SDL_Surface *surf, TTF_Font *fnt);
+typedef struct Virtual_Keyboard
+{
+	SDL_Surface *screen;
+	int x;
+	int y;
+	char buf[255];
+	
+} VirtualKeyboard_struct;
+
+extern void VirtualKeyboard_init(SDL_Surface *surf);
 extern struct virtkey *virtkbd_get_key(void);
+extern void flip_VKB();
+extern int kbd_is_active;
