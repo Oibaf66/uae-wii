@@ -23,6 +23,7 @@
 #define SMBFILENAME "/uae/uaerc.smb"
 #define USERFILENAME "/uae/uaerc.user"
 #define SAVEDFILENAME "/uae/uaerc.saved"
+#define KBDIMAGE "/apps/uae/images/kb_amiga.png"
 
 #define DEFPRTNAME "lpr"
 #define DEFSERNAME "/dev/ttyS1"

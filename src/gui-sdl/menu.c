@@ -77,7 +77,7 @@ int fh, fw;
 int msgInfo(char *text, int duration, SDL_Rect *irc)
 {
 	int len = strlen(text);
-	int X, Y, wX, wY;
+	int X, Y;
 	SDL_Rect src;
 	SDL_Rect rc;
 	SDL_Rect brc;
@@ -137,7 +137,7 @@ void msgKill(SDL_Rect *rc)
 int msgYesNo(char *text, int default_opt, int x, int y)
 {
 	int len = strlen(text);
-	int X, Y, wX, wY;
+	int X, Y;
 	SDL_Rect src;
 	SDL_Rect rc;
 	SDL_Rect brc;
@@ -426,7 +426,6 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 	int entries_visible = (p_menu->y2 - p_menu->y1) / line_height - 1;
 
 	int i, y;
-	char pTemp[256];
 
 	if ( p_menu->n_entries * line_height > p_menu->y2 )
 		y_start = p_menu->y1 + line_height;
@@ -565,7 +564,6 @@ static int get_next_seq_y(menu_t *p_menu, int v, int dy, int cicle)
 static void select_next(menu_t *p_menu, int dx, int dy, int cicle)
 {
 	int next;
-	char buffer[256];
 
 	p_menu->cur_sel = get_next_seq_y(p_menu, p_menu->cur_sel, dy, cicle);
 	next = get_next_seq_y(p_menu, p_menu->cur_sel, dy + 1, cicle);
@@ -612,7 +610,6 @@ static void menu_init_internal(menu_t *p_menu, const char *title,
 		int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
 	int submenu;
-	int i;
 	int j;
 
 	memset(p_menu, 0, sizeof(menu_t));
@@ -704,7 +701,6 @@ uint32_t menu_wait_key_press(void)
 			hats = SDL_JoystickNumHats (joy); 
 			for (i = 0; i < hats; i++) {
 				Uint8 v = SDL_JoystickGetHat (joy, i);
-				int x = 0, y = 0;
 
 				if (v & SDL_HAT_UP)
 					keys |= KEY_UP;
@@ -796,7 +792,7 @@ uint32_t menu_wait_key_press(void)
 
 		if (keys != 0)
 			break;
-		SDL_Delay(100);
+		SDL_Delay(20);
 	}
 	return keys;
 }
@@ -1050,7 +1046,7 @@ void menu_init(SDL_Surface *screen)
 	menu_font_alt16 = read_font(FONT_ALT_PATH,16);
 
 	real_screen = screen;
-	virtkbd_init(screen, menu_font_alt16);
+	VirtualKeyboard_init(screen);
 	is_inited = 1;
 }
 
