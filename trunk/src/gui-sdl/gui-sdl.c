@@ -900,7 +900,8 @@ static void emulation_options(void)
 		return;
 	
 	if ((submenus[3] != changed_prefs.gfx_refreshrate/10)&&(currprefs.gfx_vsync==0))
-		msgInfo("You must set gfx_vsync=true in uaerc file",4000,0);
+		{msgInfo("You must set gfx_vsync=true in uaerc file",4000,0);
+		submenus[3]=0;}
 		
 	
 	/* Cycle-exact or not? */
