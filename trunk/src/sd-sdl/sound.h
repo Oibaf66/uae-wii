@@ -18,7 +18,8 @@ extern void resume_sound (void);
 extern void pause_sound (void);
 extern void reset_sound (void);
 extern void driveclick_mix(uae_s16*, int); //Also defined in driveclick.h
-extern void driveclick_init(void);
+extern void driveclick_init(void); //Also defined in driveclick.h
+extern void driveclick_free(void); //Also defined in driveclick.h
 
 STATIC_INLINE void check_sound_buffers (void)
 {
