@@ -73,7 +73,7 @@ static const  char *input_messages[] = {
 		/*11*/		"  ",
 		/*12*/		"Mouse emulation",
 		/*13*/		"^|On|Off",
-		NULL,
+		NULL
 };
 
 static const char *hardware_messages[] = {
