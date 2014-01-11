@@ -251,24 +251,24 @@ void fix_options_menu_sdl (int printmsg)
 	if ((changed_prefs.cpu_level < 2)&&(changed_prefs.address_space_24==0))
 	{
 	changed_prefs.address_space_24 = 1;	
-		if (printmsg) msgInfo ("With 68000/68010 address space is 24 bit",3000, NULL);
+		if (printmsg) msgInfo ("With 68000/68010 address space is 24 bit",4000, NULL);
 	}
 	if ((changed_prefs.cpu_level >= 4)&&(changed_prefs.address_space_24==1))
 	{	
 	changed_prefs.address_space_24 = 0;
-		if (printmsg) msgInfo ("With 68040/060 address space is 32 bit",3000, NULL);
+		if (printmsg) msgInfo ("With 68040/060 address space is 32 bit",4000, NULL);
 	} 
 	
 	if ((changed_prefs.cpu_level != 0)&&(changed_prefs.cpu_compatible == 1))
 	{	
 	changed_prefs.cpu_compatible = 0;
-		if (printmsg) msgInfo (" Compatible emulation only for 68000 ",3000, NULL);	 
+		if (printmsg) msgInfo (" Compatible emulation only for 68000 ",4000, NULL);	 
 	}
 	
 	if ((changed_prefs.cpu_level != 0)&&(changed_prefs.cpu_cycle_exact == 1))
 	{	
 	changed_prefs.cpu_cycle_exact = 0;		
-		if (printmsg) msgInfo (" Cycle-exact emulation only for 68000 ",3000, NULL);	 
+		if (printmsg) msgInfo (" Cycle-exact emulation only for 68000 ",4000, NULL);	 
 	}
 	
 	if ((changed_prefs.chipmem_size & (changed_prefs.chipmem_size - 1)) != 0
@@ -276,32 +276,32 @@ void fix_options_menu_sdl (int printmsg)
 	|| changed_prefs.chipmem_size > 0x800000)
     {
 	changed_prefs.chipmem_size = 0x80000;
-		if (printmsg) msgInfo ("Unsupported chipmem size",3000, NULL);
+		if (printmsg) msgInfo ("Unsupported chipmem size",4000, NULL);
     }
 	
 	if ((changed_prefs.chipmem_size > 0x80000) && (!(changed_prefs.chipset_mask & CSMASK_ECS_AGNUS)))
 	{
 	changed_prefs.chipmem_size = 0x80000;
-		if (printmsg) msgInfo ("No more than 512KB chipmem with OCS",3000, NULL);
+		if (printmsg) msgInfo ("No more than 512KB chipmem with OCS",4000, NULL);
     }
 	
 	if ((changed_prefs.bogomem_size > 0x100000) && ((changed_prefs.chipset_mask & CSMASK_AGA)))
 	{
 	changed_prefs.bogomem_size = 0x100000;
-		if (printmsg) msgInfo ("No more than 1MB slowmem with AGA",3000, NULL);
+		if (printmsg) msgInfo ("No more than 1MB slowmem with AGA",4000, NULL);
     }
 	
     if ((changed_prefs.fastmem_size & (changed_prefs.fastmem_size - 1)) != 0
 	|| (changed_prefs.fastmem_size != 0 && (changed_prefs.fastmem_size < 0x100000 || changed_prefs.fastmem_size > 0x800000)))
     {
 	changed_prefs.fastmem_size = 0;
-		if (printmsg) msgInfo ("Unsupported fastmem size",3000, NULL);
+		if (printmsg) msgInfo ("Unsupported fastmem size",4000, NULL);
     }
 	
     if ((changed_prefs.gfxmem_size & (changed_prefs.gfxmem_size - 1)) != 0
 	|| (changed_prefs.gfxmem_size != 0 && (changed_prefs.gfxmem_size < 0x100000 || changed_prefs.gfxmem_size > 0x2000000)))
     {
-		if (printmsg) msgInfo ("Unsupported graphics card memory size",3000, NULL);
+		if (printmsg) msgInfo ("Unsupported graphics card memory size",4000, NULL);
 	changed_prefs.gfxmem_size = 0;
     }
 	
@@ -309,54 +309,54 @@ void fix_options_menu_sdl (int printmsg)
 	|| (changed_prefs.z3fastmem_size != 0 && (changed_prefs.z3fastmem_size < 0x100000 || changed_prefs.z3fastmem_size > 0x20000000)))
     {
 	changed_prefs.z3fastmem_size = 0;
-		if (printmsg) msgInfo ("Unsupported Zorro III fastmem size",3000, NULL);
+		if (printmsg) msgInfo ("Unsupported Zorro III fastmem size",4000, NULL);
     }
 	
     if (changed_prefs.address_space_24 && (changed_prefs.gfxmem_size != 0)) {
 	changed_prefs.gfxmem_size = 0;
-		if (printmsg) msgInfo ("Can't use graphic mem with 24 bit address",3000, NULL);
+		if (printmsg) msgInfo ("Can't use graphic mem with 24 bit address",4000, NULL);
 	}
 	
 	if (changed_prefs.address_space_24 && (changed_prefs.z3fastmem_size != 0)) {
 	changed_prefs.z3fastmem_size = 0;
-		if (printmsg) msgInfo (" Can't use Zorro III with 24 bit address ",3000, NULL);
+		if (printmsg) msgInfo (" Can't use Zorro III with 24 bit address ",4000, NULL);
     }
 	
     if (changed_prefs.bogomem_size != 0 && changed_prefs.bogomem_size != 0x80000 && changed_prefs.bogomem_size != 0x100000 && changed_prefs.bogomem_size != 0x1C0000)
     {
 	changed_prefs.bogomem_size = 0;
-		if (printmsg) msgInfo ("Unsupported slowmem size",3000, NULL);
+		if (printmsg) msgInfo ("Unsupported slowmem size",4000, NULL);
     }
 
     if (changed_prefs.chipmem_size > 0x200000 && changed_prefs.fastmem_size != 0) {
-		if (printmsg) msgInfo ("Can't use fastmem and more than 2MB chipmem",3000, NULL);
+		if (printmsg) msgInfo ("Can't use fastmem and more than 2MB chipmem",4000, NULL);
 	changed_prefs.fastmem_size = 0;
     }
 	
     if (changed_prefs.produce_sound < 0 || changed_prefs.produce_sound > 3) {
-		if (printmsg) msgInfo ("Value must be within 0..3",3000, NULL);
+		if (printmsg) msgInfo ("Value must be within 0..3",4000, NULL);
 	changed_prefs.produce_sound = 0;
     }
 
     if (changed_prefs.cpu_level < 2 && changed_prefs.z3fastmem_size > 0) {
-		if (printmsg) msgInfo ("Z3 fast memory requires 68020 emulation",3000, NULL);
+		if (printmsg) msgInfo ("Z3 fast memory requires 68020 emulation",4000, NULL);
 	changed_prefs.z3fastmem_size = 0;
     }
 	
     if (changed_prefs.gfxmem_size > 0 && (changed_prefs.cpu_level < 2 || changed_prefs.address_space_24)) {
-		if (printmsg) msgInfo ("Picasso96 requires 68020 emulation",3000, NULL);
+		if (printmsg) msgInfo ("Picasso96 requires 68020 emulation",4000, NULL);
 	changed_prefs.gfxmem_size = 0;
     }
 	
 #ifndef BSDSOCKET
     if (changed_prefs.socket_emu) {
-		if (printmsg) msgInfo ("Compile-time option of BSDSOCKET was not enabled. You can't use bsd-socket emulation",3000, NULL);
+		if (printmsg) msgInfo ("Compile-time option of BSDSOCKET was not enabled. You can't use bsd-socket emulation",4000, NULL);
 	changed_prefs.socket_emu = 0;
     }
 #endif
 
     if (changed_prefs.collision_level < 0 || changed_prefs.collision_level > 3) {
-		if (printmsg) msgInfo ("Invalid collision support level. Using Sprite level.",3000, NULL);
+		if (printmsg) msgInfo ("Invalid collision support level. Using Sprite level.",4000, NULL);
 	changed_prefs.collision_level = 1;
     }
 	
@@ -758,7 +758,7 @@ static void set_Port(int which)
 		changed_prefs.Port = which;
 		currprefs.Port = changed_prefs.Port;}
 		else
-			msgInfo("SD is not mounted",3000,NULL);
+			msgInfo("SD is not mounted",4000,NULL);
 		break;
 	case PORT_USB:
 		if (usbismount) {
@@ -766,7 +766,7 @@ static void set_Port(int which)
 			changed_prefs.Port = which;
 			currprefs.Port = changed_prefs.Port;}
 		else
-			msgInfo("USB is not mounted",3000,NULL);
+			msgInfo("USB is not mounted",4000,NULL);
 		break;
 	case PORT_SMB:
 		if (smbismount) {
@@ -774,7 +774,7 @@ static void set_Port(int which)
 			changed_prefs.Port = which;
 			currprefs.Port = changed_prefs.Port;}
 		else
-			msgInfo("SMB is not mounted",3000,NULL);
+			msgInfo("SMB is not mounted",4000,NULL);
 		break;
 	default:
 		break;		
@@ -826,7 +826,7 @@ if (strcmp(ext, "default")) strcat(user_options, ext); //not uarec file
 
 optionfile = fopen (user_options, "r");
     
-if (!optionfile) {msgInfo("File not found",3000,NULL);return 1;}
+if (!optionfile) {msgInfo("File not found",4000,NULL);return 1;}
 	
 msgInfo("Configurations loaded",2500,NULL);
 default_prefs (&changed_prefs, 0);
@@ -900,7 +900,7 @@ static void emulation_options(void)
 		return;
 	
 	if ((submenus[3] != changed_prefs.gfx_refreshrate/10)&&(currprefs.gfx_vsync==0))
-		msgInfo("You must set gfx_vsync=true in uaerc file",3000,0);
+		msgInfo("You must set gfx_vsync=true in uaerc file",4000,0);
 		
 	
 	/* Cycle-exact or not? */
