@@ -1,3 +1,27 @@
+version 10:
+		* Added Gamecube controller support
+		* Added graphic virtual keyboard with IR Wiimote pointer called by "+" button 
+		* Added Wiiflow support
+		* Added new menus to save and load 5 configuration files
+		* Added audio menu with new options
+		* Path of last selected file remembered in the menu
+		* Added Picasso96 memory configuration
+		* Added number of floppies configuration
+		* Added refresh rate option
+		* Added blitter exact cycle option
+		* Added 24/32 bit cpu address space option 
+		* Chip memory up to 8MB
+		* Consistency check of configuration options with gui messages
+		* Automatic reset emulator after memory or kickrom change
+		* Removed noise entering the GUI
+		* Fixed bug in blitter exact and adreess space configuration
+		* Fixed bug in sound floppy configuration
+		* Fixed bug in page up/down
+		* Patch to increase rendering speed in double buffer mode
+		* Case insensitive file order in the file menu
+		
+		-- Fabio Olimpieri <fabio.olimpieri@tin.it>, Gen 12 CEST 2014
+
 version 9.1:
 		* (build) Compiled against libogc 1.8.11 and SDL-Wii r101
 		* Fixed full resolution in 576i video mode
