@@ -40,7 +40,7 @@ z3mem_size=0
 gfxcard_size=0
 
 # Emulation precision
-cpu_compatible=true
+cpu_compatible=false
 cpu_cycle_exact=false
 
 # Alters CPU speed (values are: real, max, 1 through 20)
