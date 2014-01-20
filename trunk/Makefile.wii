@@ -24,17 +24,48 @@ SYMLINKS=src/machdep src/osdep src/gfxdep src/joydep src/guidep src/sounddep src
 
 # Source files.
 SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_DIR)/keymap/*.c) \
-	$(SRC_DIR)/machdep/support.c $(SRC_DIR)/gfxdep/rawkeys.c  $(SRC_DIR)/guidep/gui-sdl.c $(SRC_DIR)/sounddep/sound.c \
-	$(SRC_DIR)/gfxdep/sdlgfx.c $(SRC_DIR)/guidep/menu.c $(SRC_DIR)/osdep/main.c $(SRC_DIR)/threaddep/thread.c \
-	$(SRC_DIR)/gfxdep/sdlkeys.c $(SRC_DIR)/joydep/joystick.c $(SRC_DIR)/osdep/memory.c
-
-
-SRCS := $(filter-out src/compemu_raw_x86.c src/compemu_fpp.c src/compemu_support.c src/svgancui.c src/build68k.c src/catweasel.c \
-	src/cdrom.c src/blkdev-libscg.c src/blkdev.c src/blitops.c src/akiko.c src/filesys_bootrom.c \
-	src/genblitter.c src/gencomp.c src/gencpu.c \
-	src/genlinetoscr.c src/compemu.c src/compstbl.c \
-	src/enforcer.c src/ar.c src/debug.c \
-	src/readdisk.c src/gengenblitter.c src/scsiemul.c src/tui.c src/linetoscr.c, $(SRCS))
+	$(SRC_DIR)/gfxdep/rawkeys.c  \
+	$(SRC_DIR)/gfxdep/sdlgfx.c \
+	$(SRC_DIR)/gfxdep/sdlkeys.c \
+	$(SRC_DIR)/guidep/gui-sdl.c \
+	$(SRC_DIR)/guidep/menu.c \
+	$(SRC_DIR)/joydep/joystick.c \
+	$(SRC_DIR)/machdep/support.c \
+	$(SRC_DIR)/osdep/main.c \
+	$(SRC_DIR)/osdep/memory.c\
+	$(SRC_DIR)/sounddep/sound.c \
+	$(SRC_DIR)/threaddep/thread.c
+	
+SRCS := $(filter-out \
+	src/akiko.c \
+	src/ar.c \
+	src/blitops.c \
+	src/blkdev-libscg.c \
+	src/blkdev.c \
+	src/bsdsocket-posix-new.c \
+	src/build68k.c \
+	src/catweasel.c \
+	src/cdrom.c \
+	src/compemu.c \
+	src/compemu_fpp.c \
+	src/compemu_raw_x86.c \
+	src/compemu_support.c \
+	src/compstbl.c \
+	src/debug.c \
+	src/enforcer.c \
+	src/fdi2raw.c \
+	src/filesys_bootrom.c \
+	src/genblitter.c \
+	src/gencomp.c \
+	src/gencpu.c \
+	src/gengenblitter.c \
+	src/genlinetoscr.c \
+	src/linetoscr.c \
+	src/readdisk.c \
+	src/scsiemul.c \
+	src/svgancui.c \
+	src/tui.c \
+	, $(SRCS))
 
 genlinetoscr_args="-b"
 
@@ -134,7 +165,7 @@ uae.dol: uae.elf
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O3 $(MACHDEP) -Wall -Wno-unused -Wno-format
+COMMON_FLAGS	:= -g -O2 -ftree-vectorize -ffast-math -pipe  -fomit-frame-pointer -fdiagnostics-show-option $(MACHDEP) -Wall -Wno-unused -Wno-format
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
