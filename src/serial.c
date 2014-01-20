@@ -21,7 +21,7 @@
 
 #ifdef SERIAL_PORT
 # ifndef WIN32
-#  include "osdep/serial.h"
+#  include "serial.h"
 # else
 #  include "od-win32/parser.h"
 # endif
