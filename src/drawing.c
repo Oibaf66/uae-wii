@@ -75,8 +75,6 @@ static int dblpfofs[] = { 0, 2, 4, 8, 16, 32, 64, 128 };
 
 static int sprite_offs[256];
 
-static uae_u32 clxtab[256];
-
 /* Video buffer description structure. Filled in by the graphics system
  * dependent code. */
 
@@ -653,14 +651,6 @@ static void gen_pfield_tables (void)
 	dblpf_ind2[i] = i >= 128 ? i & 0x7F : (plane2 == 0 ? plane1 : plane2);
 
 	sprite_offs[i] = (i & 15) ? 0 : 2;
-
-	clxtab[i] = ((((i & 3) && (i & 12)) << 9)
-		     | (((i & 3) && (i & 48)) << 10)
-		     | (((i & 3) && (i & 192)) << 11)
-		     | (((i & 12) && (i & 48)) << 12)
-		     | (((i & 12) && (i & 192)) << 13)
-		     | (((i & 48) && (i & 192)) << 14));
-
     }
 }
 
@@ -1221,22 +1211,22 @@ static void pfield_expand_dp_bplcon2 (int regno, int v)
     regno -= 0x1000;
     switch (regno)
     {
-        case 0x100:
-        dp_for_drawing->bplcon0 = v;
-        dp_for_drawing->bplres = GET_RES(v);
-        dp_for_drawing->nr_planes = GET_PLANES(v);
+	case 0x100:
+	dp_for_drawing->bplcon0 = v;
+	dp_for_drawing->bplres = GET_RES(v);
+	dp_for_drawing->nr_planes = GET_PLANES(v);
 	dp_for_drawing->ham_seen = !! (v & 0x800);
-        break;
-        case 0x104:
-        dp_for_drawing->bplcon2 = v;
-        break;
+	break;
+	case 0x104:
+	dp_for_drawing->bplcon2 = v;
+	break;
 #ifdef AGA
 	case 0x106:
-        dp_for_drawing->bplcon3 = v;
-        break;
-        case 0x108:
-        dp_for_drawing->bplcon4 = v;
-        break;
+	dp_for_drawing->bplcon3 = v;
+	break;
+	case 0x108:
+	dp_for_drawing->bplcon4 = v;
+	break;
 #endif
     }
     pfield_expand_dp_bplcon ();
@@ -1826,11 +1816,13 @@ void finish_drawing_frame (void)
 #endif
     for (i = 0; i < max_ypos_thisframe; i++) {
 	int where;
-	int i1 = i + min_ypos_for_screen;
+	int i1;
 	int line = i + thisframe_y_adjust_real;
 
 	if (linestate[line] == LINE_UNDECIDED)
 	    break;
+
+	i1 = i + min_ypos_for_screen;
 
 	where = amiga2aspect_line_map[i1];
 	if (where >= gfxvidinfo.height)
@@ -1841,8 +1833,8 @@ void finish_drawing_frame (void)
 	pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);
     }
     if (currprefs.leds_on_screen) {
-	for (i = 0; i < TD_TOTAL_HEIGHT; i++) {
-	    int line = gfxvidinfo.height - TD_TOTAL_HEIGHT + i;
+	int line = gfxvidinfo.height - TD_TOTAL_HEIGHT;
+	for (i = TD_TOTAL_HEIGHT; i--; line++) {
 	    draw_status_line (line);
 	    do_flush_line (line);
 	}
@@ -2024,7 +2016,7 @@ void reset_drawing (void)
 
     lores_reset ();
 
-    for (i = 0; i < sizeof linestate / sizeof *linestate; i++)
+    for (i = sizeof linestate / sizeof *linestate; i--;)
 	linestate[i] = LINE_UNDECIDED;
 
     init_aspect_maps ();

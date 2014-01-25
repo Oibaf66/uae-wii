@@ -20,13 +20,13 @@
 #define HAVE_STRCASECMP 1
 
 /* Define to 1 if you have the `strcmpi' function. */
-/* #undef HAVE_STRCMPI */
+#define HAVE_STRCMPI 1
 
 /* Define to 1 if you have the `strdup' function. */
 #define HAVE_STRDUP 1
 
 /* Define to 1 if you have the `stricmp' function. */
-/* #undef HAVE_STRICMP */
+#define HAVE_STRICMP 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 #define HAVE_STRINGS_H 1
@@ -80,7 +80,7 @@
 #define SIZEOF_VOID_P 4
 
 /* The size of `__int64', as computed by sizeof. */
-#define SIZEOF___INT64 0
+#define SIZEOF___INT64 8
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -89,7 +89,7 @@
    System headers sometimes define this.
    We just want to avoid a redefinition error message.  */
 #ifndef _ALL_SOURCE
-/* # undef _ALL_SOURCE */
+# define _ALL_SOURCE 1
 #endif
 
 /* Define to empty if `const' does not conform to ANSI C. */

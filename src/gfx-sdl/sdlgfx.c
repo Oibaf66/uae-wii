@@ -52,7 +52,7 @@
 #ifdef DEBUG
 #define DEBUG_LOG write_log
 #else
-#define DEBUG_LOG(...) do ; while(0)
+#define DEBUG_LOG(...) do {} while(0)
 #endif
 
 static SDL_Surface *display;
@@ -1159,7 +1159,7 @@ void handle_events (void)
 	switch (rEvent.type) {
 	    case SDL_QUIT:
 		DEBUG_LOG ("Event: quit\n");
-		uae_stop ();
+		uae_quit ();
 		break;
 
 	    case SDL_MOUSEBUTTONDOWN:

@@ -28,16 +28,11 @@ extern void sound_volume (int dir);
 extern void switch_audio_interpol (void);
 
 extern void sample16_handler (void);
-extern void sample8_handler (void);
 extern void sample16s_handler (void);
 extern void sample16ss_handler (void);
-extern void sample8s_handler (void);
-extern void sample_ulaw_handler (void);
 
 #ifdef MULTIPLICATION_PROFITABLE
 STATIC_INLINE void init_sound_table16 (void) { }
-STATIC_INLINE void init_sound_table8  (void) { }
 #else
 extern void init_sound_table16 (void);
-extern void init_sound_table8 (void);
 #endif

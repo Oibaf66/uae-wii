@@ -31,7 +31,7 @@ static int in_callback, closing_sound;
 
 static void clearbuffer (void)
 {
-    memset (sndbuffer, (spec.format == AUDIO_U8) ? SOUND8_BASE_VAL : SOUND16_BASE_VAL, sizeof (sndbuffer));
+    memset (sndbuffer, 0, sizeof (sndbuffer));
 }
 
 /* This shouldn't be necessary . . . */
@@ -68,7 +68,7 @@ int setup_sound (void)
 
     if (SDL_InitSubSystem (SDL_INIT_AUDIO) == 0) {
 	spec.freq = currprefs.sound_freq;
-	spec.format = currprefs.sound_bits == 8 ? AUDIO_U8 : AUDIO_S16SYS;
+	spec.format = AUDIO_S16SYS;
 	spec.channels = currprefs.sound_stereo ? 2 : 1;
 	spec.callback = dummy_callback;
 	spec.samples  = spec.freq * currprefs.sound_latency / 1000;
@@ -92,7 +92,7 @@ int setup_sound (void)
 static int open_sound (void)
 {
     spec.freq = currprefs.sound_freq;
-    spec.format = currprefs.sound_bits == 8 ? AUDIO_U8 : AUDIO_S16SYS;
+    spec.format = AUDIO_S16SYS;
     spec.channels = currprefs.sound_stereo ? 2 : 1;
     spec.samples  = spec.freq * currprefs.sound_latency / 1000;
     spec.callback = sound_callback;
@@ -104,20 +104,15 @@ static int open_sound (void)
 	return 0;
     }
 
-    if (spec.format == AUDIO_S16SYS) {
-	init_sound_table16 ();
-	sample_handler = currprefs.sound_stereo ? sample16s_handler : sample16_handler;
-    } else {
-	init_sound_table8 ();
-	sample_handler = currprefs.sound_stereo ? sample8s_handler : sample8_handler;
-    }
-    have_sound = 1;
+    init_sound_table16 ();
+    sample_handler = currprefs.sound_stereo ? sample16s_handler : sample16_handler;
 
+    have_sound = 1;
     sound_available = 1;
     obtainedfreq = currprefs.sound_freq;
-    sndbufsize = spec.samples * currprefs.sound_bits / 8 * spec.channels;
-    write_log ("SDL sound driver found and configured for %d bits at %d Hz, buffer is %d ms (%d bytes).\n",
-	currprefs.sound_bits, spec.freq, spec.samples * 1000 / spec.freq, sndbufsize);
+    sndbufsize = spec.samples * 2 * spec.channels;
+    write_log ("SDL sound driver found and configured at %d Hz, buffer is %d ms (%d bytes).\n",
+	spec.freq, spec.samples * 1000 / spec.freq, sndbufsize);
    sndbufpt = sndbuffer;
 
     return 1;

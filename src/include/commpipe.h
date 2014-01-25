@@ -9,7 +9,7 @@
 typedef union {
     int i;
     uae_u32 u32;
-    void *pv;
+    const void *pv;
 } uae_pt;
 
 /* These currently require the maximum size to be known at initialization
@@ -71,7 +71,7 @@ STATIC_INLINE void write_comm_pipe_pt (smp_comm_pipe *p, uae_pt data, int no_buf
 	maybe_wake_reader (p, no_buffer);
 	return;
     }
-    
+
     uae_sem_wait (&p->lock);
     if (nxwrp == p->rdp) {
 	/* Pipe full! */
@@ -128,7 +128,7 @@ STATIC_INLINE uae_u32 read_comm_pipe_u32_blocking (smp_comm_pipe *p)
     return foo.u32;
 }
 
-STATIC_INLINE void *read_comm_pipe_pvoid_blocking (smp_comm_pipe *p)
+STATIC_INLINE const void *read_comm_pipe_pvoid_blocking (smp_comm_pipe *p)
 {
     uae_pt foo = read_comm_pipe_pt_blocking (p);
     return foo.pv;
@@ -148,7 +148,7 @@ STATIC_INLINE void write_comm_pipe_u32 (smp_comm_pipe *p, int data, int no_buffe
     write_comm_pipe_pt (p, foo, no_buffer);
 }
 
-STATIC_INLINE void write_comm_pipe_pvoid (smp_comm_pipe *p, void *data, int no_buffer)
+STATIC_INLINE void write_comm_pipe_pvoid (smp_comm_pipe *p, const void *data, int no_buffer)
 {
     uae_pt foo;
     foo.pv = data;

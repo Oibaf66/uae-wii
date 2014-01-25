@@ -530,15 +530,18 @@ int mousehack_alive (void)
 
 static void mousehack_enable (void)
 {
+#ifdef FILESYS /* Internal mousehack depends on filesys boot-rom */
     if (!mousehack_allowed ())
 	return;
     if (rtarea[get_long (RTAREA_BASE + 40) + 12 - 1])
 	return;
     rtarea[get_long (RTAREA_BASE + 40) + 12 - 1] = 1;
+#endif
 }
 
 static void mousehack_helper (void)
 {
+#ifdef FILESYS /* Internal mousehack depends on filesys boot-rom */
     int mousexpos, mouseypos;
     uae_u8 *p;
 
@@ -561,6 +564,7 @@ static void mousehack_helper (void)
     p[1] = mousexpos;
     p[2] = mouseypos >> 8;
     p[3] = mouseypos;
+#endif
 }
 
 STATIC_INLINE int adjust (int val)

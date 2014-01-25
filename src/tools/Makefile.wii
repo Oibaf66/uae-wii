@@ -10,7 +10,21 @@ LDFLAGS   =
 CFLAGS    = -I../include
 LIBRARIES =
 
-all: gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe
+all: copy gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe
+
+
+copy:
+	cp ../genblitter.c genblitter.c
+	cp ../blitops.c blitops.c
+	cp ../writelog.c writelog.c
+	cp ../build68k.c build68k.c
+	cp ../gencpu.c gencpu.c
+	cp ../readcpu.c readcpu.c
+	cp ../missing.c missing.c
+	cp ../gencomp.c gencomp.c
+	cp ../genlinetoscr.c genlinetoscr.c
+	cp ../cpudefs.c cpudefs.c
+
 
 install:
 
@@ -18,7 +32,7 @@ install:
 clean:
 	-rm -f *.o
 	-rm cpudefs.c
-	-rm -f gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe
+	-rm -f gencpu.exe gencomp.exe build68k.exe genblitter.exe genlinetoscr.exe genblitter.c blitops.c writelog.c build68k.c gencpu.c readcpu.c missing.c gencomp.c genlinetoscr.c cpudefs.c
 
 
 distclean: clean

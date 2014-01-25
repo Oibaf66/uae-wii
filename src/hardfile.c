@@ -263,7 +263,7 @@ static int handle_scsi (uaecptr request, struct hardfiledata *hfd)
 	ls = 12;
 	break;
 	default:
-        lr = -1;
+	lr = -1;
 	write_log ("UAEHF: unsupported scsi command %#2.2X\n", cmd);
 	status = 2; /* CHECK CONDITION */
 	s[0] = 0x70;
@@ -408,7 +408,7 @@ static uae_u32 REGPARAM2 hardfile_open (TrapContext *context)
     /* Check unit number */
     if (unit >= 0 && get_hardfile_data (unit) && start_thread (unit)) {
 	hfpd->opencount++;
-	put_word (m68k_areg(&context->regs, 6) + 32, get_word (m68k_areg(&context->regs, 6) + 32) + 1);
+	put_word (m68k_areg (&context->regs, 6) + 32, get_word (m68k_areg (&context->regs, 6) + 32) + 1);
 	put_long (tmp1 + 24, unit); /* io_Unit */
 	put_byte (tmp1 + 31, 0); /* io_Error */
 	put_byte (tmp1 + 8, 7); /* ln_type = NT_REPLYMSG */
@@ -432,8 +432,12 @@ static uae_u32 REGPARAM2 hardfile_close (TrapContext *context)
     if (!hfpd->opencount)
 	return 0;
     hfpd->opencount--;
-    if (hfpd->opencount == 0)
+
+    if (hfpd->opencount == 0) {
 	write_comm_pipe_u32 (&hfpd->requests, 0, 1);
+	uae_sem_wait (&hfpd->sync_sem);
+    }
+
     put_word (m68k_areg (&context->regs, 6) + 32, get_word (m68k_areg (&context->regs, 6) + 32) - 1);
     return 0;
 }
@@ -663,7 +667,7 @@ static uae_u32 hardfile_do_io (struct hardfiledata *hfd, struct hardfileprivdata
 		error = handle_scsi (request, hfd);
 	    } else { /* we don't want users trashing their "partition" hardfiles with hdtoolbox */
 		error = -3; /* IOERR_NOCMD */
-		write_log ("UAEHF: HD_SCSICMD tried on regular HDF, unit %d", unit);
+		write_log ("UAEHF: HD_SCSICMD tried on regular HDF, unit %d\n", unit);
 	    }
 	break;
 
@@ -676,7 +680,7 @@ static uae_u32 hardfile_do_io (struct hardfiledata *hfd, struct hardfileprivdata
     put_byte (request + 31, error);
 
     hf_log2 ("hf: unit=%d, request=%p, cmd=%d offset=%u len=%d, actual=%d error%=%d\n", unit, request,
-	get_word(request + 28), get_long (request + 44), get_long (request + 36), actual, error);
+	get_word (request + 28), get_long (request + 44), get_long (request + 36), actual, error);
 
     return async;
 }
@@ -793,9 +797,18 @@ void hardfile_reset (void)
 		if ((request = hfpd->d_request[i]))
 		    abort_async (hfpd, request, 0, 0);
 	    }
+
+	    write_comm_pipe_u32 (&hfpd->requests, 0, 1);
+	    uae_sem_wait (&hfpd->sync_sem);
 	}
+
 	memset (hfpd, 0, sizeof (struct hardfileprivdata));
     }
+}
+
+void hardfile_cleanup (void)
+{
+    hardfile_reset ();
 }
 
 void hardfile_install (void)

@@ -3,7 +3,7 @@
  *
  * Support for IPF/CAPS disk images
  *
- * Copyright 2004-2006 Richard Drummond
+ * Copyright 2004-2007 Richard Drummond
  *
  * Based on Win32 CAPS code by Toni Wilen
  */
@@ -23,7 +23,11 @@ static int caps_flags = DI_LOCK_DENVAR|DI_LOCK_DENNOISE|DI_LOCK_NOISE|DI_LOCK_UP
 #define LIB_TYPE 1
 
 
-#ifndef TARGET_AMIGAOS
+#if defined HAVE_DLOPEN && !defined HAVE_FRAMEWORK_CAPSIMAGE
+
+#include <dlfcn.h>
+
+#define CAPSLIB_NAME    "libcapsimage.so.2"
 
 /*
  * Repository for function pointers to the CAPSLib routines
@@ -49,12 +53,6 @@ struct {
   char *(*CAPSGetPlatformName)(CapsULong pid);
   CapsLong (*CAPSGetVersionInfo)(struct CapsVersionInfo *pi, CapsULong flag);
 } capslib;
-
-#ifdef HAVE_DLOPEN
-
-#include <dlfcn.h>
-
-#define CAPSLIB_NAME    "libcapsimage.so.2"
 
 /*
  * The Unix/dlopen method for loading and linking the CAPSLib plug-in
@@ -83,10 +81,50 @@ static int load_capslib (void)
     write_log ("Unable to open " CAPSLIB_NAME "\n.");
     return 0;
 }
-#endif // HAVE_DLOPEN
+
+/*
+ * Some defines so that we don't care that CAPSLib
+ * isn't statically linked
+ */
+#define CAPSInit            capslib.CAPSInit
+#define CAPSExit            capslib.CAPSExit
+#define CAPSAddImage        capslib.CAPSAddImage
+#define CAPSRemImage        capslib.CAPSRemImage
+#define CAPSLockImage       capslib.CAPSLockImage
+#define CAPSLockImageMemory capslib.CAPSLockImageMemory
+#define CAPSUnlockImage     capslib.CAPSUnlockImage
+#define CAPSLoadImage       capslib.CAPSLoadImage
+#define CAPSGetImageInfo    capslib.CAPSGetImageInfo
+#define CAPSLockTrack       capslib.CAPSLockTrack
+#define CAPSUnlockTrack     capslib.CAPSUnlockTrack
+#define CAPSUnlockAllTracks capslib.CAPSUnlockAllTracks
+#define CAPSGetPlatformName capslib.CAPSGetPlatformName
+#define CAPSGetVersionInfo  capslib.CAPSGetVersionInfo
+
+#else
+#ifdef HAVE_FRAMEWORK_CAPSIMAGE
+
+/*
+ * On OS X we link weakly to the CAPSImage framework. Thus we can
+ * let the dynamic linker take care of everything.
+ */
+
+/* We check for the existence of this symbol to tell whether the
+ * the framework could be linked or not.
+ */
+extern CapsLong CAPSInit(void) __attribute__((weak));
+
+static int load_capslib (void)
+{
+    if (CAPSInit != NULL)
+	return 1;
+    else
+	return 0;
+}
 
 #else
 
+#ifdef TARGET_AMIGAOS
 #ifdef __amigaos4__
 #define __USE_BASETYPE__
 #include <exec/emulation.h>
@@ -323,10 +361,7 @@ LONG CAPSGetVersionInfo (struct CapsVersionInfo *pi, CapsULong flag)
     return retval;
 }
 
-#endif
-
-
-#ifdef TARGET_AMIGAOS
+#else
 
 #if 0
 /* proto file is broken in current CAPS API */
@@ -335,6 +370,7 @@ LONG CAPSGetVersionInfo (struct CapsVersionInfo *pi, CapsULong flag)
 #if defined __GNUC__ && !defined __amigaos4__
 #include <inline/capsimage.h>
 static struct Device *CapsImageBase;
+#endif
 #endif
 #endif
 
@@ -386,31 +422,7 @@ static int load_capslib (void)
 
 #endif
 #endif
-
-
-#ifndef TARGET_AMIGAOS
-
-/*
- * Some defines so that we don't care that CAPSLib
- * isn't statically linked
- */
-#define CAPSInit            capslib.CAPSInit
-#define CAPSExit            capslib.CAPSExit
-#define CAPSAddImage        capslib.CAPSAddImage
-#define CAPSRemImage        capslib.CAPSRemImage
-#define CAPSLockImage       capslib.CAPSLockImage
-#define CAPSLockImageMemory capslib.CAPSLockImageMemory
-#define CAPSUnlockImage     capslib.CAPSUnlockImage
-#define CAPSLoadImage       capslib.CAPSLoadImage
-#define CAPSGetImageInfo    capslib.CAPSGetImageInfo
-#define CAPSLockTrack       capslib.CAPSLockTrack
-#define CAPSUnlockTrack     capslib.CAPSUnlockTrack
-#define CAPSUnlockAllTracks capslib.CAPSUnlockAllTracks
-#define CAPSGetPlatformName capslib.CAPSGetPlatformName
-#define CAPSGetVersionInfo  capslib.CAPSGetVersionInfo
-
 #endif
-
 
 /*
  * CAPS support proper starts here
@@ -431,8 +443,8 @@ int caps_init (void)
 	if (noticed)
 	    return 0;
 	gui_message ("This disk image needs the C.A.P.S. plugin\n"
-	             "which is available from\n"
-	             "http//www.caps-project.org/download.shtml\n");
+		     "which is available from\n"
+		     "http//www.caps-project.org/download.shtml\n");
 	noticed = 1;
 	return 0;
     }
@@ -476,10 +488,8 @@ int caps_loadimage (struct zfile *zf, unsigned int drv, unsigned int *num_tracks
 	return 0;
     ret = CAPSLockImageMemory (caps_cont[drv], buf, len, 0);
     free (buf);
-    if (ret != imgeOk) {
-	free (buf);
+    if (ret != imgeOk)
 	return 0;
-    }
     caps_locked[drv] = 1;
     CAPSGetImageInfo (&ci, caps_cont[drv]);
     *num_tracks = (ci.maxcylinder - ci.mincylinder + 1) * (ci.maxhead - ci.minhead + 1);

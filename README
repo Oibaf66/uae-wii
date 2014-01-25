@@ -1,5 +1,5 @@
-E-UAE 0.8.29-WIP4
-=================
+E-UAE 0.8.29
+============
 
 E-UAE is an Amiga emulator, a program that allows you to run software
 designed for Amiga computers on other platforms, such as Linux or Mac
@@ -40,43 +40,42 @@ are available for purchase online from Cloanto (publishers of the
 Amiga Forever distribution). See http://www.amigaforever.com/
 
 
-What's new since 0.8.29-WIP3
+What's new since 0.8.29-WIP4
 ============================
 
-A huge amount of work has gone into E-UAE since the last public
-release. Not of all of this work will be readily apparent to users
-since it took place under the surface. However, some user-visible
-changes include:
+New features:
+* Added a command-line tool for generating blank hardfile images,
+  called make_hdf
+* Support for IPF floppy images now supported on OS X (and officially
+  on AMD64/Linux now that libcapsimage is publically available). Go to
+  http://www.softpres.org/ to download the plug-in.
+* X-Arcade joystick supported (thanks to Robert Hurst for the patch).
+* Build scripts now include a compile-time option --disable-fpu to
+  disable building of FPU emulation.
 
-* Emulation core from WinUAE 1.3.x merged.
-* Much more stable on SMP hosts.
-* Builds on Solaris x86 (with GCC).
-* Integrated mouse-hack feature merged from WinUAE (this synchronizes
-  the Amiga mouse pointer with the host pointer when E-UAE is running
-  in a window on your desktop) merged from WinUAE. The old AmigaOS
-  mousehack tool is no longer required.
-* New, easier-to-use Linux SCSI back-end (Jochen Becher).
-* Experimental GL renderer in SDL display back-end (originally from
-  Jochen Becher but mostly re-written). On most platforms this is yet
-  to offer much over the existing 2D renderer, but on Mac OS X it
-  offers significantly better performance. Enabled with
-  'sdl.use_gl=true'.
-* Support for the 'uae-configuration' tool merged from WinUAE. This is
-  an AmigaOS shell command which allows UAE settings to be queried and
-  modified from within the emulation environment.
-* Better, smoother performance when cpu_speed=real (A500 speed). E-UAE
-  adapts better to changing system latencies.
-* 'Sinc' audio interpolation added (Antti Lankila).
-* Minor performance improvements in interpretive CPU emulator and JIT
-  engine.
-* Mac OS X icon added (from Daniel Pimley).
-* Lots of bugs fixes, including:
-  - Broken 'delayed' interrupt handling when JIT was disabled.
-  - Inconsistent refreshing of P96 screens.
-  - Filesystems being mounted twice.
-  - Hardfiles broken following a reset.
-  - Broken detection of XKB path in X11 driver (fix from Peter Volkov).
+Performance improvements:
+* Some small custom chip and blitter tweaks merged from WinUAE 1.4.3.
+* Some minor performance optimizations to blitter emulation, floppy
+  controller emulation and rendering code. (Thanks to Mustafa Tufan,
+  developer of PSP and GP2x ports of E-UAE, for a couple of these).
 
+Bug fixes:
+* Version 0.8.29-WIP4 broke the interrupt controller emulation. Fixed.
+  This also makes Action Replay cartridge emulation work again.
+* HDToolbox would hang when scanning for hard drives. Mostly fixed (I
+  still have one unreproducible report of HDToolbox hanging).
+* Hardfile emulation will no longer leak threads following a reset
+  This also fixes crashes on exit on AmigaOS and clone hosts.
+* Building on MacOS X no longer fails when building supporting tools
+  like readdisk.
+* Exiting E-UAE on OS X when started from Hi-Toro would cause 'load
+  config file' dialog to be displayed. Fixed.
+* BeOS sound driver was broken in recent changes to audio layer. Now
+  fixed (fingers crossed).
+
+Other:
+
+* Removed support for 8-bit sound (since the official UAE did so).
 
 Still to do
 ===========
