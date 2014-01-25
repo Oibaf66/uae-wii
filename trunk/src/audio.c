@@ -56,8 +56,7 @@ static int debugchannel (unsigned int ch)
 #define SINC_QUEUE_LENGTH (SINC_QUEUE_MAX_AGE / MIN_ALLOWED_PERIOD + NUMBER_OF_CPU_UPDATES_ALLOWED)
 
 typedef struct {
-    int age;
-    int output;
+    int age, output;
 } sinc_queue_t;
 
 struct audio_channel_data {
@@ -108,31 +107,18 @@ void init_sound_table16 (void)
 	for (j = 0; j < 64; j++)
 	    sound_table[j][i] = j * (uae_s8)i * (currprefs.sound_stereo ? 2 : 1);
 }
-
-#ifdef HAVE_8BIT_AUDIO_SUPPORT
-void init_sound_table8 (void)
-{
-    int i,j;
-
-    for (i = 0; i < 256; i++)
-	for (j = 0; j < 64; j++)
-	    sound_table[j][i] = (j * (uae_s8)i * (currprefs.sound_stereo ? 2 : 1)) / 256;
-}
-#endif
 #endif
 
 #ifdef MULTIPLICATION_PROFITABLE
 typedef uae_s8 sample8_t;
 #define DO_CHANNEL_1(v, c) do { (v) *= audio_channel[c].vol; } while (0)
-#define SBASEVAL8(logn) ((logn) == 1 ? SOUND8_BASE_VAL << 7 : SOUND8_BASE_VAL << 8)
 #define SBASEVAL16(logn) ((logn) == 1 ? SOUND16_BASE_VAL >> 1 : SOUND16_BASE_VAL)
-#define FINISH_DATA(data,b,logn) do { if (14 - (b) + (logn) > 0) (data) >>= 14 - (b) + (logn); else (data) <<= (b) - 14 - (logn); } while (0);
+#define FINISH_DATA(data, logn) do { (data) <<= 2 - (logn); } while (0);
 #else
 typedef uae_u8 sample8_t;
 #define DO_CHANNEL_1(v, c) do { (v) = audio_channel[c].voltbl[(v)]; } while (0)
-#define SBASEVAL8(logn) SOUND8_BASE_VAL
 #define SBASEVAL16(logn) SOUND16_BASE_VAL
-#define FINISH_DATA(data,b,logn)
+#define FINISH_DATA(data, logn)
 #endif
 
 /* Always put the right word before the left word.  */
@@ -154,7 +140,7 @@ STATIC_INLINE void put_sound_word_right (uae_u32 w)
     PUT_SOUND_WORD_RIGHT (w);
 }
 
-STATIC_INLINE void put_sound_word_left (uae_u32	w)
+STATIC_INLINE void put_sound_word_left (uae_u32 w)
 {
     if (mixed_on) {
 	uae_u32 rold, lold, rnew, lnew, tmp;
@@ -176,9 +162,6 @@ STATIC_INLINE void put_sound_word_left (uae_u32	w)
     PUT_SOUND_WORD_LEFT (w);
 }
 #endif
-
-#define DO_CHANNEL(v, c) do { (v) &= audio_channel[c].adk_mask; data += v; } while (0);
-
 
 
 static void sinc_prehandler (unsigned long best_evtime)
@@ -208,7 +191,7 @@ static void sinc_prehandler (unsigned long best_evtime)
 	    }
 	    /* make room for new and add the new value */
 	    memmove (&acd->sinc_queue[1], &acd->sinc_queue[0],
-	             sizeof(acd->sinc_queue[0]) * acd->sinc_queue_length);
+		     sizeof(acd->sinc_queue[0]) * acd->sinc_queue_length);
 	    acd->sinc_queue_length += 1;
 	    acd->sinc_queue[0].age = best_evtime;
 	    acd->sinc_queue[0].output = output - acd->sinc_output_state;
@@ -242,14 +225,14 @@ STATIC_INLINE void samplexx_sinc_handler (int *datasp)
     winsinc = winsinc_integral[n];
 
     for (i = 0; i < 4; i += 1) {
-        int j, v;
-        struct audio_channel_data *acd = &audio_channel[i];
-        /* The sum rings with harmonic components up to infinity... */
+	int j, v;
+	struct audio_channel_data *acd = &audio_channel[i];
+	/* The sum rings with harmonic components up to infinity... */
 	int sum = acd->sinc_output_state << 17;
-        /* ...but we cancel them through mixing in BLEPs instead */
-        for (j = 0; j < acd->sinc_queue_length; j += 1)
-            sum -= winsinc[acd->sinc_queue[j].age] * acd->sinc_queue[j].output;
-        v = sum >> 17;
+	/* ...but we cancel them through mixing in BLEPs instead */
+	for (j = 0; j < acd->sinc_queue_length; j += 1)
+	    sum -= winsinc[acd->sinc_queue[j].age] * acd->sinc_queue[j].output;
+	v = sum >> 17;
 	if (v > 32767)
 	    v = 32767;
 	else if (v < -32768)
@@ -264,7 +247,7 @@ static void sample16i_sinc_handler (void)
 
     samplexx_sinc_handler (datas);
     data1 = datas[0] + datas[3] + datas[1] + datas[2];
-    FINISH_DATA (data1, 16, 2);
+    FINISH_DATA (data1, 2);
     PUT_SOUND_WORD_MONO (data1);
     check_sound_buffers ();
 }
@@ -288,7 +271,7 @@ void sample16_handler (void)
     data0 += data3;
     {
 	uae_u32 data = SBASEVAL16(2) + data0;
-	FINISH_DATA (data, 16, 2);
+	FINISH_DATA (data, 2);
 	PUT_SOUND_WORD_MONO (data);
     }
     check_sound_buffers ();
@@ -337,9 +320,10 @@ static void sample16i_rh_handler (void)
     delta = audio_channel[3].per;
     ratio = ((audio_channel[3].evtime % delta) << 8) / delta;
     data0 += (data3 * (256 - ratio) + data3p * ratio) >> 8;
+
     {
 	uae_u32 data = SBASEVAL16(2) + data0;
-	FINISH_DATA (data, 16, 2);
+	FINISH_DATA (data, 2);
 	PUT_SOUND_WORD_MONO (data);
     }
     check_sound_buffers ();
@@ -410,64 +394,13 @@ static void sample16i_crux_handler (void)
     data0 += data1;
     {
 	uae_u32 data = SBASEVAL16(2) + data0;
-	FINISH_DATA (data, 16, 2);
+	FINISH_DATA (data, 2);
 	PUT_SOUND_WORD_MONO (data);
     }
     check_sound_buffers ();
 }
 
-#ifdef HAVE_8BIT_AUDIO_SUPPORT
-void sample8_handler (void)
-{
-    uae_u32 data0 = audio_channel[0].current_sample;
-    uae_u32 data1 = audio_channel[1].current_sample;
-    uae_u32 data2 = audio_channel[2].current_sample;
-    uae_u32 data3 = audio_channel[3].current_sample;
-    DO_CHANNEL_1 (data0, 0);
-    DO_CHANNEL_1 (data1, 1);
-    DO_CHANNEL_1 (data2, 2);
-    DO_CHANNEL_1 (data3, 3);
-    data0 &= audio_channel[0].adk_mask;
-    data1 &= audio_channel[1].adk_mask;
-    data2 &= audio_channel[2].adk_mask;
-    data3 &= audio_channel[3].adk_mask;
-    data0 += data1;
-    data0 += data2;
-    data0 += data3;
-    {
-        uae_u32 data = SBASEVAL8(2) + data0;
-        FINISH_DATA (data, 8, 2);
-        PUT_SOUND_BYTE (data);
-    }
-    check_sound_buffers ();
-}
-#endif
-
 #ifdef HAVE_STEREO_SUPPORT
-void sample16ss_handler (void)
-{
-    uae_u32 data0 = audio_channel[0].current_sample;
-    uae_u32 data1 = audio_channel[1].current_sample;
-    uae_u32 data2 = audio_channel[2].current_sample;
-    uae_u32 data3 = audio_channel[3].current_sample;
-    DO_CHANNEL_1 (data0, 0);
-    DO_CHANNEL_1 (data1, 1);
-    DO_CHANNEL_1 (data2, 2);
-    DO_CHANNEL_1 (data3, 3);
-
-    data0 &= audio_channel[0].adk_mask;
-    data1 &= audio_channel[1].adk_mask;
-    data2 &= audio_channel[2].adk_mask;
-    data3 &= audio_channel[3].adk_mask;
-
-    PUT_SOUND_WORD (data0 << 2);
-    PUT_SOUND_WORD (data1 << 2);
-    PUT_SOUND_WORD (data3 << 2);
-    PUT_SOUND_WORD (data2 << 2);
-
-    check_sound_buffers ();
-}
-
 static void sample16si_sinc_handler (void)
 {
     int datas[4], data1, data2;
@@ -475,9 +408,9 @@ static void sample16si_sinc_handler (void)
     samplexx_sinc_handler (datas);
     data1 = datas[0] + datas[3];
     data2 = datas[1] + datas[2];
-    FINISH_DATA (data1, 16, 1);
+    FINISH_DATA (data1, 1);
     put_sound_word_left (data1);
-    FINISH_DATA (data2, 16, 1);
+    FINISH_DATA (data2, 1);
     put_sound_word_right (data2);
     check_sound_buffers ();
 }
@@ -501,14 +434,14 @@ void sample16s_handler (void)
     data0 += data3;
     {
 	uae_u32 data = SBASEVAL16(1) + data0;
-	FINISH_DATA (data, 16, 1);
+	FINISH_DATA (data, 1);
 	put_sound_word_left (data);
     }
 
     data1 += data2;
     {
 	uae_u32 data = SBASEVAL16(1) + data1;
-	FINISH_DATA (data, 16, 1);
+	FINISH_DATA (data, 1);
 	put_sound_word_right (data);
     }
 
@@ -579,14 +512,14 @@ static void sample16si_crux_handler (void)
     data1 += data2;
     data0 += data3;
     {
-	uae_u32 data = SBASEVAL16(1) + data0;
-	FINISH_DATA (data, 16, 1);
+	uae_u32 data = SBASEVAL16 (1) + data0;
+	FINISH_DATA (data, 1);
 	put_sound_word_left (data);
     }
 
     {
-	uae_u32 data = SBASEVAL16(1) + data1;
-	FINISH_DATA (data, 16, 1);
+	uae_u32 data = SBASEVAL16 (1) + data1;
+	FINISH_DATA (data, 1);
 	put_sound_word_right (data);
     }
     check_sound_buffers ();
@@ -638,57 +571,19 @@ static void sample16si_rh_handler (void)
     data0 += (data3 * (256 - ratio) + data3p * ratio) >> 8;
     {
 	uae_u32 data = SBASEVAL16(1) + data0;
-	FINISH_DATA (data, 16, 1);
+	FINISH_DATA (data, 1);
 	put_sound_word_left (data);
     }
 
     {
 	uae_u32 data = SBASEVAL16(1) + data1;
-	FINISH_DATA (data, 16, 1);
+	FINISH_DATA (data, 1);
 	put_sound_word_right (data);
     }
     check_sound_buffers ();
 }
 
-#ifdef HAVE_8BIT_AUDIO_SUPPORT
-void sample8s_handler (void)
-{
-    uae_u32 data0 = audio_channel[0].current_sample;
-    uae_u32 data1 = audio_channel[1].current_sample;
-    uae_u32 data2 = audio_channel[2].current_sample;
-    uae_u32 data3 = audio_channel[3].current_sample;
-    DO_CHANNEL_1 (data0, 0);
-    DO_CHANNEL_1 (data1, 1);
-    DO_CHANNEL_1 (data2, 2);
-    DO_CHANNEL_1 (data3, 3);
-
-    data0 &= audio_channel[0].adk_mask;
-    data1 &= audio_channel[1].adk_mask;
-    data2 &= audio_channel[2].adk_mask;
-    data3 &= audio_channel[3].adk_mask;
-
-    data0 += data3;
-    {
-        uae_u32 data = SBASEVAL8(1) + data0;
-        FINISH_DATA (data, 8, 1);
-        PUT_SOUND_BYTE_RIGHT (data);
-    }
-    data1 += data2;
-    {
-        uae_u32 data = SBASEVAL8(1) + data1;
-        FINISH_DATA (data, 8, 1);
-        PUT_SOUND_BYTE_LEFT (data);
-    }
-    check_sound_buffers ();
-}
-#endif
 #else
-#ifdef HAVE_8BIT_AUDIO_SUPPORT
-void sample8s_handler (void)
-{
-    sample8_handler();
-}
-#endif
 
 void sample16s_handler (void)
 {
@@ -708,64 +603,8 @@ static void sample16si_sinc_handler (void)
 }
 #endif
 
-#ifdef HAVE_ULAW_AUDIO_SUPPORT
-static uae_u8 int2ulaw (int ch)
-{
-    int mask;
-
-    if (ch < 0) {
-	ch = -ch;
-	mask = 0x7f;
-    } else
-	mask = 0xff;
-
-    if (ch < 32)
-	ch = 0xF0 | (15 - (ch / 2));
-    else if (ch < 96)
-	ch = 0xE0 | (15 - (ch - 32) / 4);
-    else if (ch < 224)
-	ch = 0xD0 | (15 - (ch - 96) / 8);
-    else if (ch < 480)
-	ch = 0xC0 | (15 - (ch - 224) / 16);
-    else if (ch < 992 )
-	ch = 0xB0 | (15 - (ch - 480) / 32);
-    else if (ch < 2016)
-	ch = 0xA0 | (15 - (ch - 992) / 64);
-    else if (ch < 4064)
-	ch = 0x90 | (15 - (ch - 2016) / 128);
-    else if (ch < 8160)
-	ch = 0x80 | (15 - (ch - 4064) / 256);
-    else
-	ch = 0x80;
-
-    return (uae_u8)(mask & ch);
-}
-
-void sample_ulaw_handler (void)
-{
-    unsigned int nr;
-    uae_u32 data = 0;
-
-    for (nr = 0; nr < 4; nr++) {
-	if (!(adkcon & (0x11 << nr))) {
-	    uae_u32 d = audio_channel[nr].current_sample;
-	    DO_CHANNEL_1 (d, nr);
-	    data += d;
-	}
-    }
-    PUT_SOUND_BYTE (int2ulaw (data));
-    check_sound_buffers ();
-}
-#endif
-
 void switch_audio_interpol (void)
 {
-#if defined HAVE_8BIT_AUDIO_SUPPORT || defined HAVE_ULAW_AUDIO_SUPPORT
-    if (currprefs.sound_bits == 8)
-	/* only supported for 16-bit audio */
-	return;
-#endif
-
     if (currprefs.sound_interpol == 0) {
 	changed_prefs.sound_interpol = 1;
 	write_log ("Interpol on: rh\n");
@@ -791,6 +630,7 @@ void schedule_audio (void)
     eventtab[ev_audio].oldcycles = get_cycles ();
     for (i = 0; i < 4; i++) {
 	struct audio_channel_data *cdp = audio_channel + i;
+
 	if (cdp->evtime != MAX_EV) {
 	    if (best > cdp->evtime) {
 		best = cdp->evtime;
@@ -877,8 +717,7 @@ static void audio_handler (unsigned int nr, int timed)
     unsigned long evtime = cdp->evtime;
 
     cdp->evtime = MAX_EV;
-    switch (cdp->state)
-    {
+    switch (cdp->state) {
 	case 0:
 	    cdp->request_word = 0;
 	    cdp->request_word_skip = 0;
@@ -1029,7 +868,7 @@ void audio_reset (void)
 	}
     }
 
-#ifndef	MULTIPLICATION_PROFITABLE
+#ifndef MULTIPLICATION_PROFITABLE
     for (i = 0; i < 4; i++)
 	audio_channel[i].voltbl = sound_table[audio_channel[i].vol];
 #endif
@@ -1048,9 +887,6 @@ STATIC_INLINE int sound_prefs_changed (void)
 	    || changed_prefs.sound_mixed_stereo != currprefs.sound_mixed_stereo
 	    || changed_prefs.sound_latency != currprefs.sound_latency
 	    || changed_prefs.sound_freq != currprefs.sound_freq
-#if defined HAVE_8BIT_AUDIO_SUPPORT || defined HAVE_ULAW_AUDIO_SUPPORT
-	    || changed_prefs.sound_bits != currprefs.sound_bits
-#endif
 	    || changed_prefs.sound_adjust != currprefs.sound_adjust
 	    || changed_prefs.sound_interpol != currprefs.sound_interpol
 	    || changed_prefs.sound_volume != currprefs.sound_volume);
@@ -1074,9 +910,6 @@ void check_prefs_changed_audio (void)
 	currprefs.sound_adjust = changed_prefs.sound_adjust;
 	currprefs.sound_interpol = changed_prefs.sound_interpol;
 	currprefs.sound_freq = changed_prefs.sound_freq;
-#if defined HAVE_8BIT_AUDIO_SUPPORT || defined HAVE_ULAW_AUDIO_SUPPORT
-	currprefs.sound_bits = changed_prefs.sound_bits;
-#endif
 	currprefs.sound_latency = changed_prefs.sound_latency;
 	currprefs.sound_volume = changed_prefs.sound_volume;
 	if (currprefs.produce_sound >= 2) {
@@ -1243,7 +1076,7 @@ void audio_hsync (int dmaaction)
 #ifdef DEBUG_AUDIO
 	    if (debugchannel (nr))
 		write_log ("AUD%dDMA %d->%d (%d) LEN=%d/%d %08.8X\n", nr, cdp->dmaen, chan_ena,
-		    cdp->state, cdp->wlen, cdp->len, m68k_getpc());
+		    cdp->state, cdp->wlen, cdp->len, m68k_getpc ());
 #endif
 	    cdp->dmaen = chan_ena;
 	    if (cdp->dmaen)

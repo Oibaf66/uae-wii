@@ -1,6 +1,9 @@
 /* src/sysconfig.h.  Generated from sysconfig.h.in by configure.  */
 /* src/sysconfig.h.in.  Generated from configure.in by autoheader.  */
 
+/* Define if building universal (internal helper macro) */
+/* #undef AC_APPLE_UNIVERSAL_BUILD */
+
 /* Define to 1 if you have the `alarm' function. */
 #define HAVE_ALARM 1
 
@@ -19,11 +22,8 @@
 /* Define to 1 if you have the <caps/capsimage.h> header file. */
 /* #undef HAVE_CAPS_CAPSIMAGE_H */
 
-/* Define to 1 if you have the `cfmakeraw' function. */
-#define HAVE_CFMAKERAW 1
-
 /* Define to 1 if you have the <curses.h> header file. */
-#define HAVE_CURSES_H 1
+/* #undef HAVE_CURSES_H */
 
 /* Define to 1 if you have the <cybergraphx/cybergraphics.h> header file. */
 /* #undef HAVE_CYBERGRAPHX_CYBERGRAPHICS_H */
@@ -36,7 +36,7 @@
 #define HAVE_DIRENT_H 1
 
 /* "Define to 1 if you have 'dlopen' function */
-#define HAVE_DLOPEN 1
+/* #undef HAVE_DLOPEN */
 
 /* Define to 1 if you have the <dustat.h> header file. */
 /* #undef HAVE_DUSTAT_H */
@@ -44,11 +44,8 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
-/* Define to 1 if you have the `getcwd' function. */
-#define HAVE_GETCWD 1
-
-/* Define to 1 if you have the `getopt' function. */
-#define HAVE_GETOPT 1
+/* Define to 1 if you have the CAPS framework. */
+/* #undef HAVE_FRAMEWORK_CAPSIMAGE */
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
@@ -72,9 +69,6 @@
 /* Define to 1 if you have the <libraries/cybergraphics.h> header file. */
 /* #undef HAVE_LIBRARIES_CYBERGRAPHICS_H */
 
-/* Define to 1 if you have the `z' library (-lz). */
-#define HAVE_LIBZ 1
-
 /* Define to 1 if you have the `localtime_r' function. */
 #define HAVE_LOCALTIME_R 1
 
@@ -85,16 +79,13 @@
 /* #undef HAVE_MACHINE_SOUNDCARD_H */
 
 /* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H 1
-
-/* Define to 1 if you have the `mkdir' function. */
-#define HAVE_MKDIR 1
+/* #undef HAVE_MEMORY_H */
 
 /* Define to 1 if you have the `nanosleep' function. */
 #define HAVE_NANOSLEEP 1
 
 /* Define to 1 if you have the <ncurses.h> header file. */
-#define HAVE_NCURSES_H 1
+/* #undef HAVE_NCURSES_H */
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
@@ -105,9 +96,6 @@
 /* Define to 1 if you have the `readdir_r' function. */
 #define HAVE_READDIR_R 1
 
-/* Define to 1 if you have the `rmdir' function. */
-#undef HAVE_RMDIR
-
 /* Define to 1 if you have the `select' function. */
 #define HAVE_SELECT 1
 
@@ -115,7 +103,7 @@
 #define HAVE_SETITIMER 1
 
 /* Define to 1 if you have the `sigaction' function. */
-#undef HAVE_SIGACTION
+#define HAVE_SIGACTION 1
 
 /* Define to 1 if you have the `sleep' function. */
 #define HAVE_SLEEP 1
@@ -137,7 +125,7 @@
 #define HAVE_STRCASECMP 1
 
 /* Define to 1 if you have the `strcmpi' function. */
-/* #undef HAVE_STRCMPI */
+#define HAVE_STRCMPI 1
 
 /* Define to 1 if you have the `strdup' function. */
 #define HAVE_STRDUP 1
@@ -146,12 +134,10 @@
 #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `stricmp' function. */
-/* #undef HAVE_STRICMP */
+#define HAVE_STRICMP 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 #define HAVE_STRINGS_H 1
-/*#undef HAVE_STRINGS_H */
-
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -159,7 +145,7 @@
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
 
-/* Define to 1 if `st_blocks' is member of `struct stat'. */
+/* Define to 1 if `st_blocks' is a member of `struct stat'. */
 #define HAVE_STRUCT_STAT_ST_BLOCKS 1
 
 /* Define to 1 if your `struct stat' has `st_blocks'. Deprecated, use
@@ -193,17 +179,16 @@
 /* #undef HAVE_SYS_FS_TYPES_H */
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
-#define HAVE_SYS_IOCTL_H 1
+/* #undef HAVE_SYS_IOCTL_H */
 
 /* Define to 1 if you have the <sys/ipc.h> header file. */
-#define HAVE_SYS_IPC_H 1
+/* #undef HAVE_SYS_IPC_H */
 
 /* Define to 1 if you have the <sys/mman.h> header file. */
-#define HAVE_SYS_MMAN_H 1
+/* #undef HAVE_SYS_MMAN_H */
 
 /* Define to 1 if you have the <sys/mount.h> header file. */
-/*#define HAVE_SYS_MOUNT_H 1 */
-#undef HAVE_SYS_MOUNT_H
+/* #undef HAVE_SYS_MOUNT_H */
 
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
@@ -213,24 +198,22 @@
 #define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/shm.h> header file. */
-#define HAVE_SYS_SHM_H 1
+/* #undef HAVE_SYS_SHM_H */
 
 /* Define to 1 if you have the <sys/soundcard.h> header file. */
-#define HAVE_SYS_SOUNDCARD_H 1
+/* #undef HAVE_SYS_SOUNDCARD_H */
 
 /* Define to 1 if you have the <sys/statfs.h> header file. */
-/*#define HAVE_SYS_STATFS_H 1*/
-#undef HAVE_SYS_STATFS_H
+/* #undef HAVE_SYS_STATFS_H */
 
 /* Define to 1 if you have the <sys/statvfs.h> header file. */
 #define HAVE_SYS_STATVFS_H 1
-/* #undef HAVE_SYS_STATVFS_H1 */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/termios.h> header file. */
-#define HAVE_SYS_TERMIOS_H 1
+/* #undef HAVE_SYS_TERMIOS_H */
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define HAVE_SYS_TIME_H 1
@@ -239,14 +222,10 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/vfs.h> header file. */
-/* #define HAVE_SYS_VFS_H 1 */
-#undef HAVE_SYS_VFS_H
-
-/* Define to 1 if you have the `tcgetattr' function. */
-#define HAVE_TCGETATTR 1
+/* #undef HAVE_SYS_VFS_H */
 
 /* Define to 1 if you have the `timegm' function. */
-#undef HAVE_TIMEGM
+//#define HAVE_TIMEGM 1
 
 /* Define if you have the 'uintmax_t' type in <stdint.h> or <inttypes.h>. */
 #define HAVE_UINTMAX_T 1
@@ -267,8 +246,7 @@
 #define HAVE_UTIME_NULL 1
 
 /* Define to 1 if you have the <values.h> header file. */
-/*#define HAVE_VALUES_H 1 */
-#undef HAVE_VALUES_H
+/* #undef HAVE_VALUES_H */
 
 /* Define to 1 if you have the `vfprintf' function. */
 #define HAVE_VFPRINTF 1
@@ -295,13 +273,16 @@
 #define PACKAGE_NAME "E-UAE"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "E-UAE 0.8.29-WIP4"
+#define PACKAGE_STRING "E-UAE 0.8.29"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "e-uae"
 
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
+
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.8.29-WIP4"
+#define PACKAGE_VERSION "0.8.29"
 
 /* Define to the necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -343,8 +324,7 @@
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_bsize.
    (4.3BSD, SunOS 4, HP-UX, AIX PS/2) */
-/*#define STAT_STATFS2_BSIZE 1*/
-#undef STAT_STATFS2_BSIZE
+/* #undef STAT_STATFS2_BSIZE */
 
 /* Define if statfs takes 2 args and struct statfs has a field named f_fsize.
    (4.4BSD, NetBSD) */
@@ -361,7 +341,7 @@
 /* #undef STAT_STATFS4 */
 
 /* Define if there is a function named statvfs. (SVR4) */
-/* #undef STAT_STATVFS */
+#define STAT_STATVFS 1
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -372,28 +352,76 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 /* #undef TM_IN_SYS_TIME */
 
-/* Version number of package */
-#define VERSION "0.8.29-WIP4"
+/* Define to the UAE version */
+#define UAE_VERSION "0.8.29"
 
-/* Define to 1 if your processor stores words with the most significant byte
-   first (like Motorola and SPARC, unlike Intel and VAX). */
-#define WORDS_BIGENDIAN 1
+/* Define to the UAE major version number */
+#define UAE_VERSION_MAJOR 0
 
-/* Define to 1 if the X Window System is missing or not being used. */
-/* #undef X_DISPLAY_MISSING */
+/* Define to the UAE minor version number */
+#define UAE_VERSION_MINOR 8
 
-/* Define to 1 if on AIX 3.
-   System headers sometimes define this.
-   We just want to avoid a redefinition error message.  */
+/* Define to the UAE revision number */
+#define UAE_VERSION_REVISION 29
+
+/* Define to the optional UAE version tag */
+#define UAE_VERSION_TAG ""
+
+/* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
-/* # undef _ALL_SOURCE */
+# define _ALL_SOURCE 1
+#endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
+/* Enable threading extensions on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# define _POSIX_PTHREAD_SEMANTICS 1
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# define _TANDEM_SOURCE 1
+#endif
+/* Enable general extensions on Solaris.  */
+#ifndef __EXTENSIONS__
+# define __EXTENSIONS__ 1
 #endif
 
+
+/* Version number of package */
+#define VERSION "0.8.29"
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  define WORDS_BIGENDIAN 1
+# endif
+#endif
+
+/* Define to 1 if the X Window System is missing or not being used. */
+#define X_DISPLAY_MISSING 1
+
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 64
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
+
+/* Define to 1 if on MINIX. */
+/* #undef _MINIX */
+
+/* Define to 2 if the system does not provide POSIX.1 features except with
+   this defined. */
+/* #undef _POSIX_1_SOURCE */
+
+/* Define to 1 if you need to in order for `stat' and other things to work. */
+/* #undef _POSIX_SOURCE */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
@@ -414,7 +442,7 @@
 /* #undef size_t */
 
 /* Substitute for socklen_t */
-/* #undef socklen_t */
+#define socklen_t int
 
 /* Define to unsigned long or unsigned long long if <stdint.h> and
    <inttypes.h> don't define. */

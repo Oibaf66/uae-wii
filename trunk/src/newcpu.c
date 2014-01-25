@@ -373,9 +373,9 @@ void init_m68k (void)
 struct regstruct regs;
 static uae_s32 m68kpc_offset;
 
-#define get_ibyte_1(regs, o) get_byte((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o) + 1)
-#define get_iword_1(regs, o) get_word((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o))
-#define get_ilong_1(regs, o) get_long((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o))
+#define get_ibyte_1(regs, o) get_byte ((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o) + 1)
+#define get_iword_1(regs, o) get_word ((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o))
+#define get_ilong_1(regs, o) get_long ((regs)->pc + ((regs)->pc_p - (regs)->pc_oldp) + (o))
 
 static uae_s32 ShowEA (void *f, uae_u16 opcode, int reg, amodes mode, wordsizes size, char *buf, uae_u32 *eaddr, int safemode)
 {
@@ -690,11 +690,14 @@ void REGPARAM2 MakeFromSR (struct regstruct *regs)
 	}
     }
 
+   /* Interrupt priority level may have changed. Assert SPCFLAG_INT
+    * to check if there's an IRQ ready to go at the new level. */
     set_special (regs, SPCFLAG_INT);
+
     if (regs->t1 || regs->t0)
 	set_special (regs, SPCFLAG_TRACE);
     else
-    	/* Keep SPCFLAG_DOTRACE, we still want a trace exception for
+	/* Keep SPCFLAG_DOTRACE, we still want a trace exception for
 	   SR-modifying instructions (including STOP).  */
 	unset_special (regs, SPCFLAG_TRACE);
 }
@@ -976,15 +979,12 @@ void REGPARAM2 Exception (int nr, struct regstruct *regs, uaecptr oldpc)
 
 STATIC_INLINE void service_interrupt (unsigned int level, struct regstruct *regs)
 {
-    if (level > regs->intmask) {
+    regs->stopped = 0;
+    unset_special (regs, SPCFLAG_STOP);
 
-	regs->stopped = 0;
-	unset_special (regs, SPCFLAG_STOP);
+    Exception (level + 24, regs, 0);
 
-	Exception (level + 24, regs, 0);
-
-	regs->intmask = level;
-    }
+    regs->intmask = level;
 }
 
 /*
@@ -1472,7 +1472,7 @@ unsigned long REGPARAM2 op_illg (uae_u32 opcode, struct regstruct *regs)
 
     if ((opcode & 0xF000) == 0xF000) {
 	if (warned < 20) {
- 	    write_log ("B-Trap %04x at %08x (%p)\n", opcode, m68k_getpc (regs) + m68kpc_offset, regs->pc_p);
+	    write_log ("B-Trap %04x at %08x (%p)\n", opcode, m68k_getpc (regs) + m68kpc_offset, regs->pc_p);
 	    warned++;
 	}
 	Exception (0xB, regs, 0);
@@ -1600,13 +1600,13 @@ static NOINLINE void do_stop (struct regstruct *regs)
 		    /* Avoid small numbers of STOP cycles. Arbitrary number here. */
 		    if (stop_count > 32) {
 
-		        frame_time_t curr_time = uae_gethrtime ();
+			frame_time_t curr_time = uae_gethrtime ();
 
 			uae_msleep (1);
 
 			idletime += uae_gethrtime() - curr_time;
 		    }
-	        }
+		}
 	    }
 	}
 
@@ -1697,12 +1697,14 @@ STATIC_INLINE int do_specialties (int cycles, struct regstruct *regs)
      * In non-cycle-exact mode we handle this by separating the interrupt request
      * pending (SPCFLAG_INT) and interrupt request arrived (SPCFLAG_DOINT) events.
      * This ensures that there's always a delay of one opcode (and so at least 2
-     * machine cycles) between the interrupt controller requesting an interrupt
-     * and us servicing it here.
+     * machine cycles) between the interrupt controller requesting an interrupt or
+     * the processor changing its interrupt priority level and us servicing it here.
      *
      * In cycle-exact mode, there's just one event (SPCFLAG_INT) and the delay is
      * handled internally by the interrupt controller code in custom.c - intlev()
      * and friends.
+     *
+     * This stuff needs some tidying up!
      */
     if ((regs->spcflags & SPCFLAG_DOINT) ||
 	(currprefs.cpu_cycle_exact && (regs->spcflags & SPCFLAG_INT))) {
@@ -1711,8 +1713,15 @@ STATIC_INLINE int do_specialties (int cycles, struct regstruct *regs)
 
 	unset_special (regs, SPCFLAG_DOINT);
 
-	if (intr != -1)
+	if (intr > (int)regs->intmask) {
+	    if (currprefs.cpu_cycle_exact)
+		unset_special(regs, SPCFLAG_INT);
+
 	    service_interrupt (intr, regs);
+	} else {
+	    if (intr < 0 && currprefs.cpu_cycle_exact)
+		unset_special (regs, SPCFLAG_INT);
+	}
     }
 
     if ((regs->spcflags & SPCFLAG_INT) && !currprefs.cpu_cycle_exact) {

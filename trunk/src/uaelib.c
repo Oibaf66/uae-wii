@@ -303,6 +303,7 @@ static uae_u32 emulib_Debug (void)
  */
 static uae_u32 FindFunctionInObject (uae_u8 *objectptr)
 {
+#if 0
     uae_u8 *text_hdr;
     uae_u8 offset;
     text_hdr = (uae_u8 *)strstr ("text", (char *)objectptr);
@@ -310,6 +311,7 @@ static uae_u32 FindFunctionInObject (uae_u8 *objectptr)
 	offset = *(text_hdr + 19);
 	return (uae_u32)(objectptr + offset);
     }
+#endif
     return 0;
 }
 

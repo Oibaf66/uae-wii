@@ -29,6 +29,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_D
 	$(SRC_DIR)/gfxdep/sdlkeys.c \
 	$(SRC_DIR)/guidep/gui-sdl.c \
 	$(SRC_DIR)/guidep/menu.c \
+	$(SRC_DIR)/guidep/VirtualKeyboard.c \
 	$(SRC_DIR)/joydep/joystick.c \
 	$(SRC_DIR)/machdep/support.c \
 	$(SRC_DIR)/osdep/main.c \
@@ -61,6 +62,7 @@ SRCS := $(filter-out \
 	src/gengenblitter.c \
 	src/genlinetoscr.c \
 	src/linetoscr.c \
+	src/make_hdf.c \
 	src/readdisk.c \
 	src/scsiemul.c \
 	src/svgancui.c \
@@ -70,7 +72,7 @@ SRCS := $(filter-out \
 genlinetoscr_args="-b"
 
 # Library object files.
-OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o)) $(OBJ_DIR)/guidep/VirtualKeyboard.o
+OBJS	:= $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.c=.o))
 
 # Test source files.
 # It can be useful to switch this variable around to select individual tests which are problematic.
@@ -165,7 +167,7 @@ uae.dol: uae.elf
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O2 -ftree-vectorize -ffast-math -pipe  -fomit-frame-pointer -fdiagnostics-show-option $(MACHDEP) -Wall -Wno-unused -Wno-format
+COMMON_FLAGS	:= -g -O2 -ftree-vectorize -ffast-math -pipe -fdiagnostics-show-option $(MACHDEP) -Wall -Wno-unused -Wno-format
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \

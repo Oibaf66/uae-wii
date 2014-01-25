@@ -340,7 +340,7 @@ extern int gui_message_multibutton (int flags, const char *format,...);
 # define rmdir unlink
 
 /* Definately problems! */
-# define chmod(a,b)
+//# define chmod(a,b)
 # define dup(fd) fd
 # define utime(filename, buf) 0
 #endif

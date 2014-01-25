@@ -45,6 +45,7 @@ extern void filesys_install_code (void);
 extern void filesys_store_devinfo (uae_u8 *);
 extern void hardfile_install (void);
 extern void hardfile_reset (void);
+extern void hardfile_cleanup (void);
 extern void emulib_install (void);
 extern void expansion_init (void);
 extern void expansion_cleanup (void);

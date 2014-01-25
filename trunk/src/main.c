@@ -458,11 +458,7 @@ void usage (void)
 
 static void show_version (void)
 {
-#ifdef PACKAGE_VERSION
-    write_log (PACKAGE_NAME " " PACKAGE_VERSION "\n");
-#else
-    write_log ("UAE %d.%d.%d\n", UAEMAJOR, UAEMINOR, UAESUBREV);
-#endif
+	write_log (UAE_VERSION_STRING "\n");
     write_log ("Build date: " __DATE__ " " __TIME__ "\n");
 }
 
@@ -533,29 +529,7 @@ static void parse_cmdline (int argc, char **argv)
     }
 }
 #endif
-/*
-static void parse_user_conf_file(const char *extension)
-{
-	// FIXME! ska: This is temporary, and will be removed when you can
-	// pass command line options in meta.xml for the homebrew channel
-	char user_options[255] = "";
-	char *user_argv[] = {"program", "-f", user_options};
-#ifdef OPTIONS_IN_HOME
-	char *home = getenv ("HOME");
-	if (home != NULL && strlen (home) < 240)
-	{
-		strcpy (user_options, home);
-		strcat (user_options, "/");
-	}
-#endif
-	strcat(user_options, OPTIONSFILENAME);
-	strcat(user_options, extension);
 
-	// Allow the user uaerc to override the default one
-	//parse_cmdline (3, user_argv);
-	// Until here
-}
-*/
 static void parse_cmdline_and_init_file (int argc, char **argv)
 {
     char *home;
@@ -585,7 +559,7 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
 
 #ifdef OPTIONS_IN_HOME
 	/* sam: if not found in $HOME then look in current directory */
-        char *saved_path = strdup (optionsfile);
+	char *saved_path = strdup (optionsfile);
 	strcpy (optionsfile, OPTIONSFILENAME);
 	if (! cfgfile_load (&currprefs, optionsfile, 0) ) {
 	    /* If not in current dir either, change path back to home
@@ -593,7 +567,7 @@ static void parse_cmdline_and_init_file (int argc, char **argv)
 	    strcpy (optionsfile, saved_path);
 	}
 
-        free (saved_path);
+	free (saved_path);
 #endif
     }
 	
@@ -741,13 +715,13 @@ static int do_preinit_machine (int argc, char **argv)
     init_shm ();
 #endif
 
-    rtarea_init ();
 #ifdef FILESYS
+    rtarea_init ();
     hardfile_install ();
 #endif
 
     if (restart_config[0])
-        parse_cmdline_and_init_file (argc, argv);
+	parse_cmdline_and_init_file (argc, argv);
     else
 	currprefs = changed_prefs;
 
@@ -952,6 +926,7 @@ static void do_exit_machine (void)
 #endif
 #ifdef FILESYS
     filesys_cleanup ();
+    hardfile_cleanup ();
 #endif
 #ifdef SAVESTATE
     savestate_free ();
@@ -968,7 +943,7 @@ void real_main (int argc, char **argv)
 {
     show_version ();
 
-#if defined(FILESYS)
+#ifdef FILESYS
     currprefs.mountinfo = changed_prefs.mountinfo = &options_mountinfo;
 #endif
     restart_program = 1;
@@ -987,11 +962,11 @@ void real_main (int argc, char **argv)
 
 	do_preinit_machine (argc, argv);
 
-        /* Should we open the GUI? TODO: This mess needs to go away */
+	/* Should we open the GUI? TODO: This mess needs to go away */
 	want_gui = currprefs.start_gui;
-        if (restart_program == 2)
+	if (restart_program == 2)
 	    want_gui = 0;
-        else if (restart_program == 3)
+	else if (restart_program == 3)
 	    want_gui = 1;
 
 	changed_prefs = currprefs;
@@ -1041,7 +1016,7 @@ void real_main (int argc, char **argv)
 	    uae_target_state = UAE_STATE_RUNNING;
 
 	    /*
- 	     * Main Loop
+	     * Main Loop
 	     */
 	    do {
 		set_state (uae_target_state);
@@ -1063,7 +1038,7 @@ void real_main (int argc, char **argv)
 			handle_events ();
 
 			/* Manually pump input device */
-                	inputdevicefunc_keyboard.read ();
+			inputdevicefunc_keyboard.read ();
 			inputdevicefunc_mouse.read ();
 			inputdevicefunc_joystick.read ();
 			inputdevice_handle_inputcode ();
@@ -1096,7 +1071,7 @@ void real_main (int argc, char **argv)
 
 	do_exit_machine ();
 
-        /* TODO: This stuff is a hack. What we need to do is
+	/* TODO: This stuff is a hack. What we need to do is
 	 * check whether a config GUI is available. If not,
 	 * then quit.
 	 */
@@ -1110,7 +1085,7 @@ int init_sdl (void)
 {
     int result = (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER /*| SDL_INIT_AUDIO*/) == 0);
     if (result)
-        atexit (SDL_Quit);
+	atexit (SDL_Quit);
 
     return result;
 }

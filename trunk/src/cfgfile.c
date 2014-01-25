@@ -81,7 +81,6 @@ static const struct cfg_lines opttable[] =
     {"keyboard_leds", "Keyboard LEDs" },
     {"sound_output", "" },
     {"sound_frequency", "" },
-    {"sound_bits", "" },
     {"sound_channels", "" },
     {"sound_latency", "" },
 #ifdef JIT
@@ -153,7 +152,7 @@ static const char *obsolete[] = {
     "sound_pri_cutoff", "sound_pri_time",
     "avoid_dga", "override_dga_address", "avoid_vid", "avoid_cmov",
     "comp_midopt", "comp_lowopt",
-    "fast_copper", "sound_max_buf",
+    "fast_copper", "sound_max_buf", "sound_bits",
     0 };
 
 #define UNEXPANDED "$(FILE_PATH)"
@@ -401,7 +400,6 @@ void save_options (FILE *f, const struct uae_prefs *p, int type)
 #endif
 
     cfgfile_write (f, "sound_output=%s\n", soundmode1[p->produce_sound]);
-    cfgfile_write (f, "sound_bits=%d\n", p->sound_bits);
     cfgfile_write (f, "sound_channels=%s\n", stereomode[p->sound_stereo]);
     cfgfile_write (f, "sound_stereo_separation=%d\n", p->sound_stereo_separation);
     cfgfile_write (f, "sound_stereo_mixing_delay=%d\n", p->sound_mixed_stereo >= 0 ? p->sound_mixed_stereo : 0);
@@ -807,7 +805,7 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 	    if (cfgfile_path (option, value, "hardfile_path"))
 		return 1;
 #ifdef SAVESTATE
-            if (cfgfile_path (option, value, "savestate_path"))
+	    if (cfgfile_path (option, value, "savestate_path"))
 		return 1;
 #endif
 #ifndef _WIN32
@@ -838,7 +836,6 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
     }
 
     if (cfgfile_intval (option, value, "sound_latency", &p->sound_latency, 1)
-	|| cfgfile_intval (option, value, "sound_bits", &p->sound_bits, 1)
 	|| cfgfile_intval (option, value, "sound_frequency", &p->sound_freq, 1)
 	|| cfgfile_intval (option, value, "sound_adjust", &p->sound_adjust, 1)
 	|| cfgfile_intval (option, value, "sound_volume", &p->sound_volume, 1)
@@ -905,11 +902,11 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 
     if    (cfgfile_string (option, value, "config_info", p->info, 256)
 	|| cfgfile_string (option, value, "config_description", p->description, 256))
-        return 1;
+	return 1;
 
 #ifdef DEBUGGER
     if    (cfgfile_yesno (option, value, "use_debugger", &p->start_debugger))
-        return 1;
+	return 1;
 #endif
 
     if    (cfgfile_yesno (option, value, "log_illegal_mem", &p->illegal_mem)
@@ -1172,7 +1169,7 @@ static int cfgfile_parse_hardware (struct uae_prefs *p, char *option, char *valu
 	return 1;
 #endif
     if (cfgfile_strval (option, value, "collision_level", &p->collision_level, collmode, 0))
-        return 1;
+	return 1;
     if (cfgfile_string (option, value, "kickstart_rom_file", p->romfile, 256)
 	|| cfgfile_string (option, value, "kickstart_ext_rom_file", p->romextfile, 256)
 	|| cfgfile_string (option, value, "kickstart_key_file", p->keyfile, 256)
@@ -1295,7 +1292,7 @@ static int cfgfile_parse_hardware (struct uae_prefs *p, char *option, char *valu
 		write_log ("Error: %s\n", err_msg);
 
 	    free (str);
-        }
+	}
 #endif
 	return 1;
     }
@@ -1377,7 +1374,7 @@ static int cfgfile_parse_hardware (struct uae_prefs *p, char *option, char *valu
 		write_log ("Error: %s\n", err_msg);
 
 	    free (str);
-        }
+	}
 #endif
 	return 1;
 
@@ -1565,7 +1562,7 @@ int cfgfile_load_2 (struct uae_prefs *p, const char *filename, int real, int *ty
     fh = fopen (filename, "r");
 #ifndef SINGLEFILE
     if (! fh) {
-        write_log ("failed\n");
+	write_log ("failed\n");
 	return 0;
     }
 #endif
@@ -1739,8 +1736,8 @@ static void parse_sound_spec (struct uae_prefs *p, char *spec)
 	else
 	    p->sound_stereo = 0;
     }
-    if (x2)
-	p->sound_bits = atoi (x2);
+//    if (x2)
+//	p->sound_bits = atoi (x2);
     if (x3)
 	p->sound_freq = atoi (x3);
 //    if (x4)
@@ -1848,7 +1845,7 @@ static void parse_hardfile_spec (char *spec)
        err_msg = add_filesys_unit (currprefs.mountinfo, 0, 0, x4, 0, atoi (x0), atoi (x1), atoi (x2), atoi (x3), 0, 0, 0);
 
        if (err_msg)
-           write_log ("%s\n", err_msg);
+	   write_log ("%s\n", err_msg);
     }
 #endif
 
@@ -2020,8 +2017,8 @@ int parse_cmdline_option (struct uae_prefs *p, char c, char *arg)
 	    p->color_mode = 0;
 	}
 #else
-        p->amiga_screen_type = atoi (arg);
-        if (p->amiga_screen_type < 0 || p->amiga_screen_type > 2) {
+	p->amiga_screen_type = atoi (arg);
+	if (p->amiga_screen_type < 0 || p->amiga_screen_type > 2) {
 	    write_log ("Bad screen-type selected. Defaulting to public screen.\n");
 	    p->amiga_screen_type = 2;
 	}
@@ -2374,7 +2371,6 @@ void default_prefs (struct uae_prefs *p, int type)
     p->sound_stereo = 1;
     p->sound_stereo_separation = 7;
     p->sound_mixed_stereo = 0;
-    p->sound_bits = DEFAULT_SOUND_BITS;
     p->sound_freq = DEFAULT_SOUND_FREQ;
     p->sound_latency = DEFAULT_SOUND_LATENCY;
     p->sound_interpol = 0;

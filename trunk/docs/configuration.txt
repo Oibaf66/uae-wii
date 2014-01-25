@@ -708,13 +708,6 @@ sound_output=<type>
   exact      - audio emulation is enabled and exact output enabled.
 
 
-sound_bits=<n>
-
-  Selects the resolution of audio output. <n> can be 8 or 16 for 8-bit and
-  16-bit output, respectively. Most hosts will use 16-bit output and this
-  will be the default.
-
-
 sound_frequency=<n>
 
   Selects the frequency of emulated audio output in Hertz. Typically,

@@ -667,17 +667,17 @@ STATIC_INLINE void log_dump(void)
 
     return;
 
-    write_log("----------------------\n");
+    write_log ("----------------------\n");
     for (i=0;i<N_REGS;i++) {
 	switch(nstate[i]) {
-	 case L_UNKNOWN: write_log("Nat %d : UNKNOWN\n",i); break;
-	 case L_UNAVAIL: write_log("Nat %d : UNAVAIL\n",i); break;
-	 default:        write_log("Nat %d : %d\n",i,nstate[i]); break;
+	 case L_UNKNOWN: write_log ("Nat %d : UNKNOWN\n",i); break;
+	 case L_UNAVAIL: write_log ("Nat %d : UNAVAIL\n",i); break;
+	 default:        write_log ("Nat %d : %d\n",i,nstate[i]); break;
 	}
     }
     for (i=0;i<VREGS;i++) {
 	if (vstate[i]==L_UNNEEDED)
-	    write_log("Virt %d: UNNEEDED\n",i);
+	    write_log ("Virt %d: UNNEEDED\n",i);
     }
 }
 
@@ -4319,7 +4319,7 @@ MENDFUNC(2,fmul_rr,(FRW d, FR s))
 int kill_rodent(int r)
 {
     return KILLTHERAT &&
-        have_rat_stall &&
+	have_rat_stall &&
 	(live.state[r].status==INMEM ||
 	 live.state[r].status==CLEAN ||
 	 live.state[r].status==ISCONST ||
@@ -4349,7 +4349,9 @@ void sync_m68k_pc(void)
  ********************************************************************/
 
 uae_u32 scratch[VREGS];
+#ifdef FPUEMU
 fptype  fscratch[VFREGS];
+#endif
 
 void init_comp(void)
 {
@@ -4395,6 +4397,7 @@ void init_comp(void)
     live.state[NEXT_HANDLER].needflush=NF_HANDLER;
     set_status(NEXT_HANDLER,UNDEF);
 
+#ifdef FPUEMU
     for (i=0;i<VFREGS;i++) {
 	if (i<8) { /* First 8 registers map to 68k FPU registers */
 	    live.fate[i].mem=(uae_u32*)(((fptype*)regs.fp)+i);
@@ -4409,7 +4412,7 @@ void init_comp(void)
 	else
 	    live.fate[i].mem=(uae_u32*)(fscratch+i);
     }
-
+#endif
 
     for (i=0;i<N_REGS;i++) {
 	live.nat[i].touched=0;
@@ -6067,13 +6070,13 @@ void compile_block (const cpu_history *pc_hist, int blocklen, int totcycles)
 	align_target (align_jumps);
 	current_compile_p=get_target();
 
-        raise_in_cl_list(bi);
-        bi->nexthandler=current_compile_p;
+	raise_in_cl_list(bi);
+	bi->nexthandler=current_compile_p;
 
-        /* We will flush soon, anyway, so let's do it now */
-        if (current_compile_p>=max_compile_start)
-            flush_icache_hard(7);
+	/* We will flush soon, anyway, so let's do it now */
+	if (current_compile_p>=max_compile_start)
+	    flush_icache_hard(7);
 
-        do_extra_cycles(totcycles); /* for the compilation time */
+	do_extra_cycles(totcycles); /* for the compilation time */
     }
 }

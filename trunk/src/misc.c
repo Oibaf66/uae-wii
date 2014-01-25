@@ -26,19 +26,19 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 // d0 3=readsamples    d1=unit a0=addr      read samples from card ret: d0=samples read
       // make sure you have from amigaside blksize*4 mem alloced
       // d0=-1 no data available d0=-2 no recording open
-          // d0 > 0 there are more blksize Data in the que
-          // do the loop until d0 get 0
-          // if d0 is greater than 200 bring a message
-          // that show the user that data is lost
-          // maximum blocksbuffered are 250 (8,5 sec)
+	  // d0 > 0 there are more blksize Data in the que
+	  // do the loop until d0 get 0
+	  // if d0 is greater than 200 bring a message
+	  // that show the user that data is lost
+	  // maximum blocksbuffered are 250 (8,5 sec)
 // d0 4=writeinterrupt d1=unit  d0=0 no interrupt happen for this unit
-          // d0=-2 no playing open
+	  // d0=-2 no playing open
 
-        //note units for now not support use only unit 0
+	//note units for now not support use only unit 0
 
 // d0=10 get clipboard size      d0=size in bytes
 // d0=11 get clipboard data      a0=clipboarddata
-                                  //Note: a get clipboard size must do before
+				  //Note: a get clipboard size must do before
 // d0=12 write clipboard data    a0=clipboarddata
 // d0=13 setp96mouserate         d1=hz value
 // d0=100 open dll               d1=dll name in windows name conventions
@@ -55,14 +55,14 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
     int opcode = m68k_dreg (&context->regs, 0);
 
     switch (opcode) {
-        int i, slen, t, todo, byte1, byte2;
-        uae_u32 src, num_vars;
-        static int cap_pos, clipsize;
+	int i, slen, t, todo, byte1, byte2;
+	uae_u32 src, num_vars;
+	static int cap_pos, clipsize;
 #if 0
-        LPTSTR p, p2, pos1, pos2;
-        static  LPTSTR clipdat;
+	LPTSTR p, p2, pos1, pos2;
+	static  LPTSTR clipdat;
 #endif
-        int cur_pos;
+	int cur_pos;
 
 /*
  * AHI emulation support
@@ -82,7 +82,7 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 	case 2:
 	    addr=(char *)m68k_areg (&context->regs, 0);
 	    for (i = 0; i < (amigablksize*4); i += 4) {
-		ahisndbufpt[0] = get_long((unsigned int)addr + i);
+		ahisndbufpt[0] = get_long ((unsigned int)addr + i);
 		ahisndbufpt+=1;
 		/*ahisndbufpt[0]=chipmem_bget((unsigned int)addr+i+2);
 		  ahisndbufpt+=1;
@@ -106,7 +106,7 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 	    else
 		todo = cur_pos + (RECORDBUFFER * t) - cap_pos;
 	    if (todo < t) {
-	        //if no complete buffer ready exit
+		//if no complete buffer ready exit
 		return -1;
 	    }
 	    i = IDirectSoundCaptureBuffer_Lock (lpDSB2r, cap_pos, t, &pos1, &byte1, &pos2, &byte2, 0);
@@ -253,7 +253,7 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 	    oldnum = uaevar.changenum;
 	    return 1;
 	}
-        case 105:	//returns memory offset
+	case 105:	//returns memory offset
 	    return (uae_u32) get_real_address (0);
 	case 106:	//byteswap 16bit vars
 			//a0 = start address
@@ -319,7 +319,7 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 		BSWAP_WORD_END:
 	    }
 	    return (uae_u32) bswap_buffer;
-        case 107:	//byteswap 32bit vars - see case 106
+	case 107:	//byteswap 32bit vars - see case 106
 			//a0 = start address
 			//d1 = number of 32bit vars
 			//returns address of new array
@@ -389,6 +389,7 @@ static uae_u32 REGPARAM2 misc_demux (TrapContext *context)
 
 void misc_hsync_stuff (void)
 {
+#ifdef FILESYS
     static int misc_demux_installed;
 
 #ifdef AHI
@@ -413,4 +414,5 @@ void misc_hsync_stuff (void)
 	org (a);
 	misc_demux_installed = 1;
     }
+#endif
 }
