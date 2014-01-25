@@ -490,7 +490,11 @@ static void dup_mountinfo (const struct uaedev_mount_info *mip, struct uaedev_mo
 	if (uip->rootdir)
 	    uip->rootdir = my_strdup (uip->rootdir);
 	if (uip->hf.handle)
+#ifdef GEKKO	//work arround for the lack of dup function
+		hdf_open (&uip->hf, uip->hf.path);
+#else	
 	    hdf_dup (&uip->hf, &uip->hf);
+#endif		
     }
 }
 
@@ -513,17 +517,6 @@ struct hardfiledata *get_hardfile_data (int nr)
     return &uip[nr].hf;
 }
 
-static void reopen_hdfile (struct uaedev_mount_info *mip)
-{
-    int i;
-
-    for (i = 0; i < mip->num_units; i++) {
-	UnitInfo *uip = mip->ui + i;
-	if (uip->hf.handle) 
-		hdf_open (&uip->hf, uip->hf.path);
-		//hdf_open (&uip->hf, "/uae/harddisks/hardfile.hdf");
-    }
-}
 
 /* minimal AmigaDOS definitions */
 
@@ -3731,7 +3724,6 @@ void filesys_start_threads (void)
     int i;
 	
     free_mountinfo (&current_mountinfo);
-	reopen_hdfile (&options_mountinfo);
     dup_mountinfo (&options_mountinfo, &current_mountinfo);
 	
     uip = current_mountinfo.ui;
