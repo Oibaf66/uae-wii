@@ -1421,7 +1421,9 @@ int debuggable (void)
 
 int mousehack_allowed (void)
 {
+#ifdef GEKKO	
 	return 0;
+#endif	
     return mousehack;
 }
 
