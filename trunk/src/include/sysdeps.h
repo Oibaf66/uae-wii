@@ -335,12 +335,7 @@ extern int gui_message_multibutton (int flags, const char *format,...);
 #endif
 
 #ifdef GEKKO
-/* Technically not true, but looking at libfat, it seems like
- * unlink can remove directories as well */
-# define rmdir unlink
-
 /* Definately problems! */
-//# define chmod(a,b)
 # define dup(fd) fd
 # define utime(filename, buf) 0
 #endif
