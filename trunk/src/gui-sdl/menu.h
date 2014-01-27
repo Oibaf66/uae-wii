@@ -55,6 +55,8 @@ int menu_is_inited(void);
 
 int ext_matches(const char *name, const char *ext);
 
+void flip_screen (void);
+
 #if defined(__cplusplus)
 }
 #endif

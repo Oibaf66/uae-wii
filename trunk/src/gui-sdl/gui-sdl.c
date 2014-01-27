@@ -1384,7 +1384,7 @@ void gui_display(int shortcut)
 	
 	memset(submenus, 0, sizeof(submenus));
 
-	if (shortcut==-1) do //Enter Menu
+	if (shortcut==-1) {do //Enter Menu
 	{
 		opt = menu_select_title("Main menu", main_menu_messages, submenus);
 		notice_screen_contents_lost ();
@@ -1432,7 +1432,7 @@ void gui_display(int shortcut)
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10);
+	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10);flip_screen();}
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
