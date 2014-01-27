@@ -74,6 +74,11 @@ static TTF_Font *menu_font_alt16;
 
 int fh, fw;
 
+void flip_screen (void)
+{
+	SDL_Flip(real_screen);
+}
+
 int msgInfo(char *text, int duration, SDL_Rect *irc)
 {
 	int len = strlen(text);
@@ -835,9 +840,9 @@ static int menu_select_internal(SDL_Surface *screen,
 		else if (keys & KEY_DOWN)
 			select_next(p_menu, 0, 1, 1);
 		else if (keys & KEY_PAGEUP)
-			select_next(p_menu, 0, -18, 0);
+			select_next(p_menu, 0, -19, 0);
 		else if (keys & KEY_PAGEDOWN)
-			select_next(p_menu, 0, 18, 0);
+			select_next(p_menu, 0, 19, 0);
 		else if (keys & KEY_LEFT)
 			select_next(p_menu, -1, 0 ,1);
 		else if (keys & KEY_RIGHT)
@@ -897,7 +902,7 @@ int menu_select_title(const char *title, const char **msgs, int *submenus)
 {
 	SDL_FillRect(real_screen, 0, SDL_MapRGB(real_screen->format, 0, 0, 0));
 	return menu_select_sized(title, msgs, submenus, 0,
-			32, 32, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-32,
+			32, 20, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-20,
 			NULL, NULL, 20);
 }
 
@@ -1001,7 +1006,7 @@ const char *menu_select_file(const char *dir_path,const char *selected_file, int
 	if (dir_path == NULL)
 		dir_path = "";
 	return menu_select_file_internal(dir_path,
-			0, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32, selected_file, which);
+			0, 20, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20, selected_file, which);
 }
 
 static TTF_Font *read_font(const char *path, int font_size)
