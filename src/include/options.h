@@ -244,9 +244,9 @@ struct uae_prefs {
     int statecapturerate, statecapturebuffersize;
 #endif
 
-    int use_wheel_input;
-	int logfile;
 #ifdef GEKKO
+    int use_wheel_input;
+	int write_logfile;
 	int smb_enable;
 	char SmbUser[32]; 
 	char SmbPwd[32];
