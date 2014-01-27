@@ -884,9 +884,10 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 		if (p->gfx_correct_ratio > 100) p->gfx_correct_ratio = 100;
 		return 1;
 	}
-#endif
-	if (cfgfile_yesno  (option, value, "logfile", &p->logfile))
+	if (cfgfile_yesno  (option, value, "write_logfile", &p->write_logfile))
     	return 1;
+#endif
+	
 #ifdef DRIVESOUND
     if    (cfgfile_intval (option, value, "floppy0sound", &p->dfxclick[0], 1)
 	|| cfgfile_intval (option, value, "floppy1sound", &p->dfxclick[1], 1)
@@ -2506,8 +2507,8 @@ void default_prefs (struct uae_prefs *p, int type)
     p->mountinfo = &options_mountinfo;
 #endif
 
-	p->use_wheel_input = 0;
 #ifdef GEKKO
+	p->use_wheel_input = 0;
 	p->smb_enable = 0;
 	strcpy (p->SmbUser,"User");
 	strcpy (p->SmbPwd, "Password");
@@ -2516,8 +2517,8 @@ void default_prefs (struct uae_prefs *p, int type)
 	p->Port= PORT_DEFAULT;
 	p->rumble= 0;
 	p->gfx_correct_ratio = 100;
-#endif
-	p->logfile= 0;
+	p->write_logfile= 0;
+#endif	
 
 #ifdef UAE_MINI
     default_prefs_mini (p, 0);

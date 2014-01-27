@@ -61,8 +61,6 @@
 #include "windows.h"
 #endif
 
-extern int log_quiet;
-
 struct uae_prefs currprefs, changed_prefs;
 
 static int restart_program;
@@ -78,7 +76,8 @@ struct gui_info gui_data;
 bool usbismount = false;
 bool networkisinit = false;
 bool smbismount = false; 
-bool sdismount = false; 
+bool sdismount = false;
+int log_quiet = 0; 
 
 #if defined(GEKKO)
 
@@ -1140,7 +1139,7 @@ int main (int argc, char **argv)
 	printf("\x1b[2J");
 	printf("\x1b[2;0H");	
 	
-	if (!(log_quiet = !currprefs.logfile))	set_logfile("/uae/uae.log");
+	if (!(log_quiet = !currprefs.write_logfile)) set_logfile("/uae/uae.log");
 	
 	#endif
 	

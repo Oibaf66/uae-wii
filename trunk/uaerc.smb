@@ -8,4 +8,4 @@ smb_ip=192.168.0.1
 
 
 # Enable logfile
-logfile=false
+write_logfile=false
