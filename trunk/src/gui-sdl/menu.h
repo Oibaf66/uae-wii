@@ -1,9 +1,10 @@
 /*********************************************************************
  *
  * Copyright (C) 2004, 2008,  Simon Kagstrom
+ * Copyright (C) 2010,2014,  Fabio Olimpieri
  *
  * Filename:      menu.h
- * Author:        Simon Kagstrom <simon.kagstrom@gmail.com>
+ * Author:        Simon Kagstrom <simon.kagstrom@gmail.com>, Fabio Olimpieri
  * Description:
  *
  * $Id$
@@ -31,6 +32,7 @@ extern "C" {
 #define KEY_HELP     256
 #define FULL_DISPLAY_X 640
 #define FULL_DISPLAY_Y 480
+#define  MAX_DEVICE_ITEM 32
 
 
 void menu_print_font(SDL_Surface *screen, int r, int g, int b, int x, int y, const char *msg, int font_size);
@@ -56,6 +58,8 @@ int menu_is_inited(void);
 int ext_matches(const char *name, const char *ext);
 
 void flip_screen (void);
+
+int menu_select_devices(void);
 
 #if defined(__cplusplus)
 }

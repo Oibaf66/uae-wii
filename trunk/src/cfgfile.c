@@ -2461,10 +2461,12 @@ void default_prefs (struct uae_prefs *p, int type)
     prefs_set_attr ("rom_path",       strdup_path_expand (TARGET_ROM_PATH));
 #ifdef GEKKO	
     prefs_set_attr ("floppy_path",    strdup(TARGET_FLOPPY_PATH)); //We don't want / at the end of path
+	prefs_set_attr ("hardfile_path",  strdup(TARGET_HARDFILE_PATH));
 #else	
 	prefs_set_attr ("floppy_path",    strdup_path_expand (TARGET_FLOPPY_PATH));
+	prefs_set_attr ("hardfile_path",  strdup_path_expand (TARGET_HARDFILE_PATH));
 #endif	
-    prefs_set_attr ("hardfile_path",  strdup_path_expand (TARGET_HARDFILE_PATH));
+    
 #ifdef SAVESTATE
     prefs_set_attr ("savestate_path", strdup_path_expand (TARGET_SAVESTATE_PATH));
 #endif

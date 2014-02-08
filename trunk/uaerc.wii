@@ -4,13 +4,13 @@ kickstart_key_file=$(FILE_PATH)/rom.key
 floppy0=/uae/floppies/
 
 #Examples of hardfile (hard drive partition) 
-#hardfile2=rw,DH0:/uae/harddisks/hardfile.hdf,32,1,2,512,0,
+#hardfile2=rw,DH0:/uae/HD/hardfile.hdf,32,1,2,512,0,
 
 #Examples of hardfile (full partitionable hard disk /RDB) 
-#hardfile2=rw,:/uae/harddisks/hardfile.hdf,0,0,0,0,0,
+#hardfile2=rw,:/uae/HD/hardfile.hdf,0,0,0,0,0,
 
 #You can also use hardfile from a real usb harddisk
-#hardfile2=rw,DH0:usb:/harddisks/hardfile.hdf,32,1,2,512,0,
+#hardfile2=rw,DH0:usb:/HD/hardfile.hdf,32,1,2,512,0,
 
 #You can also use hardfile from wifi connection with SMB
 #hardfile2=rw,DH0:smb:/hardfile.hdf,32,1,2,512,0,

@@ -37,6 +37,8 @@
 //#define DEBUG_AUDIO
 #define DEBUG_CHANNEL_MASK 15
 
+extern int is_vsync (void);
+
 int audio_channel_mask = 15;
 
 static int debugchannel (unsigned int ch)

@@ -21,6 +21,7 @@
 #include "VirtualKeyboard.h"
 #include "sounddep/sound.h"
 #include "inputdevice.h"
+#include "filesys.h"
 
 #define ID_BUTTON_OFFSET 0
 #define ID_AXIS_OFFSET 32
@@ -51,10 +52,11 @@ static const char *main_menu_messages[] = {
 		/*08*/		"Emulation options",
 		/*09*/		"Audio options",
 		/*10*/		"Other options",
-		/*11*/		"Save confs",
-		/*12*/		"Load confs",
-		/*13*/		"Reset UAE",
-		/*14*/		"Quit",
+		/*11*/		"HD emulation",
+		/*12*/		"Save confs",
+		/*13*/		"Load confs",
+		/*14*/		"Reset UAE",
+		/*15*/		"Quit",
 		NULL
 };
 
@@ -220,6 +222,79 @@ static const char *load_conf_messages[] = {
 		NULL
 };
 
+static const char *hd_emulation_messages[] = {
+		/*00*/		"Mount virtual filesystem",
+		/*01*/		" ",
+		/*02*/		"Mount RDB hard disk",
+		/*03*/		" ",
+		/*04*/		"Mount hard drive partition",
+		/*05*/		" ",
+		/*06*/		"Unmount device",
+		/*07*/		" ",
+		/*08*/		"Make hardfile",
+		/*09*/		" ",
+		/*10*/		"Delete hardfile",
+		NULL
+};
+
+static const char *VFS_configuration_messages[] = {
+		/*00*/		"Device Name",
+		/*01*/		"^|DH0|DH1|DH2|DH3|DH4|DH5",
+		/*02*/		"Volume name",
+		/*03*/		"^|VFS0|VFS1|VFS2|VFS3|VFS4",
+		/*04*/		"Access",
+		/*05*/		"^| RW | RO ",
+		/*06*/		"Boot priority",
+		/*07*/		"^| 0 | 1 | 2 | 3 |127|-128",
+		NULL
+};
+
+static const char *partition_configuration_messages[] = {
+		/*00*/		"Device Name",
+		/*01*/		"^|DH0|DH1|DH2|DH3|DH4|DH5",
+		/*02*/		"Access",
+		/*03*/		"^| RW | RO ",
+		/*04*/		"Sectors per track",
+		/*05*/		"^|32|64|128|256",
+		/*06*/		"Surfaces/heads",
+		/*07*/		"^| 1 | 2 | 4 | 8 | 16 ",
+		/*08*/		"Reserved blocks",
+		/*09*/		"^| 0 | 1 | 2 | 3 | 4 ",
+		/*10*/		"Block size",
+		/*11*/		"^|512|1024|2048|4096",
+		/*12*/		"Boot priority",
+		/*13*/		"^| 0 | 1 | 2 | 3 |127|-128",
+		NULL
+};
+
+static const char *make_hdf_messages[] = {
+		/*00*/		"Name",
+		/*01*/		"^|HDF0|HDF1|HDF2|HDF3|HDF4|HDF5",
+		/*01*/		"Size",
+		/*02*/		"^|10M|20M|50M|100M|200M|500M",
+		/*03*/		"Sectors per track",
+		/*04*/		"^|32|64|128|256",
+		/*05*/		"Surfaces/heads",
+		/*06*/		"^| 1 | 2 | 4 | 8 | 16 ",
+		/*07*/		"Block size",
+		/*08*/		"^|512|1024|2048|4096",
+		NULL
+};
+
+static const char *RDB_configuration_messages[] = {
+		/*04*/		"Access",
+		/*05*/		"^| RW | RO ",
+		NULL
+};
+
+static const char *device_table[] = {"DH0","DH1","DH2","DH3","DH4","DH5"};
+static const char *volume_table[] = {"VFS0","VFS1","VFS2","VFS3","VFS4"};
+static const char *hdf_name_table[] = {"HDF0","HDF1","HDF2","HDF3","HDF4","HDF5"};
+static const int sector_table[] = {32, 64, 128, 256};
+static const int surface_table[] = {1, 2, 4, 8, 16};
+static const int blocksize_table[] = {512, 1024, 2048, 4096};
+static const int boot_priority_table[] = {0, 1, 2, 3, 127, -128};
+static const int hdf_size_table[] = {10*1024*1024,20*1024*1024,50*1024*1024,100*1024*1024,10*1024*1024, 200*1024*1024,500*1024*1024 };
 static const int correct_aspect_table[] = {0,100,95,93,90};
 static const int cpu_to_chipset_table[] = {0,-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
@@ -395,6 +470,17 @@ void fix_options_menu_sdl (int printmsg)
 #endif
 }
 
+int file_exists (const char *name)
+{
+    FILE *f;
+	f = fopen(name,"rb");
+    if (!f)
+	return 0;
+    fclose (f);
+    return 1;
+}
+
+
 static int find_index_by_val(int val, const int vec[], int vec_size, int default_val)
 {
 	int i;
@@ -551,6 +637,192 @@ static void insert_rom(void)
 		strcpy (changed_prefs.romfile, name);
 		free((void*)name);
 	}
+}
+
+static void mount_harddisk(void)
+{
+#ifdef FILESYS
+
+	int submenus[1], opt, access;
+
+	submenus[0] = 0; //RW
+	
+
+	opt = menu_select_title("RDB configuration menu",
+			RDB_configuration_messages, submenus);
+	if (opt < 0)
+		return;
+	access = submenus[0];
+
+	char *name, *err_msg;
+	char *ptr_file_name;
+	char dir[255];
+	strncpy(dir,prefs_get_attr("hardfile_path"),255);
+	name = (char *) menu_select_file(dir, NULL, 0);
+	
+	if (name != NULL)
+	{
+		ptr_file_name = strrchr(name,'/');
+		if (ptr_file_name) ptr_file_name++; else ptr_file_name = name;
+		if (strcmp(ptr_file_name, "None") == 0)
+			return;
+		
+		err_msg= (char *) add_filesys_unit (currprefs.mountinfo, NULL,NULL , name, access, 0, 0, 0, 0, 0,NULL, 0);
+			
+		if (err_msg) msgInfo(err_msg, 3000, NULL);
+		
+		free((void*)name);
+	}
+#endif	
+}
+
+void mount_partition(void)
+{
+#ifdef FILESYS
+	int submenus[7], opt; 
+	int access, sector, surfaces, reserved, blocksize, priority;
+	const char *device;
+
+	submenus[0] = 0; //device 
+	submenus[1] = 0; //access
+	submenus[2] = 0; //sector	
+	submenus[3] = 0; //surfacces
+	submenus[4] = 2; //reserved
+	submenus[5] = 0; //blocksize
+	submenus[6] = 0; //priority
+	
+
+	opt = menu_select_title("HD partition configuration menu",
+			partition_configuration_messages, submenus);
+	if (opt < 0)
+		return;
+	device = device_table[submenus[0]];
+	access = submenus[1];
+	sector = sector_table[submenus[2]];
+	surfaces = surface_table[submenus[3]];
+	reserved = submenus[4];
+	blocksize = blocksize_table[submenus[5]];
+	priority = boot_priority_table[submenus[6]];
+
+	char *name, *err_msg;
+	char *ptr_file_name;
+	char dir[255];
+	strncpy(dir,prefs_get_attr("hardfile_path"),255);
+	name = (char *) menu_select_file(dir, NULL, 0);
+	
+	if (name != NULL)
+	{
+		ptr_file_name = strrchr(name,'/');
+		if (ptr_file_name) ptr_file_name++; else ptr_file_name = name;
+		if (strcmp(ptr_file_name, "None") == 0)
+			return;
+		
+		err_msg= (char *) add_filesys_unit (currprefs.mountinfo, device ,NULL , name, access, sector, surfaces, reserved, blocksize, priority,NULL, 0);
+			
+		if (err_msg) msgInfo(err_msg, 3000, NULL);
+		
+		free((void*)name);
+	}
+#endif
+}
+
+
+static void mount_virtual_file_system(void)
+{
+#ifdef FILESYS
+int submenus[4], opt; 
+	int access,  priority;
+	const char *device, *volume;
+
+	submenus[0] = 0; //device 
+	submenus[1] = 0; //volume
+	submenus[2] = 0; //access
+	submenus[3] = 5; //priority
+	
+
+	opt = menu_select_title("VFS configuration menu",
+			VFS_configuration_messages, submenus);
+	if (opt < 0)
+		return;
+	device = device_table[submenus[0]];
+	volume = volume_table[submenus[1]];
+	access = submenus[2];
+	priority = boot_priority_table[submenus[3]];
+
+	char *err_msg;
+	err_msg= (char *) add_filesys_unit (currprefs.mountinfo, device,volume , "/uae/harddir", 0, 0, 0, 0, 0, priority, NULL, 0);	
+	if (err_msg) msgInfo(err_msg, 3000, NULL);
+#endif			
+}
+
+static void unmount_device()
+{
+#ifdef FILESYS
+
+	int dev_to_unmount=menu_select_devices();
+	if (dev_to_unmount==-1) return;
+	
+	if (kill_filesys_unit (currprefs.mountinfo, dev_to_unmount) == -1)
+	msgInfo("Volume does not exist", 3000, NULL);	
+#endif			
+}
+
+extern int make_hdf(int size, const char *hdf_path, int blocks_per_track, int surfaces, int block_size);
+
+void make_hardfile(void)
+{
+#ifdef FILESYS
+	int submenus[5], opt; 
+	int sector, surfaces, blocksize, size;
+	const char *device, *hdf_name;
+
+	submenus[0] = 0; //name
+	submenus[1] = 0; //size
+	submenus[2] = 0; //sector	
+	submenus[3] = 0; //surfacces
+	submenus[4] = 0; //blocksize
+	
+
+	opt = menu_select_title("Make hardfile menu",
+			make_hdf_messages, submenus);
+	if (opt < 0)
+		return;
+	
+	hdf_name = hdf_name_table[submenus[0]];
+	size = hdf_size_table[submenus[1]];
+	sector = sector_table[submenus[2]];
+	surfaces = surface_table[submenus[3]];
+	blocksize = blocksize_table[submenus[4]];
+	
+	
+	const char *dir = prefs_get_attr("hardfile_path");
+	char hdf_path[256];
+
+	snprintf(hdf_path, 255, "%s/%s.hdf", dir, hdf_name);
+	
+	if (file_exists(hdf_path)) 
+	{
+		if (msgYesNo("Overwrite the existing file?", 0, FULL_DISPLAY_X /2-180, FULL_DISPLAY_Y /2-48))
+		unlink (hdf_path); else return;
+	}
+	
+	msgInfo("Creating file",1,NULL);	
+		
+	if (!make_hdf(size, hdf_path, sector, surfaces, blocksize)) 
+		msgInfo("Hardfile created",4000,NULL);
+	else
+		msgInfo("Failed to create hardfile",4000,NULL);	
+#endif
+}
+
+void delete_hardfile(void)
+{
+	char *name;
+	char dir[255];
+	strncpy(dir,prefs_get_attr("hardfile_path"),255);
+	name = (char *) menu_select_file(dir, NULL, 0);
+	if (name && msgYesNo("Are you sure to delete the hardfile?", 0, FULL_DISPLAY_X /2-200, FULL_DISPLAY_Y /2-48))
+		{unlink (name); msgInfo("Hardfile deleted",3000,NULL);}
 }
 
 static void cpu_chipset_options(void)
@@ -1300,6 +1572,42 @@ static void help(void)
 			help_messages, NULL);
 }
 */
+
+
+void hd_emulation()
+{
+int opt;
+
+	opt = menu_select_title("HD emulation menu",
+			hd_emulation_messages, NULL);
+	if (opt < 0)
+		return;
+	
+	switch(opt)
+		{
+		case 0:
+			mount_virtual_file_system();
+			break;
+		case 2:
+			mount_harddisk();
+			break;
+		case 4:
+			mount_partition();
+			break;
+		case 6:
+			unmount_device();
+			break;
+		case 8:
+			make_hardfile();
+			break;
+		case 10:
+			delete_hardfile();
+			break;	
+		default:
+			break;
+		}
+}
+
 void gui_init (int argc, char **argv)
 {
 }
@@ -1415,24 +1723,27 @@ void gui_display(int shortcut)
 			break;	
 		case 10:
 			other_options();
-			break;	
-		case 11:	
-			save_conf_file_menu();
+			break;
+		case 11:
+			hd_emulation();
 			break;
 		case 12:	
+			save_conf_file_menu();
+			break;
+		case 13:	
 			load_conf_file_menu();
 			break;	
-		case 13:
+		case 14:
 			uae_reset(1);
 			break;	
-		case 14:
+		case 15:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) 
 				{currprefs.rumble=0; uae_quit();}	
 			break;
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10);flip_screen();}
+	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 11);flip_screen();}
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	

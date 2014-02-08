@@ -187,13 +187,13 @@ dist:uae.dol
 	install -d $@/uae
 	install -d $@/uae/roms
 	install -d $@/uae/floppies
-	install -d $@/uae/harddisks
+	install -d $@/uae/HD
 	install -d $@/uae/harddir
 	install -d $@/uae/saves
 	install -d $@/uae/wave
 	echo "dummy" > $@/uae/roms/put-your-kick-dot-rom-here
 	echo "dummy" > $@/uae/floppies/dummy
-	echo "dummy" > $@/uae/harddisks/dummy
+	echo "dummy" > $@/uae/HD/dummy
 	echo "dummy" > $@/uae/harddir/dummy
 	echo "dummy" > $@/uae/saves/dummy
 	cp $< $@/apps/uae/boot.dol
