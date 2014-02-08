@@ -10,7 +10,7 @@
 
 #define TARGET_ROM_PATH         "/uae/roms"
 #define TARGET_FLOPPY_PATH      "/uae/floppies"
-#define TARGET_HARDFILE_PATH    "/uae/harddisks"
+#define TARGET_HARDFILE_PATH    "/uae/HD"
 #define TARGET_SAVESTATE_PATH   "/uae/saves"
 #define TARGET_SD_PATH   "sd:/"
 #define TARGET_USB_PATH   "usb:/"

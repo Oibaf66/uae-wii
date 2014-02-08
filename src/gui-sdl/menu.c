@@ -1,9 +1,10 @@
 /*********************************************************************
 *
 * Copyright (C) 2004,2008,  Simon Kagstrom
+* Copyright (C) 2010,2014,  Fabio Olimpieri
 *
 * Filename:      menu.c
-* Author:        Simon Kagstrom <simon.kagstrom@gmail.com>
+* Author:        Simon Kagstrom <simon.kagstrom@gmail.com>, Fabio Olimpieri
 * Description:   Code for menus (originally for Mophun)
 *
 * $Id$
@@ -17,9 +18,15 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "sysconfig.h"
 #include "menu.h"
 #include "VirtualKeyboard.h"
+
+#include "sysconfig.h"
+#include "sysdeps.h"
+#include "options.h"
+#include "filesys.h"
+
+
 
 struct joyinfo {
     SDL_Joystick *joy;
@@ -54,6 +61,22 @@ typedef struct
 	int        start_entry_visible;
 	int        n_entries;
 } menu_t;
+
+enum hdlist_cols {
+    HDLIST_DEVICE,
+    HDLIST_VOLUME,
+    HDLIST_PATH,
+    HDLIST_READONLY,
+    HDLIST_HEADS,
+    HDLIST_CYLS,
+    HDLIST_SECS,
+    HDLIST_RSRVD,
+    HDLIST_SIZE,
+    HDLIST_BLKSIZE,
+    HDLIST_BOOTPRI,
+    HDLIST_MAX_COLS
+};
+
 
 static SDL_Surface *real_screen;
 
@@ -283,7 +306,7 @@ static const char **get_file_list(const char *base_dir)
 		char buf[255];
 		//ipf files are not enabled in UAE Wii
 		const char *exts[] = {".adf", ".ADF", ".adz", ".ADZ", ".zip",".ZIP",".dms", ".DMS",
-				".sav", ".SAV", ".uss", ".USS", ".rom", ".ROM", NULL};
+				".sav", ".SAV", ".uss", ".USS", ".rom", ".ROM", ".hdf", ".HDF", NULL};
 		struct stat st;
 
 		snprintf(buf, 255, "%s/%s", base_dir, de->d_name);
@@ -320,6 +343,89 @@ static const char **get_file_list(const char *base_dir)
         qsort(&file_list[1], cur-1, sizeof(const char *), cmpstringp);
 
         return file_list;
+}
+
+const char **get_file_list_devices()
+{
+	char **device_list_menu;
+	
+	device_list_menu = (char**)malloc((MAX_DEVICE_ITEM+1) * sizeof(char*));
+	device_list_menu[0] = NULL;
+	
+	#ifdef FILESYS
+
+    int i, nr;
+	char  texts[HDLIST_MAX_COLS][64];
+	
+	nr = nr_units(currprefs.mountinfo);
+	
+	if (!nr) return NULL;
+	
+	for (i=0; i<HDLIST_MAX_COLS; i++)
+	strcpy (texts[i], "   ");
+	
+	device_list_menu[0]=malloc(80);
+	
+	sprintf(device_list_menu[0], "#1NR %-6s %-6s %s %s %s %s %s %s %s",
+	"Device", "Volume","Acc","Sec", "Sur","Res","Blk","Prio", "Path");
+	
+    for (i = 0; i < nr; i++) {
+	int     secspertrack, surfaces, reserved, blocksize, bootpri;
+	uae_u64 size;
+	int     cylinders, readonly, flags;
+	char   *devname, *volname, *rootdir, *filesysdir;
+	const char *failure;
+	
+	device_list_menu[i+1]=malloc(80);
+
+	
+	/* We always use currprefs.mountinfo for the GUI.  The filesystem
+	   code makes a private copy which is updated every reset.  */
+	failure = get_filesys_unit (currprefs.mountinfo, i,
+				    &devname, &volname, &rootdir, &readonly,
+				    &secspertrack, &surfaces, &reserved,
+				    &cylinders, &size, &blocksize, &bootpri,
+				    &filesysdir, &flags);
+
+	if (is_hardfile (currprefs.mountinfo, i)) {
+	    if (secspertrack == 0)
+	        strcpy (texts[HDLIST_DEVICE], "N/A" );
+	    else //Partitionable hard disk or partition
+	    strncpy (texts[HDLIST_DEVICE], devname, 6);
+		texts[HDLIST_DEVICE][6]='\0';
+	    sprintf (texts[HDLIST_VOLUME],  "N/A" );
+	    sprintf (texts[HDLIST_HEADS], "%.3d", surfaces);
+	    //sprintf (texts[HDLIST_CYLS],    "%.3d", cylinders);
+	    sprintf (texts[HDLIST_SECS],    "%.3d", secspertrack);
+	    sprintf (texts[HDLIST_RSRVD],   "%.3d", reserved);
+	    //sprintf (texts[HDLIST_SIZE],    "%.3d", size);
+	    sprintf (texts[HDLIST_BLKSIZE], "%.3d", blocksize);
+	} else { //Virtual filesystem
+	    strncpy (texts[HDLIST_DEVICE], devname, 6);
+		texts[HDLIST_DEVICE][6]='\0';
+	    strncpy (texts[HDLIST_VOLUME], volname, 6);
+		texts[HDLIST_VOLUME][6]='\0';
+	    strcpy (texts[HDLIST_HEADS],   "N/A");
+	    //strcpy (texts[HDLIST_CYLS],    "N/A");
+	    strcpy (texts[HDLIST_SECS],    "N/A");
+	    strcpy (texts[HDLIST_RSRVD],   "N/A");
+	    //strcpy (texts[HDLIST_SIZE],    "N/A");
+	    strcpy (texts[HDLIST_BLKSIZE], "N/A");
+	}
+	strncpy  (texts[HDLIST_PATH], rootdir ,24);
+	texts[HDLIST_PATH][24]='\0';
+	strcpy  (texts[HDLIST_READONLY], readonly ? "RO " : "RW ");
+	sprintf (texts[HDLIST_BOOTPRI], "%4d", bootpri);
+    
+	sprintf(device_list_menu[i+1], "%.2d %-6s %-6s %s %s %s %s %s %s %-24s",
+	i,texts[HDLIST_DEVICE],texts[HDLIST_VOLUME],texts[HDLIST_READONLY], texts[HDLIST_SECS],
+	texts[HDLIST_HEADS],texts[HDLIST_RSRVD], texts[HDLIST_BLKSIZE] ,texts[HDLIST_BOOTPRI], texts[HDLIST_PATH]);
+	}
+	
+	device_list_menu[i+1]=NULL;
+	
+#endif	
+	return (const char **) device_list_menu;
 }
 
 
@@ -914,7 +1020,7 @@ int menu_select(const char **msgs, int *submenus)
 static const char *menu_select_file_internal(const char *dir_path,
 		int x, int y, int x2, int y2, const char *selected_file, int which)
 {
-	const char **file_list = get_file_list(dir_path);
+	const char **file_list;
 	char *sel;
 	char *out;
 	const char *ptr_selected_file;
@@ -922,6 +1028,9 @@ static const char *menu_select_file_internal(const char *dir_path,
 	int opt;
 	int i;
 	char buf[64];
+	
+	if (!strcmp(dir_path,"devices")) file_list =  get_file_list_devices(); 
+    else file_list = get_file_list(dir_path);
 	
 	if (file_list == NULL)
 		return NULL;
@@ -989,24 +1098,20 @@ static const char *menu_select_file_internal(const char *dir_path,
         return out;
 }
 
-/*
-const char *menu_select_file_start(const char *dir_path, const char **d64_name)
-{
-	const char *file = menu_select_file_internal(dir_path,
-			32, 32, FULL_DISPLAY_X, FULL_DISPLAY_Y - 32);
-
-	if (!file)
-		return NULL;
-
-	return file;
-}
-*/
 const char *menu_select_file(const char *dir_path,const char *selected_file, int which)
 {
 	if (dir_path == NULL)
 		dir_path = "";
 	return menu_select_file_internal(dir_path,
 			0, 20, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20, selected_file, which);
+}
+
+int menu_select_devices()
+{
+	const char *selected_device; 
+	selected_device= menu_select_file_internal("devices",
+			0, 20, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20, NULL, 0);
+	if (!selected_device) return -1; else return (atoi(selected_device));	
 }
 
 static TTF_Font *read_font(const char *path, int font_size)
