@@ -89,13 +89,10 @@ static SDL_Surface *real_screen;
 
 static int is_inited = 0;
 static TTF_Font *menu_font16, *menu_font20,*menu_font8, *menu_font10 ;
-static TTF_Font *menu_font_alt16;
 #if defined(GEKKO)
 #define FONT_PATH "/apps/uae/FreeMono.ttf"
-#define FONT_ALT_PATH "/apps/uae/Smaller.ttf"
 #else
 #define FONT_PATH "FreeMono.ttf"
-#define FONT_ALT_PATH "Smaller.ttf"
 #endif
 
 int fh, fw;
@@ -487,48 +484,6 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 		}
 
 	
-	if (!font_surf)
-	{
-		fprintf(stderr, "%s\n", TTF_GetError());
-		exit(1);
-	}
-
-	SDL_BlitSurface(font_surf, NULL, screen, &dst);
-	SDL_FreeSurface(font_surf);
-}
-
-void menu_print_font_alt(SDL_Surface *screen, int r, int g, int b, int x, int y, const char *msg)
-{
-#undef _MAX_STRING
-#define _MAX_STRING 64
-	SDL_Surface *font_surf;
-	SDL_Rect dst = {x, y,  0, 0};
-	SDL_Color color = {r, g, b};
-	char buf[255];
-	unsigned int i;
-
-	memset(buf, 0, sizeof(buf));
-	strncpy(buf, msg, 254);
-	if (buf[0] != '|' && buf[0] != '^' && buf[0] != '.'
-		&& buf[0] != '#' && buf[0] != ' ' )
-	{
-		if (strlen(buf)>_MAX_STRING)
-		{
-			buf[_MAX_STRING-3] = '.';
-			buf[_MAX_STRING-2] = '.';
-			buf[_MAX_STRING-1] = '.';
-			buf[_MAX_STRING] = '\0';
-		}
-	}
-
-	/* Fixup multi-menu option look */
-	for (i = 0; i < strlen(buf) ; i++)
-	{
-		if (buf[i] == '^' || buf[i] == '|')
-			buf[i] = ' ';
-	}
-
-	font_surf = TTF_RenderText_Blended(menu_font_alt16, buf, color);
 	if (!font_surf)
 	{
 		fprintf(stderr, "%s\n", TTF_GetError());
@@ -1185,8 +1140,6 @@ void menu_init(SDL_Surface *screen)
 	menu_font8 = read_font(FONT_PATH, 8);
 	menu_font10 = read_font(FONT_PATH, 10);
 	
-	menu_font_alt16 = read_font(FONT_ALT_PATH,16);
-	
 	real_screen = screen;
 	VirtualKeyboard_init(screen);
 	is_inited = 1;
@@ -1201,7 +1154,6 @@ void menu_deinit(void)
 	TTF_CloseFont(menu_font20);
 	TTF_CloseFont(menu_font8);
 	TTF_CloseFont(menu_font10);
-	TTF_CloseFont(menu_font_alt16);
 	
 	TTF_Quit();
 }
