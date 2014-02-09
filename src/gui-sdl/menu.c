@@ -77,6 +77,9 @@ enum hdlist_cols {
     HDLIST_MAX_COLS
 };
 
+int FULL_DISPLAY_X; //640
+int FULL_DISPLAY_Y; //480
+int RATIO;
 
 static SDL_Surface *real_screen;
 
@@ -85,7 +88,7 @@ static SDL_Surface *real_screen;
 #define IS_MARKER(p_msg) ( (p_msg)[0] == '@' )
 
 static int is_inited = 0;
-static TTF_Font *menu_font16, *menu_font20;
+static TTF_Font *menu_font16, *menu_font20,*menu_font8, *menu_font10 ;
 static TTF_Font *menu_font_alt16;
 #if defined(GEKKO)
 #define FONT_PATH "/apps/uae/FreeMono.ttf"
@@ -110,21 +113,21 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	SDL_Rect rc;
 	SDL_Rect brc;
 
-	X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12;
-	Y = (FULL_DISPLAY_Y /2) - 24;
+	X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12/RATIO;
+	Y = (FULL_DISPLAY_Y /2) - 24/RATIO;
 
-	brc.x = FULL_DISPLAY_X/2-2*12; 
-	brc.y=Y+42;
-	brc.w=48;
-	brc.h=20;
+	brc.x = FULL_DISPLAY_X/2-2*12/RATIO; 
+	brc.y=Y+42/RATIO;
+	brc.w=48/RATIO;
+	brc.h=20/RATIO;
 
 	rc.x = X; 
 	rc.y=Y;
-	rc.w=12*(len + 2);
-	rc.h=duration > 0 ? 48 : 80;
+	rc.w=12*(len + 2)/RATIO;
+	rc.h=duration > 0 ? 48/RATIO : 80/RATIO;
 
-	src.x=rc.x+4;
-	src.y=rc.y+4;
+	src.x=rc.x+4/RATIO;
+	src.y=rc.y+4/RATIO;
 	src.w=rc.w;
 	src.h=rc.h;
 
@@ -138,7 +141,7 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	}
 	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
 	SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
-	menu_print_font(real_screen, 255,255,255, X+12, Y+12, text,20);
+	menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 	SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
 	SDL_UpdateRect(real_screen, rc.x, rc.y, rc.w,rc.h);
 	if (duration > 0)
@@ -146,7 +149,7 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 	else if (duration < 0)
 	{
 		SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x00, 0x80, 0x00));
-		menu_print_font(real_screen, 0,0,0, FULL_DISPLAY_X/2-12, Y+42, "OK",20);
+		menu_print_font(real_screen, 0,0,0, FULL_DISPLAY_X/2-12/RATIO, Y+42/RATIO, "OK",20);
 		SDL_UpdateRect(real_screen, brc.x, brc.y, brc.w, brc.h);
 		while (!(KEY_SELECT & menu_wait_key_press())) {}
 
@@ -175,22 +178,22 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 	//old = default_opt;
 
 	if (x < 0)
-		X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12;
+		X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12/RATIO;
 	else
 		X = x;
 
 	if (y < 0)	
-		Y = (FULL_DISPLAY_Y /2) - 48;
+		Y = (FULL_DISPLAY_Y /2) - 48/RATIO;
 	else
 		Y = y;
 
 	rc.x=X; 
 	rc.y=Y;
-	rc.w=12*(len + 2);
-	rc.h=80;
+	rc.w=12*(len + 2)/RATIO;
+	rc.h=80/RATIO;
 
-	src.x=rc.x+4;
-	src.y=rc.y+4;
+	src.x=rc.x+4/RATIO;
+	src.y=rc.y+4/RATIO;
 	src.w=rc.w;
 	src.h=rc.h;
 
@@ -198,27 +201,27 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 	{
 		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
 		SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
-		menu_print_font(real_screen, 255,255,255, X+12, Y+12, text,20);
+		menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 
 		if (default_opt)
 		{
-			brc.x=rc.x + rc.w/2-5*12; 
-			brc.y=rc.y+42;
-			brc.w=12*3;
-			brc.h=20;
+			brc.x=rc.x + rc.w/2-5*12/RATIO; 
+			brc.y=rc.y+42/RATIO;
+			brc.w=12*3/RATIO;
+			brc.h=20/RATIO;
 			SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x00, 0x80, 0x00));
 		}
 		else
 		{
-			brc.x=rc.x + rc.w/2+5*12-2*12-6; 
-			brc.y=rc.y+42;
-			brc.w=12*3;
-			brc.h=20;
+			brc.x=rc.x + rc.w/2+5*12/RATIO-2*12/RATIO-6/RATIO; 
+			brc.y=rc.y+42/RATIO;
+			brc.w=12*3/RATIO;
+			brc.h=20/RATIO;
 			SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x80, 0x00, 0x00));
 		}
 	
-		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12, Y+42, "YES",20);
-		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12+8*12, Y+42, "NO",20);
+		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12/RATIO, Y+42/RATIO, "YES",20);
+		menu_print_font(real_screen, 255,255,255, rc.x + rc.w/2-5*12/RATIO+8*12/RATIO, Y+42/RATIO, "NO",20);
 		
 		SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
 		SDL_UpdateRect(real_screen, rc.x, rc.y, rc.w,rc.h);
@@ -472,8 +475,18 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 			buf[i] = ' ';
 	}
 
-	if (font_size == 16) font_surf = TTF_RenderUTF8_Blended(menu_font16, buf, color);
-		else font_surf = TTF_RenderUTF8_Blended(menu_font20, buf, color);		
+	if (FULL_DISPLAY_X == 640)
+		{
+		if (font_size == 16) font_surf = TTF_RenderUTF8_Blended(menu_font16, buf, color);
+		else font_surf = TTF_RenderUTF8_Blended(menu_font20, buf, color);
+		}
+	else 	
+		{
+		if (font_size == 16) font_surf = TTF_RenderUTF8_Blended(menu_font8, buf, color);
+		else font_surf = TTF_RenderUTF8_Blended(menu_font10, buf, color);
+		}
+
+	
 	if (!font_surf)
 	{
 		fprintf(stderr, "%s\n", TTF_GetError());
@@ -534,7 +547,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 	int x_start = p_menu->x1;
 	int y_start = p_menu->y1 + line_height;
 	SDL_Rect r;
-	int entries_visible = (p_menu->y2 - p_menu->y1) / line_height - 1;
+	int entries_visible = (p_menu->y2 - p_menu->y1 -5) / line_height - 1;
 
 	int i, y;
 
@@ -991,8 +1004,17 @@ int menu_select_sized(const char *title, const char **msgs, int *submenus, int s
 	else
 		info = 1;
 	*/
+	if (FULL_DISPLAY_X == 640)
+	{
 	if (font_size == 16) menu_init_internal(&menu, title, menu_font16, msgs, x, y, x2, y2);
 	else menu_init_internal(&menu, title, menu_font20, msgs, x, y, x2, y2);
+	}
+	else
+	{
+	if (font_size == 16) menu_init_internal(&menu, title, menu_font8, msgs, x, y, x2, y2);
+	else menu_init_internal(&menu, title, menu_font10, msgs, x, y, x2, y2);
+	}
+
 
 	if (sel >= 0)
 		select_one(&menu, sel);
@@ -1008,7 +1030,7 @@ int menu_select_title(const char *title, const char **msgs, int *submenus)
 {
 	SDL_FillRect(real_screen, 0, SDL_MapRGB(real_screen->format, 0, 0, 0));
 	return menu_select_sized(title, msgs, submenus, 0,
-			32, 20, FULL_DISPLAY_X-32, FULL_DISPLAY_Y-20,
+			32/RATIO, 16/RATIO, FULL_DISPLAY_X-32/RATIO, FULL_DISPLAY_Y-16/RATIO,
 			NULL, NULL, 20);
 }
 
@@ -1103,14 +1125,14 @@ const char *menu_select_file(const char *dir_path,const char *selected_file, int
 	if (dir_path == NULL)
 		dir_path = "";
 	return menu_select_file_internal(dir_path,
-			0, 20, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20, selected_file, which);
+			0, 20/RATIO, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20/RATIO, selected_file, which);
 }
 
 int menu_select_devices()
 {
 	const char *selected_device; 
 	selected_device= menu_select_file_internal("devices",
-			0, 20, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20, NULL, 0);
+			0, 20/RATIO, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20/RATIO, NULL, 0);
 	if (!selected_device) return -1; else return (atoi(selected_device));	
 }
 
@@ -1149,17 +1171,41 @@ static TTF_Font *read_font(const char *path, int font_size)
 
 void menu_init(SDL_Surface *screen)
 {
+	
+	FULL_DISPLAY_X = currprefs.gfx_width_win;
+	FULL_DISPLAY_Y = currprefs.gfx_height_win;
+	RATIO = 640/FULL_DISPLAY_X;
+	
+	if (is_inited) return;
+	
 	TTF_Init();
 
 	menu_font16 = read_font(FONT_PATH, 16);
 	menu_font20 = read_font(FONT_PATH, 20);
+	menu_font8 = read_font(FONT_PATH, 8);
+	menu_font10 = read_font(FONT_PATH, 10);
 	
 	menu_font_alt16 = read_font(FONT_ALT_PATH,16);
-
+	
 	real_screen = screen;
 	VirtualKeyboard_init(screen);
 	is_inited = 1;
 }
+
+void menu_deinit(void)
+{
+	is_inited = 0;
+	VirtualKeyboard_fini();
+	
+	TTF_CloseFont(menu_font16);
+	TTF_CloseFont(menu_font20);
+	TTF_CloseFont(menu_font8);
+	TTF_CloseFont(menu_font10);
+	TTF_CloseFont(menu_font_alt16);
+	
+	TTF_Quit();
+}
+
 
 int menu_is_inited(void)
 {

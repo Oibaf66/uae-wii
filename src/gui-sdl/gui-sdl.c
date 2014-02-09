@@ -179,14 +179,16 @@ static const char *other_messages[] = {
 		/*03*/		"^| 0 | 1 | 2 | 3 | 4 ",
 		/*04*/		"Correct aspect ratio",
 		/*05*/		"^|off|100%|95%|93%|90%|custom",
-		/*06*/		"Scanlines",
-		/*07*/		"^|on|off",
-		/*08*/		"Leds",
+		/*06*/		"Resolution",
+		/*07*/		"^|320X240|640X480",
+		/*08*/		"Scanlines",
 		/*09*/		"^|on|off",
-		/*10*/		"Port",
-		/*11*/		"^|DEFAULT|SD|USB|SMB",
-		/*12*/		"Rumble",
-		/*13*/		"^|on|off",
+		/*10*/		"Leds",
+		/*11*/		"^|on|off",
+		/*12*/		"Port",
+		/*13*/		"^|DEFAULT|SD|USB|SMB",
+		/*14*/		"Rumble",
+		/*15*/		"^|on|off",
 		NULL
 };
 
@@ -802,7 +804,7 @@ void make_hardfile(void)
 	
 	if (file_exists(hdf_path)) 
 	{
-		if (msgYesNo("Overwrite the existing file?", 0, FULL_DISPLAY_X /2-180, FULL_DISPLAY_Y /2-48))
+		if (msgYesNo("Overwrite the existing file?", 0, FULL_DISPLAY_X /2-180/RATIO, FULL_DISPLAY_Y /2-48/RATIO))
 		unlink (hdf_path); else return;
 	}
 	
@@ -821,7 +823,7 @@ void delete_hardfile(void)
 	char dir[255];
 	strncpy(dir,prefs_get_attr("hardfile_path"),255);
 	name = (char *) menu_select_file(dir, NULL, 0);
-	if (name && msgYesNo("Are you sure to delete the hardfile?", 0, FULL_DISPLAY_X /2-200, FULL_DISPLAY_Y /2-48))
+	if (name && msgYesNo("Are you sure to delete the hardfile?", 0, FULL_DISPLAY_X /2-200/RATIO, FULL_DISPLAY_Y /2-48/RATIO))
 		{unlink (name); msgInfo("Hardfile deleted",3000,NULL);}
 }
 
@@ -1216,10 +1218,28 @@ static void audio_options(void)
 	fix_options_menu_sdl(1);
 }
 
+static void set_gfx_resolution (int res)
+{
+	if (res) //640X480
+	{
+		changed_prefs.gfx_width_win = 640;
+		changed_prefs.gfx_height_win = 480;
+		changed_prefs.gfx_lores = 0;
+		changed_prefs.gfx_linedbl = 1;
+	}
+	else //320X240
+	{
+		changed_prefs.gfx_width_win = 320;
+		changed_prefs.gfx_height_win = 240;
+		changed_prefs.gfx_lores = 1;
+		changed_prefs.gfx_linedbl = 0;
+	}
+}
+
 static void other_options(void)
 {
-	int submenus[7];
-	int opt, floppy_n;
+	int submenus[8];
+	int opt, floppy_n, old_sub_3;
 	
 	memset(submenus, 0, sizeof(submenus));
 	
@@ -1228,10 +1248,11 @@ static void other_options(void)
 	submenus[0] = get_floppy_speed();
 	submenus[1] = floppy_n;
 	submenus[2] = get_gfx_aspect_ratio();
-	submenus[3] = !(changed_prefs.gfx_linedbl == 2) ;
-	submenus[4] = !changed_prefs.leds_on_screen;
-	submenus[5] = changed_prefs.Port;
-	submenus[6] = !changed_prefs.rumble;
+	submenus[3] =  old_sub_3 = (changed_prefs.gfx_width_win == 640) ;
+	submenus[4] = !(changed_prefs.gfx_linedbl == 2) ;
+	submenus[5] = !changed_prefs.leds_on_screen;
+	submenus[6] = changed_prefs.Port;
+	submenus[7] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			other_messages, submenus);
@@ -1241,10 +1262,11 @@ static void other_options(void)
 	set_floppy_speed(submenus[0]);
 	set_floppy_number(submenus[1]);
 	set_gfx_aspect_ratio(submenus[2]);
-	changed_prefs.gfx_linedbl = submenus[3] ? 1 : 2;
-	changed_prefs.leds_on_screen = !submenus[4];
-	set_Port(submenus[5]);
-	changed_prefs.rumble = !submenus[6];
+	if (old_sub_3 != submenus[3]) set_gfx_resolution(submenus[3]); 
+	if (changed_prefs.gfx_width_win == 640) changed_prefs.gfx_linedbl = submenus[4] ? 1 : 2;
+	changed_prefs.leds_on_screen = !submenus[5];
+	set_Port(submenus[6]);
+	changed_prefs.rumble = !submenus[7];
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
 	currprefs.rumble = changed_prefs.rumble;
 	
@@ -1737,7 +1759,7 @@ void gui_display(int shortcut)
 			uae_reset(1);
 			break;	
 		case 15:
-			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138, FULL_DISPLAY_Y /2-48)) 
+			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138/RATIO, FULL_DISPLAY_Y /2-48/RATIO)) 
 				{currprefs.rumble=0; uae_quit();}	
 			break;
 		default:

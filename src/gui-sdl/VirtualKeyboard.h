@@ -30,7 +30,8 @@ typedef struct Virtual_Keyboard
 	
 } VirtualKeyboard_struct;
 
-extern void VirtualKeyboard_init(SDL_Surface *surf);
+void VirtualKeyboard_init(SDL_Surface *surf);
+void VirtualKeyboard_fini(void);
 extern struct virtkey *virtkbd_get_key(void);
-extern void flip_VKB();
+void flip_VKB();
 extern int kbd_is_active;
