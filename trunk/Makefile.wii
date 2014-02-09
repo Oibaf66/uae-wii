@@ -200,7 +200,6 @@ dist:uae.dol
 	cp meta.xml $@/apps/uae/
 	cp icon.png $@/apps/uae/
 	cp FreeMono.ttf $@/apps/uae/
-	cp Smaller.ttf $@/apps/uae/
 	cp README.Cloanto-Amiga_Forever $@/apps/uae/docs/
 	cp images/kb_amiga.png $@/apps/uae/images/
 	cp uaerc.wii $@/uae/uaerc
