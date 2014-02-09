@@ -47,6 +47,10 @@
 #include "hotkeys.h"
 #include "sdlgfx.h"
 
+#ifdef USE_SDL
+#include "guidep/menu.h"
+#endif
+
 /* Uncomment for debugging output */
 //#define DEBUG
 #ifdef DEBUG
@@ -57,8 +61,6 @@
 
 static SDL_Surface *display;
 static SDL_Surface *screen;
-extern void menu_init(SDL_Surface *screen);
-
 
 /* Standard P96 screen modes */
 #define MAX_SCREEN_MODES 12
@@ -943,7 +945,9 @@ static int graphics_subinit (void)
 	gui_message ("Unable to set video mode: %s\n", SDL_GetError ());
 	return 0;
     } else {
-	menu_init(screen);
+#ifdef USE_SDL
+	menu_init(screen); //GEKKO
+#endif
 	/* Just in case we didn't get exactly what we asked for . . . */
 	fullscreen   = ((screen->flags & SDL_FULLSCREEN) == SDL_FULLSCREEN);
 	is_hwsurface = ((screen->flags & SDL_HWSURFACE)  == SDL_HWSURFACE);
@@ -1140,6 +1144,9 @@ void graphics_leave (void)
     graphics_subshutdown ();
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     dumpcustom ();
+#ifdef USE_SDL	
+	menu_deinit(); //GEKKO
+#endif
 }
 
 void graphics_notify_state (int state)
@@ -1404,6 +1411,10 @@ int check_prefs_changed_gfx (void)
     currprefs.gfx_pfullscreen	 = changed_prefs.gfx_pfullscreen;
 	#ifdef GEKKO 
 	currprefs.gfx_correct_ratio  = changed_prefs.gfx_correct_ratio;
+	current_width  = currprefs.gfx_width_win;
+    current_height = currprefs.gfx_height_win;
+	gfxvidinfo.width  = current_width;
+	gfxvidinfo.height = current_height;
 	#endif
 
 #ifdef PICASSO96

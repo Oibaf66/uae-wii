@@ -104,6 +104,12 @@ void VirtualKeyboard_init(SDL_Surface *screen)
 	kbd_is_active=0;
 }
 
+void VirtualKeyboard_fini(void)
+{
+	SDL_FreeSurface (image_kbd);
+	vkb_is_init = -1;
+	kbd_is_active = 0;
+}
 
 void draw_vk()
 {
@@ -198,6 +204,8 @@ struct virtkey *get_key_internal()
 struct virtkey* virtkbd_get_key()
 {
 	virtkey_t *key;
+	
+	if (FULL_DISPLAY_X != 640) {msgInfo("Virtual Keyboard only with 640X480 res",4000,NULL);return NULL;}
 	
 	if (vkb_is_init != 1) return NULL;
 	
