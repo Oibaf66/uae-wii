@@ -367,7 +367,7 @@ const char **get_file_list_devices()
 	device_list_menu[0]=malloc(80);
 	
 	sprintf(device_list_menu[0], "#1NR %-6s %-6s %s %s %s %s %s %s %s",
-	"Device", "Volume","Acc","Sec", "Sur","Res","Blk","Prio", "Path");
+	"Device", "Volume","Acc","Sec", "Sur","Res","Blks","Prio", "Path");
 	
     for (i = 0; i < nr; i++) {
 	int     secspertrack, surfaces, reserved, blocksize, bootpri;
@@ -388,18 +388,20 @@ const char **get_file_list_devices()
 				    &filesysdir, &flags);
 
 	if (is_hardfile (currprefs.mountinfo, i)) {
-	    if (secspertrack == 0)
+	    if (secspertrack == 0) //RDB
 	        strcpy (texts[HDLIST_DEVICE], "N/A" );
 	    else //Partitionable hard disk or partition
-	    strncpy (texts[HDLIST_DEVICE], devname, 6);
-		texts[HDLIST_DEVICE][6]='\0';
+	    {
+			strncpy (texts[HDLIST_DEVICE], devname, 6);
+			texts[HDLIST_DEVICE][6]='\0';
+		}
 	    sprintf (texts[HDLIST_VOLUME],  "N/A" );
 	    sprintf (texts[HDLIST_HEADS], "%.3d", surfaces);
 	    //sprintf (texts[HDLIST_CYLS],    "%.3d", cylinders);
 	    sprintf (texts[HDLIST_SECS],    "%.3d", secspertrack);
 	    sprintf (texts[HDLIST_RSRVD],   "%.3d", reserved);
 	    //sprintf (texts[HDLIST_SIZE],    "%.3d", size);
-	    sprintf (texts[HDLIST_BLKSIZE], "%.3d", blocksize);
+	    sprintf (texts[HDLIST_BLKSIZE], "%.4d", blocksize);
 	} else { //Virtual filesystem
 	    strncpy (texts[HDLIST_DEVICE], devname, 6);
 		texts[HDLIST_DEVICE][6]='\0';
@@ -410,7 +412,7 @@ const char **get_file_list_devices()
 	    strcpy (texts[HDLIST_SECS],    "N/A");
 	    strcpy (texts[HDLIST_RSRVD],   "N/A");
 	    //strcpy (texts[HDLIST_SIZE],    "N/A");
-	    strcpy (texts[HDLIST_BLKSIZE], "N/A");
+	    strcpy (texts[HDLIST_BLKSIZE], "N/A ");
 	}
 	strncpy  (texts[HDLIST_PATH], rootdir ,24);
 	texts[HDLIST_PATH][24]='\0';
@@ -1012,7 +1014,8 @@ static const char *menu_select_file_internal(const char *dir_path,
 	if (file_list == NULL)
 		return NULL;
 
-	if (selected_file) 
+	if (!strcmp(dir_path,"devices")) opt = menu_select_sized("Select device to unmount", file_list, NULL, 0, x, y, x2, y2, NULL, NULL ,16);
+	else if (selected_file) 
 	{
 		ptr_selected_file= strrchr(selected_file,'/');
 		if (ptr_selected_file) ptr_selected_file++;
@@ -1033,6 +1036,8 @@ static const char *menu_select_file_internal(const char *dir_path,
 
 	if (!sel)
 		return NULL;
+		
+	if (!strcmp(dir_path,"devices")) return sel;
 	
 	if (!strcmp(sel,"[..]")) //selected "[..]"
 	{
@@ -1085,10 +1090,14 @@ const char *menu_select_file(const char *dir_path,const char *selected_file, int
 
 int menu_select_devices()
 {
-	const char *selected_device; 
-	selected_device= menu_select_file_internal("devices",
+	char *selected_device;
+	int nr_sel;
+	selected_device= (char *) menu_select_file_internal("devices",
 			0, 20/RATIO, FULL_DISPLAY_X, FULL_DISPLAY_Y - 20/RATIO, NULL, 0);
-	if (!selected_device) return -1; else return (atoi(selected_device));	
+	if (!selected_device) nr_sel = -1; 
+	else {selected_device[2]=0; nr_sel = atoi(selected_device);}
+	free ((void*)selected_device);
+	return nr_sel;
 }
 
 static TTF_Font *read_font(const char *path, int font_size)
