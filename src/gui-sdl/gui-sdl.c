@@ -764,6 +764,7 @@ static void unmount_device()
 	int dev_to_unmount=menu_select_devices();
 	if (dev_to_unmount==-1) return;
 	
+	write_log("Unmounting device: %d\n",dev_to_unmount );
 	if (kill_filesys_unit (currprefs.mountinfo, dev_to_unmount) == -1)
 	msgInfo("Volume does not exist", 3000, NULL);	
 #endif			
@@ -811,7 +812,7 @@ void make_hardfile(void)
 	msgInfo("Creating file",1,NULL);	
 		
 	if (!make_hdf(size, hdf_path, sector, surfaces, blocksize)) 
-		msgInfo("Hardfile created",4000,NULL);
+		msgInfo("Hardfile created",2000,NULL);
 	else
 		msgInfo("Failed to create hardfile",4000,NULL);	
 #endif
@@ -1226,6 +1227,7 @@ static void set_gfx_resolution (int res)
 		changed_prefs.gfx_height_win = 480;
 		changed_prefs.gfx_lores = 0;
 		changed_prefs.gfx_linedbl = 1;
+		currprefs.input_mouse_speed = 100;
 	}
 	else //320X240
 	{
@@ -1233,6 +1235,7 @@ static void set_gfx_resolution (int res)
 		changed_prefs.gfx_height_win = 240;
 		changed_prefs.gfx_lores = 1;
 		changed_prefs.gfx_linedbl = 0;
+		currprefs.input_mouse_speed = 200;
 	}
 }
 
