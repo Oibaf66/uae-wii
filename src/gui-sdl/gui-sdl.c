@@ -31,7 +31,7 @@
 #ifdef DEBUG_VK
 #define DEBUG_LOG write_log
 #else
-#define DEBUG_LOG(...) do ; while(0)
+#define DEBUG_LOG(...) do {} while(0)
 #endif
 
 extern int usbismount, smbismount, sdismount;
@@ -770,7 +770,7 @@ static void unmount_device()
 #endif			
 }
 
-extern int make_hdf(int size, const char *hdf_path, int blocks_per_track, int surfaces, int block_size);
+extern int make_hdf(unsigned int size, const char *hdf_path, int blocks_per_track, int surfaces, int block_size);
 
 void make_hardfile(void)
 {
@@ -811,7 +811,7 @@ void make_hardfile(void)
 	
 	msgInfo("Creating file",1,NULL);	
 		
-	if (!make_hdf(size, hdf_path, sector, surfaces, blocksize)) 
+	if (!make_hdf((unsigned int) size, hdf_path, sector, surfaces, blocksize)) 
 		msgInfo("Hardfile created",2000,NULL);
 	else
 		msgInfo("Failed to create hardfile",4000,NULL);	

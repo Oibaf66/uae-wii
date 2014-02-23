@@ -450,7 +450,7 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 #define _MAX_STRING 64
 	SDL_Surface *font_surf;
 	SDL_Rect dst = {x, y,  0, 0};
-	SDL_Color color = {r, g, b};
+	SDL_Color color = {r, g, b, 0};
 	char buf[255];
 	unsigned int i;
 

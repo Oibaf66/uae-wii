@@ -75,7 +75,7 @@ static int create_hdf (const char *path, off_t size)
     return -1;
 }
 
-int make_hdf(int size, const char *hdf_path, int blocks_per_track, int surfaces, int block_size)
+int make_hdf(unsigned int size, const char *hdf_path, int blocks_per_track, int surfaces, int block_size)
 {
     char *size_spec;
 	const char *device_name ="DH0";
@@ -89,7 +89,7 @@ int make_hdf(int size, const char *hdf_path, int blocks_per_track, int surfaces,
 	exit (EXIT_FAILURE);
     }
 
-    if ((size >= (1LL << 31)) && (sizeof (off_t) < sizeof (uae_u64))) {
+    if ((size >= (1u << 31)) && (sizeof (off_t) < sizeof (uae_u64))) {
 	write_log ("Specified size too large (2GB file size is maximum).\n");
 	exit (EXIT_FAILURE);
     }

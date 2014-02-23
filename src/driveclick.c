@@ -168,7 +168,7 @@ void driveclick_init (void)
     static char tmp_path[1024];
 
     driveclick_free ();
-    vv = 0;
+    vv = 0; v = 0;
 
     write_log("driveclick init...\n");    
 
