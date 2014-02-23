@@ -167,14 +167,15 @@ uae.dol: uae.elf
 	@echo ----
 
 # Compilation flags.
-COMMON_FLAGS	:= -g -O2 -ftree-vectorize -ffast-math -pipe -fdiagnostics-show-option $(MACHDEP) -Wall -Wno-unused -Wno-format
+COMMON_FLAGS	:= -g -O3 $(MACHDEP) -Wall -W -Wno-unused -Wno-format -Wno-sign-compare 
 INCLUDES	:=  -Isrc/md-generic/ -Isrc/include -Isrc -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/libogc/include/SDL -I$(PORTLIBS)/include
 DEFINES		:=  -DOS_WITHOUT_MEMORY_MANAGEMENT -DSAVESTATE -DUSE_SDL -DSUPPORT_THREADS -DCPUEMU_0 -DCPUEMU_5 -DCPUEMU_6 \
 		    -DFPUEMU -DAGA -DAUTOCONFIG -DFILESYS \
-		    -DTD_START_HEIGHT=20 -DDRIVESOUND 
+		    -DTD_START_HEIGHT=20 -DDRIVESOUND -DREGPARAM=
 CFLAGS		:= $(COMMON_FLAGS) $(INCLUDES) $(DEFINES)
 
-#unused defines; -DCAPS (to enable ipf file) -DFDI2RAW (to enable DFI file)
+#unused defines: -DCAPS (to enable ipf file) -DFDI2RAW (to enable DFI file)
+#unused flags: -ftree-vectorize -ffast-math
 
 # Test link flags.
 LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(PORTLIBS)/lib -L$(DEVKITPRO)/libogc/lib -L$(DEVKITPRO)/libogc/lib/wii -lz -lSDL_ttf -lSDL -lSDL_image -lpng -ljpeg -lfreetype -lfat -lwiiuse -lbte -logc -lm -lwiikeyboard -ltinysmb
@@ -225,7 +226,7 @@ run:
 uae.elf: src/tools/genlinetoscr.exe src/blit.h src/blitfunc.c src/blitfunc.h src/blittable.c src/linetoscr.c $(SYMLINKS) src/target.h src/md-fpp.h src/sysconfig.h $(OBJS)
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
-	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 	#keep elf for debugging
 	#cp $@ /tmp/elf
 
