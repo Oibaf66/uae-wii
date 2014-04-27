@@ -1025,15 +1025,18 @@ static const char *menu_select_file_internal(const char *dir_path,
 	}
 	else opt = menu_select_sized("Select file", file_list, NULL, 0, x, y, x2, y2, NULL, NULL ,16);
 	
-	if (opt < 0)
-		return NULL;
-	sel = strdup(file_list[opt]);
+	sel = NULL;
+	
+	if (opt >= 0) sel = strdup(file_list[opt]);
 
 	/* Cleanup everything - file_list is NULL-terminated */
         for ( i = 0; file_list[i]; i++ )
         	free((void*)file_list[i]);
         free(file_list);
-
+	
+	if (opt < 0)
+		return NULL;	
+		
 	if (!sel)
 		return NULL;
 		
