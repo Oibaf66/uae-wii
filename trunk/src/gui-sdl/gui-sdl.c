@@ -19,7 +19,7 @@
 #include "uae.h"
 #include "menu.h"
 #include "VirtualKeyboard.h"
-#include "sounddep/sound.h"
+#include "audio.h"
 #include "inputdevice.h"
 #include "filesys.h"
 
@@ -1713,7 +1713,7 @@ void gui_display(int shortcut)
 	int submenus[3];
 	int opt;
 	gui_is_active=1;
-	pause_sound();
+	audio_pause();
 	
 	memset(submenus, 0, sizeof(submenus));
 
@@ -1772,7 +1772,7 @@ void gui_display(int shortcut)
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
-	resume_sound();
+	audio_resume();
 	gui_is_active=0;
 }
 
