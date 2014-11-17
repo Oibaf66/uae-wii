@@ -1638,11 +1638,13 @@ static int td_pos = (TD_RIGHT|TD_BOTTOM);
 # define TD_START_HEIGHT 0
 #endif
 
-#define TD_TOTAL_HEIGHT (TD_PADY + TD_NUM_HEIGHT + TD_START_HEIGHT)
+#define TD_TOTAL_HEIGHT (TD_PADY*2 + TD_NUM_HEIGHT + TD_START_HEIGHT)
 
 #define NUMBERS_NUM 14
 
 #define TD_BORDER 0x333
+
+int td_total_height_offset = 0; //For GEKKO 320X240 resolution
 
 static const char *numbers = { /* ugly  0123456789CHD% */
 "+++++++--++++-+++++++++++++++++-++++++++++++++++++++++++++++++++++++++++++++-++++++-++++----++---+"
@@ -1703,7 +1705,7 @@ static void draw_status_line (int line)
     else
 	x_start = TD_PADX;
 
-    y = line - (gfxvidinfo.height - TD_TOTAL_HEIGHT);
+    y = line - (gfxvidinfo.height - TD_TOTAL_HEIGHT) - td_total_height_offset;
     xlinebuffer = gfxvidinfo.linemem;
     if (xlinebuffer == 0)
 	xlinebuffer = row_map[line];
@@ -1770,7 +1772,7 @@ static void draw_status_line (int line)
 	    am = 3;
 	}
 	c = xcolors[on ? on_rgb : off_rgb];
-	if (y == 0 || y == TD_TOTAL_HEIGHT - 1)
+	if (y == 0 || y == TD_TOTAL_HEIGHT - 1 - td_total_height_offset)
 	    c = xcolors[TD_BORDER];
 
 	x = x_start + pos * TD_WIDTH;
@@ -1833,8 +1835,9 @@ void finish_drawing_frame (void)
 	pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);
     }
     if (currprefs.leds_on_screen) {
-	int line = gfxvidinfo.height - TD_TOTAL_HEIGHT;
-	for (i = TD_TOTAL_HEIGHT; i--; line++) {
+	if (currprefs.gfx_width_win == 640) td_total_height_offset = 0; else td_total_height_offset = 9;
+	int line = gfxvidinfo.height - TD_TOTAL_HEIGHT + td_total_height_offset;
+	for (i = TD_TOTAL_HEIGHT- td_total_height_offset; i--; line++) {
 	    draw_status_line (line);
 	    do_flush_line (line);
 	}
