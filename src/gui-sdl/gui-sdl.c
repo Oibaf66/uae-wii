@@ -45,7 +45,7 @@ static const char *main_menu_messages[] = {
 		/*01*/		"^|df0|df1|df2|df3",
 		/*02*/		"States",
 		/*03*/		"^|Load|Save|Delete",
-		/*04*/		"#1-------------------------------------",
+		/*04*/		"#1-----------------------------------------------",
 		/*05*/		"Wiimote configuration",
 		/*06*/		"^|Wiimote1|Wiimote2",
 		/*07*/		"Hardware options",
@@ -1239,6 +1239,8 @@ static void set_gfx_resolution (int res)
 	}
 }
 
+extern int screen_is_picasso;
+
 static void other_options(void)
 {
 	int submenus[8];
@@ -1265,7 +1267,11 @@ static void other_options(void)
 	set_floppy_speed(submenus[0]);
 	set_floppy_number(submenus[1]);
 	set_gfx_aspect_ratio(submenus[2]);
-	if (old_sub_3 != submenus[3]) set_gfx_resolution(submenus[3]); 
+	if (old_sub_3 != submenus[3])
+		{
+		if (screen_is_picasso) msgInfo("No gfx change with Picasso",3000,NULL);
+		else set_gfx_resolution(submenus[3]);
+		}
 	if (changed_prefs.gfx_width_win == 640) changed_prefs.gfx_linedbl = submenus[4] ? 1 : 2;
 	changed_prefs.leds_on_screen = !submenus[5];
 	set_Port(submenus[6]);

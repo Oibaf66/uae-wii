@@ -77,7 +77,7 @@ static int red_bits, green_bits, blue_bits;
 static int red_shift, green_shift, blue_shift;
 
 #ifdef PICASSO96
-static int screen_is_picasso;
+int screen_is_picasso;
 static int screen_was_picasso;
 static char picasso_invalid_lines[1201];
 static int picasso_has_invalid_lines;
