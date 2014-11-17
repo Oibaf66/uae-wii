@@ -136,7 +136,7 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 		irc->w=src.w;
 		irc->h=src.h;
 	}
-	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
+	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 96, 136, 184));	
 	SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
 	menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 	SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
@@ -196,7 +196,7 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 
 	while (1)
 	{
-		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 0, 96, 0));	
+		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 96, 136, 184));	
 		SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
 		menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 
@@ -447,7 +447,7 @@ static submenu_t *find_submenu(menu_t *p_menu, int index)
 void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 		int x, int y, const char *msg, int font_size)
 {
-#define _MAX_STRING 64
+#define _MAX_STRING 62
 	SDL_Surface *font_surf;
 	SDL_Rect dst = {x, y,  0, 0};
 	SDL_Color color = {r, g, b, 0};
@@ -501,7 +501,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 {
 	int font_height = TTF_FontHeight(p_menu->p_font);
 	int line_height = (font_height + font_height / 4);
-	int x_start = p_menu->x1;
+	int x_start = p_menu->x1+6/RATIO;
 	int y_start = p_menu->y1 + line_height;
 	SDL_Rect r;
 	int entries_visible = (p_menu->y2 - p_menu->y1 -5) / line_height - 1;
@@ -535,8 +535,8 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 		if (sel < 0)
 			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x40, 0x00, 0x00));
 		else
-			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x00, 0xe7, 0xe7));
-		menu_print_font(screen, 0,0,0, p_menu->x1, p_menu->y1, p_menu->title, font_size);
+			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 96, 136, 184)); //Title
+		menu_print_font(screen, 255,255,255, p_menu->x1+4/RATIO, p_menu->y1, p_menu->title, font_size);
 	}
 
 	for (i = p_menu->start_entry_visible; i <= p_menu->start_entry_visible + entries_visible; i++)
@@ -571,7 +571,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 				switch (msg[1])
 				{
 				case '1':
-					menu_print_font(screen, 0,0,255,
+					menu_print_font(screen, 96,136,184,
 							x_start, y_start + y, msg+2, font_size);
 					break;
 				case '2':
@@ -900,11 +900,15 @@ static int menu_select_internal(SDL_Surface *screen,
 	while(1)
 	{
 		SDL_Rect r = {p_menu->x1, p_menu->y1,
-				p_menu->x2 - p_menu->x1, p_menu->y2 - p_menu->y1};
+				p_menu->x2 - p_menu->x1, p_menu->y2 - p_menu->y1+2/RATIO};
+		SDL_Rect r_int = {p_menu->x1+4/RATIO, p_menu->y1,
+				p_menu->x2 - p_menu->x1-8/RATIO, p_menu->y2 - p_menu->y1-2/RATIO};		
 		uint32_t keys;
+		
 		int sel_last = p_menu->cur_sel;
 
-		SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+		SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 96, 136, 184));
+		SDL_FillRect(screen, &r_int, SDL_MapRGB(screen->format, 255, 255, 255));
 
 		menu_draw(screen, p_menu, 0, font_size);
 		SDL_Flip(screen);
