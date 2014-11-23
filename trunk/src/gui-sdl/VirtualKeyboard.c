@@ -24,6 +24,14 @@
 #include "target.h"
 #include "gensound.h"
 
+/* Uncomment for debugging output */
+//#define DEBUG_VK
+#ifdef DEBUG_VK
+#define DEBUG_LOG write_log
+#else
+#define DEBUG_LOG(...) do {} while(0)
+#endif
+
 static SDL_Surface *image_kbd, *tmp_surface ;
 static int vkb_is_init;
 //static int key_code;
@@ -68,14 +76,15 @@ static int buttons_margins[KEY_ROWS][KEY_COLS+1] = {
 {28,63,95,329,361,396,515,567,593,620},
 {14,80,146,212,278,344,411,476,543}};
 
-
+extern int RATIO;
 
 void VirtualKeyboard_init(SDL_Surface *screen)
 {
+	if (vkb_is_init) return;
+	
 	VirtualKeyboard.screen = screen;
-	VirtualKeyboard.x = 3; //Where to print the keyboard
-	VirtualKeyboard.y = 100;
-	vkb_is_init = -1;
+	VirtualKeyboard.x = 2/RATIO; //Where to print the keyboard
+	VirtualKeyboard.y = 100/RATIO;
 	
 	char kbd_image[255];
 
@@ -91,7 +100,7 @@ void VirtualKeyboard_init(SDL_Surface *screen)
     }
 #endif
 
-    strcat (kbd_image, KBDIMAGE);
+    if (RATIO == 1) strcat (kbd_image, KBDIMAGE); else strcat (kbd_image, KBDIMAGE_SMALL);
 	
 	tmp_surface=IMG_Load(kbd_image);
 
@@ -102,19 +111,23 @@ void VirtualKeyboard_init(SDL_Surface *screen)
 	memset(VirtualKeyboard.buf, 0, sizeof(VirtualKeyboard.buf));
 	vkb_is_init = 1;
 	kbd_is_active=0;
+	DEBUG_LOG("Virtual keyboard is inited\n");
 }
 
 void VirtualKeyboard_fini(void)
 {
+	if (!vkb_is_init) return;
+	
 	SDL_FreeSurface (image_kbd);
-	vkb_is_init = -1;
+	vkb_is_init = 0;
 	kbd_is_active = 0;
+	DEBUG_LOG("Virtual keyboard is finished\n");
 }
 
 void draw_vk()
 {
 	SDL_Rect dst_rect = {VirtualKeyboard.x, VirtualKeyboard.y, 0, 0};
-	SDL_BlitSurface(image_kbd, NULL, VirtualKeyboard.screen, &dst_rect); 	 
+	SDL_BlitSurface(image_kbd, NULL, VirtualKeyboard.screen, &dst_rect);
 }
 
 inline void flip_VKB()
@@ -181,7 +194,7 @@ struct virtkey *get_key_internal()
 			x = (xm-border_x);
 			y = (ym-border_y);
 			
-			i = get_index(x,y);
+			i = get_index(x*RATIO,y*RATIO);
 			
 			if (i==-1) continue;
 			
@@ -205,9 +218,7 @@ struct virtkey* virtkbd_get_key()
 {
 	virtkey_t *key;
 	
-	if (FULL_DISPLAY_X != 640) {msgInfo("Virtual Keyboard only with 640X480 res",4000,NULL);return NULL;}
-	
-	if (vkb_is_init != 1) return NULL;
+	if (!vkb_is_init) return NULL;
 	
 	pause_sound();
 	
