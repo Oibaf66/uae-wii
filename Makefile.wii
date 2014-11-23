@@ -203,6 +203,7 @@ dist:uae.dol
 	cp FreeMono.ttf $@/apps/uae/
 	cp README.Cloanto-Amiga_Forever $@/apps/uae/docs/
 	cp images/kb_amiga.png $@/apps/uae/images/
+	cp images/kb_amiga_small.png $@/apps/uae/images/
 	cp uaerc.wii $@/uae/uaerc
 	cp uaerc.smb $@/uae/
 	cp docs/configuration.txt $@/apps/uae/docs/

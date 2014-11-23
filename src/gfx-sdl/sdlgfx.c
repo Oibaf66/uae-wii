@@ -46,10 +46,8 @@
 #include "inputdevice.h"
 #include "hotkeys.h"
 #include "sdlgfx.h"
-
-#ifdef USE_SDL
 #include "guidep/menu.h"
-#endif
+
 
 /* Uncomment for debugging output */
 //#define DEBUG
@@ -945,9 +943,9 @@ static int graphics_subinit (void)
 	gui_message ("Unable to set video mode: %s\n", SDL_GetError ());
 	return 0;
     } else {
-#ifdef USE_SDL
+
 	menu_init(screen); //GEKKO
-#endif
+
 	/* Just in case we didn't get exactly what we asked for . . . */
 	fullscreen   = ((screen->flags & SDL_FULLSCREEN) == SDL_FULLSCREEN);
 	is_hwsurface = ((screen->flags & SDL_HWSURFACE)  == SDL_HWSURFACE);
@@ -1112,6 +1110,9 @@ static void graphics_subshutdown (void)
 	if (display != screen)
 	    SDL_FreeSurface (screen);
     }
+
+	menu_deinit(); //GEKKO	
+	
     display = screen = 0;
     mousehack = 0;
 
@@ -1144,9 +1145,6 @@ void graphics_leave (void)
     graphics_subshutdown ();
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     dumpcustom ();
-#ifdef USE_SDL	
-	menu_deinit(); //GEKKO
-#endif
 }
 
 void graphics_notify_state (int state)

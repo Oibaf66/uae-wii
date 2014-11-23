@@ -26,7 +26,13 @@
 #include "options.h"
 #include "filesys.h"
 
-
+/* Uncomment for debugging output */
+//#define DEBUG_MENU
+#ifdef DEBUG_MENU
+#define DEBUG_LOG write_log
+#else
+#define DEBUG_LOG(...) do {} while(0)
+#endif
 
 struct joyinfo {
     SDL_Joystick *joy;
@@ -1159,10 +1165,13 @@ void menu_init(SDL_Surface *screen)
 	real_screen = screen;
 	VirtualKeyboard_init(screen);
 	is_inited = 1;
+	DEBUG_LOG("Menu is inited\n");
 }
 
 void menu_deinit(void)
 {
+	if (!is_inited) return;
+	
 	is_inited = 0;
 	VirtualKeyboard_fini();
 	
@@ -1172,6 +1181,7 @@ void menu_deinit(void)
 	TTF_CloseFont(menu_font10);
 	
 	TTF_Quit();
+	DEBUG_LOG("Menu is finished\n");
 }
 
 
