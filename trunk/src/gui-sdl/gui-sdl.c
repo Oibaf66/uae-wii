@@ -193,7 +193,7 @@ static const char *other_messages[] = {
 };
 
 static const char *save_conf_messages[] = {
-		/*00*/		"Save conf file to load at start up (uaerc.saved)",
+		/*00*/		"Save conf file to load at start (uaerc.saved)",
 		/*01*/		" ",
 		/*02*/		"Save confs file 1",
 		/*03*/		" ",

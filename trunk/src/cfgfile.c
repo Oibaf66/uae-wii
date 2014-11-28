@@ -798,12 +798,14 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 		#ifdef GEKKO
 	    if (cfgfile_path_noexpand (option, value, "floppy_path"))
 		return 1;
+		if (cfgfile_path_noexpand (option, value, "hardfile_path"))
+		return 1;
 		#else
 		if (cfgfile_path (option, value, "floppy_path"))
 		return 1;
-		#endif
 	    if (cfgfile_path (option, value, "hardfile_path"))
 		return 1;
+		#endif
 #ifdef SAVESTATE
 	    if (cfgfile_path (option, value, "savestate_path"))
 		return 1;
