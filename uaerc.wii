@@ -40,12 +40,12 @@ z3mem_size=0
 gfxcard_size=0
 
 # Emulation precision
-cpu_compatible=false
+cpu_compatible=true
 cpu_cycle_exact=false
 
 # Alters CPU speed (values are: real, max, 1 through 20)
 # i.e. setting of 4 = 20% CHIPSET and 80% CPU
-cpu_speed=max
+cpu_speed=real
 
 #Immediate blits helps with speed
 immediate_blits=true
@@ -76,8 +76,8 @@ floppy_speed=100
 
 # Sound configuration
 sound_output=normal
-sound_frequency=32000
-sound_latency=200
+sound_frequency=48000
+sound_latency=100
 
 # Graphic configuration
 
@@ -92,7 +92,7 @@ gfx_height_fullscreen=480
 gfx_center_horizontal=true
 gfx_center_vertical=true
 
-# Vsync along with full screen enables double buffer and refresh rate setting
+# Vsync enabled along with full screen enables double buffer and refresh rate setting
 # Vsync false is faster
 gfx_vsync=false
 
