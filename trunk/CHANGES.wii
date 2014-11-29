@@ -1,3 +1,13 @@
+version 11:
+		* Update to E-UAE 0.8.29 (more compatibility)
+		* Added 320X240 resolution (more emulation speed)
+		* Added hardfile and Virtual File System support in the GUI
+		* Amiga colors for GUI, added borders to the windows
+		* Set sound frequency to 48k
+		* Small bug fixes
+
+-- Fabio Olimpieri <fabio.olimpieri@tin.it>, Nov 30 CEST 2014
+
 version 10:
 		* Added Gamecube controller support
 		* Added graphic virtual keyboard with IR Wiimote pointer called by "+" button 
