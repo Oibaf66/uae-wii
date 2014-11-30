@@ -96,6 +96,9 @@ gfx_center_vertical=true
 # Vsync false is faster
 gfx_vsync=false
 
+# Set the refresh rate (1-60), 0 disabled
+gfx_refreshrate=0
+
 # Set true to adapt the Amiga screen to Wii SDL screen (640X480) 
 gfx_correct_aspect=false
 

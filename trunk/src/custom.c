@@ -2220,14 +2220,24 @@ void init_hz (void)
 {
     int isntsc;
 
-    if ((currprefs.chipset_refreshrate == 50 && !currprefs.ntscmode) ||
-	(currprefs.chipset_refreshrate == 60 && currprefs.ntscmode)) {
-	currprefs.chipset_refreshrate = 0;
-	changed_prefs.chipset_refreshrate = 0;
-    }
     if (is_vsync ()) {
 	currprefs.chipset_refreshrate = abs (currprefs.gfx_refreshrate);
 	changed_prefs.chipset_refreshrate = abs (currprefs.gfx_refreshrate);
+    }
+#ifdef GEKKO	
+	else
+	{
+	currprefs.chipset_refreshrate = 0;
+	changed_prefs.chipset_refreshrate = 0;
+	currprefs.gfx_refreshrate = 0;
+	changed_prefs.gfx_refreshrate = 0;
+	}
+#endif
+
+   if ((currprefs.chipset_refreshrate == 50 && !currprefs.ntscmode) ||
+	(currprefs.chipset_refreshrate == 60 && currprefs.ntscmode)) {
+	currprefs.chipset_refreshrate = 0;
+	changed_prefs.chipset_refreshrate = 0;
     }
 
     beamcon0 = new_beamcon0;
