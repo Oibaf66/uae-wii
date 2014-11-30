@@ -1365,7 +1365,11 @@ static void switch_keymaps (void)
 
 int check_prefs_changed_gfx (void)
 {
-    if (changed_prefs.map_raw_keys != currprefs.map_raw_keys) {
+#ifdef GEKKO
+    int old_currprefs_gfx_vsync = currprefs.gfx_vsync;
+#endif
+	
+	if (changed_prefs.map_raw_keys != currprefs.map_raw_keys) {
 	switch_keymaps ();
 	currprefs.map_raw_keys = changed_prefs.map_raw_keys;
     }
@@ -1384,6 +1388,7 @@ int check_prefs_changed_gfx (void)
 	    && changed_prefs.gfx_pfullscreen    == currprefs.gfx_pfullscreen
 		#ifdef GEKKO 
 		&& changed_prefs.gfx_correct_ratio  == currprefs.gfx_correct_ratio
+		&& changed_prefs.gfx_vsync  == currprefs.gfx_vsync
 		#endif
 		) {
 	return 0;
@@ -1413,12 +1418,17 @@ int check_prefs_changed_gfx (void)
     current_height = currprefs.gfx_height_win;
 	gfxvidinfo.width  = current_width;
 	gfxvidinfo.height = current_height;
+	currprefs.gfx_vsync  = changed_prefs.gfx_vsync;
 	#endif
 
 #ifdef PICASSO96
     if (!screen_is_picasso)
 #endif
 	graphics_subinit ();
+	
+#ifdef GEKKO //Hack to force init_custom
+currprefs.gfx_vsync  = old_currprefs_gfx_vsync;
+#endif	
 
     return 0;
 }

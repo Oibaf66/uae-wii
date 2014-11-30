@@ -143,12 +143,14 @@ static const char *emulation_messages[] = {
 		/*04*/		"Framerate",
 		/*05*/		"^|100%|50%|33%|25%|12%|custom",
 		/*06*/		"Refresh rate (Hz)",
-		/*07*/		"^|off|10|20|30|40|50|60",		
+		/*07*/		"^|off|30|35|40|45|50|60|custom",		
 		/*08*/		"Collision level",
 		/*09*/		"^|none|sprites|playfields|full",		
 		/*10*/		"Immediate blits",
 		/*11*/		"^|on|off",
 		/*12*/		"Blitter cycle exact",
+		/*13*/		"^|on|off",
+		/*12*/		"Vsync",
 		/*13*/		"^|on|off",
 		NULL
 };
@@ -301,6 +303,7 @@ static const int correct_aspect_table[] = {0,100,95,93,90};
 static const int cpu_to_chipset_table[] = {0,-1,512*2,512*4, 512*8, 512*12, 512*16, 512*20};
 static const int floppy_table[] = {100, 0, 400, 800};
 static const int framerate_table[] = {1, 2, 3, 4, 8};
+static const int refreshrate_table[] = {0, 30, 35, 40, 45, 50, 60};
 
 /*
 static const char *help_messages[] = {
@@ -951,6 +954,21 @@ static int get_gfx_framerate(void)
 
 }
 
+static void set_gfx_refreshrate(int which)
+{
+	/* Custom setting - don't touch! */
+	if (which > SDL_arraysize(refreshrate_table)-1)
+		return;
+	changed_prefs.gfx_refreshrate = refreshrate_table[which];
+}
+
+static int get_gfx_refreshrate(void)
+{
+	return find_index_by_val(changed_prefs.gfx_refreshrate, refreshrate_table,
+			SDL_arraysize(refreshrate_table), 7);
+
+}
+
 static void set_gfx_aspect_ratio(int which)
 {
 	if (!which) {changed_prefs.gfx_correct_aspect = 0; return;}
@@ -1156,7 +1174,7 @@ static void set_dfxclick(int sounddf_on)
 
 static void emulation_options(void)
 {
-	int submenus[7];
+	int submenus[8], old_sub_3;
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -1164,18 +1182,19 @@ static void emulation_options(void)
 	submenus[0] = get_emulation_accuracy();
 	submenus[1] = get_cpu_to_chipset_speed();
 	submenus[2] = get_gfx_framerate();
-	submenus[3] = changed_prefs.gfx_refreshrate/10;
+	submenus[3] = old_sub_3 = get_gfx_refreshrate();
 	submenus[4] = changed_prefs.collision_level;
 	submenus[5] = !changed_prefs.immediate_blits;
 	submenus[6] = !changed_prefs.blitter_cycle_exact;
+	submenus[7] = !changed_prefs.gfx_vsync;
 	
 	opt = menu_select_title("Emulation options menu",
 			emulation_messages, submenus);
 	if (opt < 0)
 		return;
 	
-	if ((submenus[3] != changed_prefs.gfx_refreshrate/10)&&(currprefs.gfx_vsync==0))
-		{msgInfo("You must set gfx_vsync=true in uaerc file",4000,0);
+	if ((submenus[3] != old_sub_3)&&(submenus[7]))
+		{msgInfo("You must set vsync on",3000,0);
 		submenus[3]=0;}
 		
 	
@@ -1183,10 +1202,11 @@ static void emulation_options(void)
 	set_emulation_accuracy(submenus[0]);
 	set_cpu_to_chipset_speed(submenus[1]);
 	set_gfx_framerate(submenus[2]);
-	changed_prefs.gfx_refreshrate = submenus[3]*10;
+	set_gfx_refreshrate(submenus[3]);
 	changed_prefs.collision_level = submenus[4];	
 	changed_prefs.immediate_blits = !submenus[5];
 	changed_prefs.blitter_cycle_exact = !submenus[6];
+	changed_prefs.gfx_vsync = !submenus[7];
 	
 	fix_options_menu_sdl(1);
 }
@@ -1719,6 +1739,7 @@ void gui_display(int shortcut)
 	int submenus[3];
 	int opt;
 	gui_is_active=1;
+	int exit = 0;
 	audio_pause();
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -1769,12 +1790,12 @@ void gui_display(int shortcut)
 			break;	
 		case 15:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138/RATIO, FULL_DISPLAY_Y /2-48/RATIO)) 
-				{currprefs.rumble=0; uae_quit();}	
+				{currprefs.rumble=0; uae_quit(); exit = 1;}
 			break;
 		default:
 			break;
 		}
-	} while (opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 11);flip_screen();}
+	} while ((opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 11 || opt == 15)&&!exit);flip_screen();}
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
