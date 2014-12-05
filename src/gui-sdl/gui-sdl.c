@@ -1795,7 +1795,8 @@ void gui_display(int shortcut)
 		default:
 			break;
 		}
-	} while ((opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 11 || opt == 15)&&!exit);flip_screen();}
+	} while ((opt == 0 || opt == 5 || opt == 8 || opt == 9 || opt == 10 || opt == 11 || opt == 15)&&!exit);
+	if (!exit) flip_screen();}
 	
 	if (shortcut==6) {virtual_keyboard(); notice_screen_contents_lost ();}//Enter Virtual Keyboard
 	
