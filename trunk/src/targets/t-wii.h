@@ -25,6 +25,8 @@
 #define SAVEDFILENAME "/uae/uaerc.saved"
 #define KBDIMAGE "/apps/uae/images/kb_amiga.png"
 #define KBDIMAGE_SMALL "/apps/uae/images/kb_amiga_small.png"
+#define WINDOWIMAGE "/apps/uae/images/window_bg.png"
+#define WINDOWIMAGE_SMALL "/apps/uae/images/window_bg_small.png"
 
 #define DEFPRTNAME "lpr"
 #define DEFSERNAME "/dev/ttyS1"

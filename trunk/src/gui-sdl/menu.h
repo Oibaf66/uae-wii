@@ -15,6 +15,7 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include<SDL/SDL_image.h>
 #include <stdint.h>
 
 #if defined(__cplusplus)

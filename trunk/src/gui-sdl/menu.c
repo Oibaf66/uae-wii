@@ -96,10 +96,12 @@ static SDL_Surface *real_screen;
 static int is_inited = 0;
 static TTF_Font *menu_font16, *menu_font20,*menu_font8, *menu_font10 ;
 #if defined(GEKKO)
-#define FONT_PATH "/apps/uae/FreeMono.ttf"
+#define FONT_PATH "/apps/uae/font.ttf"
 #else
 #define FONT_PATH "FreeMono.ttf"
 #endif
+
+static SDL_Surface *image_window, *tmp_surface ;
 
 int fh, fw;
 
@@ -142,7 +144,7 @@ int msgInfo(char *text, int duration, SDL_Rect *irc)
 		irc->w=src.w;
 		irc->h=src.h;
 	}
-	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 96, 136, 184));	
+	SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 116, 117, 206));	
 	SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
 	menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 	SDL_UpdateRect(real_screen, src.x, src.y, src.w, src.h);
@@ -176,9 +178,6 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 	SDL_Rect rc;
 	SDL_Rect brc;
 	uint32_t key;
-	//int old;
-
-	//old = default_opt;
 
 	if (x < 0)
 		X = (FULL_DISPLAY_X /2) - (len / 2 + 1)*12/RATIO;
@@ -202,24 +201,24 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 
 	while (1)
 	{
-		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 96, 136, 184));	
+		SDL_FillRect(real_screen, &src, SDL_MapRGB(real_screen->format, 116, 117, 206));	
 		SDL_FillRect(real_screen, &rc, SDL_MapRGB(real_screen->format, 128, 128, 128));
 		menu_print_font(real_screen, 255,255,255, X+12/RATIO, Y+12/RATIO, text,20);
 
 		if (default_opt)
 		{
-			brc.x=rc.x + rc.w/2-5*12/RATIO; 
+			brc.x=rc.x + rc.w/2-5*12/RATIO-2/RATIO; 
 			brc.y=rc.y+42/RATIO;
-			brc.w=12*3/RATIO;
-			brc.h=20/RATIO;
+			brc.w=12*3/RATIO+4/RATIO;
+			brc.h=22/RATIO;
 			SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x00, 0x80, 0x00));
 		}
 		else
 		{
-			brc.x=rc.x + rc.w/2+5*12/RATIO-2*12/RATIO-6/RATIO; 
+			brc.x=rc.x + rc.w/2+5*12/RATIO-2*12/RATIO-8/RATIO; 
 			brc.y=rc.y+42/RATIO;
-			brc.w=12*3/RATIO;
-			brc.h=20/RATIO;
+			brc.w=12*3/RATIO+4/RATIO;
+			brc.h=22/RATIO;
 			SDL_FillRect(real_screen, &brc, SDL_MapRGB(real_screen->format, 0x80, 0x00, 0x00));
 		}
 	
@@ -372,7 +371,7 @@ const char **get_file_list_devices()
 	
 	device_list_menu[0]=malloc(80);
 	
-	sprintf(device_list_menu[0], "#1NR %-6s %-6s %s %s %s %s %s %s %s",
+	sprintf(device_list_menu[0], "#2NR %-6s %-6s %s %s %s %s %s %s %s",
 	"Device", "Volume","Acc","Sec", "Sur","Res","Blks","Prio", "Path");
 	
     for (i = 0; i < nr; i++) {
@@ -506,14 +505,23 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_size)
 {
 	int font_height = TTF_FontHeight(p_menu->p_font);
-	int line_height = (font_height + font_height / 4);
+	int line_height = font_height + font_height/16 +(font_height==24);
 	int x_start = p_menu->x1+6/RATIO;
 	int y_start = p_menu->y1 + line_height;
 	SDL_Rect r;
 	int entries_visible = (p_menu->y2 - p_menu->y1 -5) / line_height - 1;
 
 	int i, y;
-
+	
+	SDL_Rect r_ext = {p_menu->x1, p_menu->y1,
+				p_menu->x2 - p_menu->x1, p_menu->y2 - p_menu->y1+2/RATIO};
+	SDL_Rect r_int = {p_menu->x1+4/RATIO, p_menu->y1,
+				p_menu->x2 - p_menu->x1-8/RATIO, p_menu->y2 - p_menu->y1-2/RATIO};	
+				
+	
+	SDL_FillRect(screen, &r_ext, SDL_MapRGB(screen->format, 116, 117, 206));
+	SDL_BlitSurface(image_window, &r_int, real_screen, &r_int);
+		
 	if ( p_menu->n_entries * line_height > p_menu->y2 )
 		y_start = p_menu->y1 + line_height;
 
@@ -541,7 +549,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 		if (sel < 0)
 			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0x40, 0x00, 0x00));
 		else
-			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 96, 136, 184)); //Title
+			SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 116, 117, 206)); //Title
 		menu_print_font(screen, 255,255,255, p_menu->x1+4/RATIO, p_menu->y1, p_menu->title, font_size);
 	}
 
@@ -561,15 +569,15 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 				menu_print_font(screen, 0x40,0x40,0x40,
 						x_start, y_start + y, msg, font_size);
 			else if (p_menu->cur_sel == i) /* Selected - color */
-				menu_print_font(screen, 0,200,0,
+				menu_print_font(screen, 0,128,0,
 						x_start, y_start + y, msg, font_size);
 			else if (IS_SUBMENU(msg))
 			{
-				if (p_menu->cur_sel == i-1)
-					menu_print_font(screen, 0,200,0,
+				if (p_menu->cur_sel == i-1) /* Selected - color */
+					menu_print_font(screen, 0,128,0,
 							x_start, y_start + y, msg, font_size);
 				else
-					menu_print_font(screen, 0x40,0x40,0x40,
+					menu_print_font(screen, 20,20,20,
 							x_start, y_start + y, msg, font_size);
 			}
 			else if (msg[0] == '#')
@@ -577,11 +585,11 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 				switch (msg[1])
 				{
 				case '1':
-					menu_print_font(screen, 96,136,184,
+					menu_print_font(screen, 116,117,206,
 							x_start, y_start + y, msg+2, font_size);
 					break;
 				case '2':
-					menu_print_font(screen, 0x40,0x40,0x40,
+					menu_print_font(screen, 25,0,231,
 							x_start, y_start + y, msg+2, font_size);
 					break;
 				default:
@@ -590,8 +598,8 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 					break;							
 				}
 			}
-			else /* Otherwise white */
-				menu_print_font(screen, 0x40,0x40,0x40,
+			else //Not selected
+				menu_print_font(screen, 20,20,20,
 						x_start, y_start + y, msg, font_size);
 			if (IS_SUBMENU(msg))
 			{
@@ -622,13 +630,13 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 								exit(1);
 							}
 
-							r = (SDL_Rect){ x_start + (n+1) * w-1, y_start + (i+ 1 - p_menu->start_entry_visible) * ((h + h/4)) -3, (n_chars - 1) * w, 2};
+							r = (SDL_Rect){ x_start + (n+1) * w, y_start + (i+ 1 - p_menu->start_entry_visible) * line_height -3/RATIO, (n_chars - 1) * w, 2};
 							if (p_menu->cur_sel == i-1)
 								SDL_FillRect(screen, &r,
 										SDL_MapRGB(screen->format, 255,0,0));
 							else
 								SDL_FillRect(screen, &r,
-										SDL_MapRGB(screen->format, 0x40,0x40,0x40));
+										SDL_MapRGB(screen->format, 20,20,20));
 							break;
 						}
 					}
@@ -905,16 +913,10 @@ static int menu_select_internal(SDL_Surface *screen,
 
 	while(1)
 	{
-		SDL_Rect r = {p_menu->x1, p_menu->y1,
-				p_menu->x2 - p_menu->x1, p_menu->y2 - p_menu->y1+2/RATIO};
-		SDL_Rect r_int = {p_menu->x1+4/RATIO, p_menu->y1,
-				p_menu->x2 - p_menu->x1-8/RATIO, p_menu->y2 - p_menu->y1-2/RATIO};		
+			
 		uint32_t keys;
 		
 		int sel_last = p_menu->cur_sel;
-
-		SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 96, 136, 184));
-		SDL_FillRect(screen, &r_int, SDL_MapRGB(screen->format, 255, 255, 255));
 
 		menu_draw(screen, p_menu, 0, font_size);
 		SDL_Flip(screen);
@@ -926,9 +928,9 @@ static int menu_select_internal(SDL_Surface *screen,
 		else if (keys & KEY_DOWN)
 			select_next(p_menu, 0, 1, 1);
 		else if (keys & KEY_PAGEUP)
-			select_next(p_menu, 0, -19, 0);
+			select_next(p_menu, 0, -20, 0);
 		else if (keys & KEY_PAGEDOWN)
-			select_next(p_menu, 0, 19, 0);
+			select_next(p_menu, 0, 20, 0);
 		else if (keys & KEY_LEFT)
 			select_next(p_menu, -1, 0 ,1);
 		else if (keys & KEY_RIGHT)
@@ -1152,8 +1154,20 @@ void menu_init(SDL_Surface *screen)
 	FULL_DISPLAY_X = currprefs.gfx_width_win;
 	FULL_DISPLAY_Y = currprefs.gfx_height_win;
 	RATIO = 640/FULL_DISPLAY_X;
+	char window_image[255];
 	
 	if (is_inited) return;
+	
+    strcpy (window_image, "");
+	
+	if (RATIO == 1) strcat (window_image, WINDOWIMAGE); else strcat (window_image, WINDOWIMAGE_SMALL);
+	
+	tmp_surface=IMG_Load(window_image);
+
+	if (tmp_surface == NULL) {write_log("Impossible to load window background image\n"); return;}
+	image_window=SDL_DisplayFormat(tmp_surface);
+	SDL_FreeSurface (tmp_surface);
+	
 	
 	TTF_Init();
 
@@ -1173,6 +1187,7 @@ void menu_deinit(void)
 	if (!is_inited) return;
 	
 	is_inited = 0;
+	SDL_FreeSurface (image_window);
 	VirtualKeyboard_fini();
 	
 	TTF_CloseFont(menu_font16);
