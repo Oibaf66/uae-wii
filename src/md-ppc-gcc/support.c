@@ -182,6 +182,8 @@ int machdep_inithrtimer (void)
 	    timebase = machdep_linux_gettimebase ();
 #       elif __MORPHOS__
 	    timebase = machdep_morphos_gettimebase ();
+#   elif GEKKO
+	timebase = 60750000; //	TB_TIMER_CLOCK*1000
 #endif
 
 	if (!timebase)
