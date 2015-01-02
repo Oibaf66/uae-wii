@@ -37,6 +37,10 @@
 # include "arcadia.h"
 #endif
 
+#ifdef GEKKO
+# include "ogc/lwp_watchdog.h"
+#endif
+
 //#define CIA_DEBUG_R
 //#define CIA_DEBUG_W
 //#define DONGLE_DEBUG
@@ -407,9 +411,13 @@ void CIA_hsync_handler (void)
 static void tod_hack_reset (void)
 {
     struct timeval tv;
-    uae_u32 rate = currprefs.ntscmode ? 60 : 50;
-    gettimeofday (&tv, NULL);
+    uae_u32 rate = currprefs.ntscmode ? 60 : 50;   
+#ifdef GEKKO //gettimeofday is buggy in libogc
+	tod_hack = (uae_u32) ((ticks_to_microsecs(gettick())/(1000000 / rate)));
+#else
+	gettimeofday (&tv, NULL);
     tod_hack = (uae_u32)(((uae_u64)tv.tv_sec) * rate  + tv.tv_usec / (1000000 / rate));
+#endif
     tod_hack -= ciaatod;
     tod_hack_delay = 10 * 50;
 }
@@ -431,8 +439,12 @@ void CIA_vsync_handler ()
 	    }
 	}
 	if (tod_hack_delay == 0) {
-	    gettimeofday (&tv, NULL);
+#ifdef GEKKO //gettimeofday is buggy in libogc
+		t = (uae_u32) ((ticks_to_microsecs(gettick())/(1000000 / rate)));
+#else
+		gettimeofday (&tv, NULL);
 	    t = (uae_u32)(((uae_u64)tv.tv_sec) * rate + tv.tv_usec / (1000000 / rate));
+#endif		
 	    nt = t - tod_hack;
 	    if ((nt < ciaatod && ciaatod - nt < 10) || nt == ciaatod)
 		return; /* try not to count backwards */
