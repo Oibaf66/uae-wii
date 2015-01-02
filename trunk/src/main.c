@@ -105,6 +105,7 @@ bool ConnectShare ()
 		else {
 		printf("Established connection to SMB share\n\n");
 		}
+		sleep(1);
 
 	return smbismount;
 }
@@ -1132,13 +1133,9 @@ int main (int argc, char **argv)
 	if (currprefs.smb_enable) networkisinit = InitNetwork();
 	
 	if (networkisinit && currprefs.smb_enable) ConnectShare(); 
-		
-	sleep(3);
-	
-	// clear the screen
-	printf("\x1b[2J");
-	printf("\x1b[2;0H");	
-	
+
+	sleep(2);
+
 	if (!(log_quiet = !currprefs.write_logfile)) set_logfile("/uae/uae.log");
 	
 	#endif
