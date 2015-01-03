@@ -63,18 +63,16 @@ static const char *main_menu_messages[] = {
 static const  char *input_messages[] = {
 		/*00*/		"Bind key to Wiimote",
 		/*01*/		"^|1|2|-",
-		/*02*/		"  ",
-		/*03*/		"Bind key to Nunchuk",
-		/*04*/		"^|Z|C",
-		/*05*/		"  ",
-		/*06*/		"Bind key to Classic",
-		/*07*/		"^|a|b|x|y|L|R|Zl|Zr|-",
-		/*08*/		"  ",
-		/*09*/		"Mario kart wheel (horizontal only)",
-		/*10*/		"^|On|Off",
-		/*11*/		"  ",
-		/*12*/		"Mouse emulation",
-		/*13*/		"^|On|Off",
+		/*02*/		"Bind key to Nunchuk",
+		/*03*/		"^|Z|C",
+		/*04*/		"Bind key to Classic",
+		/*05*/		"^|a|b|x|y|L|R|Zl|Zr|-",
+		/*06*/		"Mario kart wheel (horizontal only)",
+		/*07*/		"^|On|Off",
+		/*08*/		"Mouse emulation",
+		/*09*/		"^|On|Off",
+		/*10*/		"Rumble",
+		/*11*/		"^|on|off",	
 		NULL
 };
 
@@ -189,8 +187,6 @@ static const char *other_messages[] = {
 		/*11*/		"^|on|off",
 		/*12*/		"Port",
 		/*13*/		"^|DEFAULT|SD|USB|SMB",
-		/*14*/		"Rumble",
-		/*15*/		"^|on|off",
 		NULL
 };
 
@@ -1127,7 +1123,8 @@ cfgfile_load(&changed_prefs, user_options, 0);
 fix_options_menu_sdl(0);
 currprefs.Port = changed_prefs.Port;
 currprefs.leds_on_screen = changed_prefs.leds_on_screen;
-currprefs.rumble = changed_prefs.rumble;
+currprefs.rumble[0] = changed_prefs.rumble[0];
+currprefs.rumble[1] = changed_prefs.rumble[1];
 
 return 0;
 }
@@ -1263,7 +1260,7 @@ extern int screen_is_picasso;
 
 static void other_options(void)
 {
-	int submenus[8];
+	int submenus[7];
 	int opt, floppy_n, old_sub_3;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -1277,7 +1274,6 @@ static void other_options(void)
 	submenus[4] = !(changed_prefs.gfx_linedbl == 2) ;
 	submenus[5] = !changed_prefs.leds_on_screen;
 	submenus[6] = changed_prefs.Port;
-	submenus[7] = !changed_prefs.rumble;
 
 	opt = menu_select_title("Other options menu",
 			other_messages, submenus);
@@ -1295,9 +1291,8 @@ static void other_options(void)
 	if (changed_prefs.gfx_width_win == 640) changed_prefs.gfx_linedbl = submenus[4] ? 1 : 2;
 	changed_prefs.leds_on_screen = !submenus[5];
 	set_Port(submenus[6]);
-	changed_prefs.rumble = !submenus[7];
+	
 	currprefs.leds_on_screen = changed_prefs.leds_on_screen;
-	currprefs.rumble = changed_prefs.rumble;
 	
 	fix_options_menu_sdl(1);
 	
@@ -1417,21 +1412,21 @@ static void input_options(int joy)
 	const int classic_to_sdl[] = {9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
 	int sdl_key = 1;
 	const char *key;
-	int submenus[5];
+	int submenus[6];
 	int opt;
 	struct virtkey *virtualkey;
 
 	memset(submenus, 0, sizeof(submenus));
 	submenus[3] = !changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0];
 	submenus[4] = (changed_prefs.mouse_settings[1][joy].enabled == 0);
+	submenus[5] = !changed_prefs.rumble[joy];
 
 	opt = menu_select_title("Input menu",
 			input_messages, submenus);
 	if (opt < 0)
 		return;
-	/* Translate key to UAE key event name */
 	
-	if (opt == 9)
+	if (opt == 6) //Mario Kart Wheel
 	{	
 		if (!submenus[3]){
 			if (!joy) insert_keyboard_map("JOY2_HORIZ","input.1.joystick.%d.axis.6", 0);
@@ -1443,7 +1438,7 @@ static void input_options(int joy)
 		return;
 	}
 
-	if (opt == 12)
+	if (opt == 8) //Mouse emulation
 	{
 		if (submenus[4])
 		{
@@ -1457,6 +1452,13 @@ static void input_options(int joy)
 		return;
 	}
 	
+	if (opt == 10) //Rumble
+	{
+		changed_prefs.rumble[joy] = !submenus[5];
+		currprefs.rumble[joy] = changed_prefs.rumble[joy];
+		return;
+	}
+	
 	virtualkey = virtkbd_get_key();
 	if (virtualkey == NULL)
 		return;
@@ -1466,9 +1468,9 @@ static void input_options(int joy)
 		{
 		case 0: /* wiimote */
 			sdl_key = wiimote_to_sdl[submenus[0]]; break;
-		case 3: /* nunchuk */
+		case 2: /* nunchuk */
 			sdl_key = nunchuk_to_sdl[submenus[1]]; break;
-		case 6: /* classic */
+		case 4: /* classic */
 			sdl_key = classic_to_sdl[submenus[2]]; break;
 		default: /* can never happen */
 			break;
@@ -1790,7 +1792,7 @@ void gui_display(int shortcut)
 			break;	
 		case 15:
 			if (msgYesNo("Are you sure to quit?", 0, FULL_DISPLAY_X /2-138/RATIO, FULL_DISPLAY_Y /2-48/RATIO)) 
-				{currprefs.rumble=0; uae_quit(); exit = 1;}
+				{currprefs.rumble[0]=0; currprefs.rumble[1]=0;uae_quit(); exit = 1;}
 			break;
 		default:
 			break;

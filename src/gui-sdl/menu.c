@@ -520,7 +520,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 				
 	
 	SDL_FillRect(screen, &r_ext, SDL_MapRGB(screen->format, 116, 117, 206));
-	SDL_BlitSurface(image_window, &r_int, real_screen, &r_int);
+	SDL_BlitSurface(image_window, &r_int, screen, &r_int);
 		
 	if ( p_menu->n_entries * line_height > p_menu->y2 )
 		y_start = p_menu->y1 + line_height;
