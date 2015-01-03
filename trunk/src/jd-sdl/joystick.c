@@ -37,12 +37,14 @@ struct joyinfo joys[MAX_INPUT_DEVICES];
 #ifdef GEKKO
 void Rumble(unsigned int nr, unsigned int i, int bs)
 {
-		static Uint32 last_ticks[MAX_INPUT_DEVICES];
+		static Uint32 last_ticks[2];
 		Uint32 cur_ticks;
-		static bool rumble_on[MAX_INPUT_DEVICES];
-		static bool fire_pressed[MAX_INPUT_DEVICES];
-		static int joystickbutton_fire[MAX_INPUT_DEVICES]={-1,-1,-1,-1,-1,-1};
+		static bool rumble_on[2];
+		static bool fire_pressed[2];
+		static int joystickbutton_fire[2]={-1,-1,-1,-1,-1,-1};
 		int kc;
+		
+		if (nr>1) return;
 		
 		cur_ticks = SDL_GetTicks();
 		
@@ -123,7 +125,11 @@ static void read_joy (unsigned int nr)
 	int bs = SDL_JoystickGetButton (joy, i) ? 1 : 0;
 	setjoybuttonstate (nr, i, bs);
 	#ifdef GEKKO
-	if (!gui_is_active && currprefs.rumble) Rumble (nr,i, bs);
+	if (!gui_is_active)
+	{
+		if ((nr==0) && (currprefs.rumble[0])) Rumble (0,i, bs);
+		if ((nr==1) && (currprefs.rumble[1])) Rumble (1,i, bs);
+	}	
 	#endif
     }
 }

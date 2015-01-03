@@ -557,7 +557,8 @@ void save_options (FILE *f, const struct uae_prefs *p, int type)
 #if defined GEKKO
     //cfgfile_write (f, "wii_use_mario_kart_wheel=%s\n", p->use_wheel_input ? "yes" : "no");
 	cfgfile_write (f, "wii_port=%d\n", p->Port);
-	cfgfile_write (f, "rumble=%s\n", p->rumble? "true" : "false");
+	cfgfile_write (f, "rumble1=%s\n", p->rumble[0]? "true" : "false");
+	cfgfile_write (f, "rumble2=%s\n", p->rumble[1]? "true" : "false");
 	cfgfile_write (f, "gfx_correct_ratio=%d\n", p->gfx_correct_ratio);
 #endif
 
@@ -875,7 +876,8 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
     	//return 1;
 	if (cfgfile_intval (option, value, "wii_port", &p->Port, 1)) return 1;
 	if (cfgfile_yesno  (option, value, "smb_enable", &p->smb_enable)) return 1;
-	if (cfgfile_yesno  (option, value, "rumble", &p->rumble)) return 1;
+	if (cfgfile_yesno  (option, value, "rumble1", &p->rumble[0])) return 1;
+	if (cfgfile_yesno  (option, value, "rumble2", &p->rumble[1])) return 1;
 	if (cfgfile_string (option, value, "user", p->SmbUser, 32)
 	|| cfgfile_string (option, value, "password", p->SmbPwd,32)
 	|| cfgfile_string (option, value, "share_name", p->SmbShare, 32)
@@ -2519,7 +2521,8 @@ void default_prefs (struct uae_prefs *p, int type)
 	strcpy (p->SmbShare, "Share");
 	strcpy (p->SmbIp, "192.168.0.1");
 	p->Port= PORT_DEFAULT;
-	p->rumble= 0;
+	p->rumble[0]= 0;
+	p->rumble[1]= 0;
 	p->gfx_correct_ratio = 100;
 	p->write_logfile= 0;
 #endif	
