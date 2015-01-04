@@ -1462,6 +1462,8 @@ static void input_options(int joy)
 	virtualkey = virtkbd_get_key();
 	if (virtualkey == NULL)
 		return;
+	if (virtualkey->ev_name == NULL)
+		return;
 	key = virtualkey->ev_name;
 	
 	switch(opt)
@@ -1507,6 +1509,7 @@ static void virtual_keyboard(void)
 	
 	virtkey_t *key =virtkbd_get_key();  
 	if (key) {key_code = key->sdl_code;} else return;
+	if (!key_code) return;
 	
 	SDL_Event event_key;
 	
