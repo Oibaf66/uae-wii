@@ -125,11 +125,8 @@ static void read_joy (unsigned int nr)
 	int bs = SDL_JoystickGetButton (joy, i) ? 1 : 0;
 	setjoybuttonstate (nr, i, bs);
 	#ifdef GEKKO
-	if (!gui_is_active)
-	{
-		if ((nr==0) && (currprefs.rumble[0])) Rumble (0,i, bs);
-		if ((nr==1) && (currprefs.rumble[1])) Rumble (1,i, bs);
-	}	
+	if ((nr==0) && (currprefs.rumble[0])) Rumble (0,i, bs);
+	if ((nr==1) && (currprefs.rumble[1])) Rumble (1,i, bs);	
 	#endif
     }
 }
