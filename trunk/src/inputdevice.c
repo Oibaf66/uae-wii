@@ -1724,7 +1724,7 @@ void inputdevice_default_prefs (struct uae_prefs *p)
     p->input_joystick_deadzone = 33;
     p->input_joymouse_speed = 10;
     p->input_mouse_speed = 100;
-    p->input_autofire_framecnt = 10;
+    p->input_autofire_framecnt = 9;
     for (i = 0; i <= MAX_INPUT_SETTINGS; i++) {
 	set_kbr_default (p, i, 0);
 	input_get_default_mouse (p->mouse_settings[i]);

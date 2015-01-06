@@ -63,7 +63,7 @@ static virtkey_t keys[KEY_COLS * KEY_ROWS] = {
   N("Sft","SHIFT_LEFT",304),K("Z",122),K("X",120),K("C",99), K("V",118), K("B",98), K("N",110), K("M",109),N(",","COMMA",44),N(".","PERIOD",46), N("/","SLASH",47), N("Sft","SHIFT_RIGHT",303), N("Lft","CURSOR_LEFT",276), N("Dwn","CURSOR_DOWN",274),  N("Rgt", "CURSOR_RIGHT",275),K("KP1",257),K("KP2",258), K("KP3",259), N("Enter","KP_ENTERENTER",271),KNL(),KNL(),
   N("Alt","ALT_LEFT",308), N("Amg","AMIGA_LEFT",310),N("space", "SPACE",32),N("Amg","AMIGA_RIGHT",309),N("Alt","ALT_RIGHT",307),KNL(),K("KP0",256),N(".","KP_PERIOD",266),N("Enter","KP_ENTER",271),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),
  
-  NJ("Fire","JOY_FIRE_BUTTON"),NJ("Joy 2nd button","JOY_2ND_BUTTON"),NJ("Joy 3rd button","JOY_3RD_BUTTON"), NJ("Joy left","JOY_LEFT"),NJ("Joy right","JOY_RIGHT"),NJ("Joy up","JOY_UP"),NJ("Joy down","JOY_DOWN"),D("None"),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(), KNL()};
+  NJ("Fire","JOY_FIRE_BUTTON"),NJ("AutoFire","JOY_AUTOFIRE_BUTTON"),NJ("Joy 2nd button","JOY_2ND_BUTTON"),NJ("Joy 3rd button","JOY_3RD_BUTTON"), NJ("Joy left","JOY_LEFT"),NJ("Joy right","JOY_RIGHT"),NJ("Joy up","JOY_UP"),NJ("Joy down","JOY_DOWN"),D("None"),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL(),KNL()};
 
 static int rows_margins[KEY_ROWS+1] = {26, 49, 74, 98, 122, 145, 172, 198};
 
@@ -74,7 +74,7 @@ static int buttons_margins[KEY_ROWS][KEY_COLS+1] = {
 {14,42,67,93,119,145,171,197,223,249,275,301,327,353,412,449,476,515,541,567,593,620},
 {14,80,106,132,158,184,210,236,262,288,314,340,417,449,476,515,541,567,593,620 },
 {28,63,95,329,361,396,515,567,593,620},
-{14,80,146,212,278,344,411,476,543}};
+{14,80,146,212,278,344,411,476,543,609}};
 
 extern int RATIO;
 

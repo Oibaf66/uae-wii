@@ -72,7 +72,9 @@ static const  char *input_messages[] = {
 		/*08*/		"Mouse emulation",
 		/*09*/		"^|On|Off",
 		/*10*/		"Rumble",
-		/*11*/		"^|on|off",	
+		/*11*/		"^|on|off",
+		/*12*/		"Autofire delay",
+		/*13*/		"^|3|6|9|12|15",
 		NULL
 };
 
@@ -1412,25 +1414,27 @@ static void input_options(int joy)
 	const int classic_to_sdl[] = {9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
 	int sdl_key = 1;
 	const char *key;
-	int submenus[6];
-	int opt;
+	int submenus[7];
+	int opt, autofire;
 	struct virtkey *virtualkey;
 
 	memset(submenus, 0, sizeof(submenus));
 	submenus[3] = !changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0];
 	submenus[4] = (changed_prefs.mouse_settings[1][joy].enabled == 0);
 	submenus[5] = !changed_prefs.rumble[joy];
+	submenus[6] = changed_prefs.input_autofire_framecnt/3-1;
+	if (submenus[6]<0) submenus[6] = 0;
 
 	opt = menu_select_title("Input menu",
 			input_messages, submenus);
 	if (opt < 0)
 		return;
-	
+		
 	if (opt == 6) //Mario Kart Wheel
 	{	
 		if (!submenus[3]){
 			if (!joy) insert_keyboard_map("JOY2_HORIZ","input.1.joystick.%d.axis.6", 0);
-			else insert_keyboard_map("JOY1_HORIZ" ,"input.1.joystick.%d.axis.6", 1);}
+			else insert_keyboard_map("JOY1_HORIZ" , "input.1.joystick.%d.axis.6", 1);}
 		else{
 				changed_prefs.joystick_settings[1][joy].eventid[ID_AXIS_OFFSET + 6][0] = 0;
 				inputdevice_config_change();
@@ -1459,6 +1463,13 @@ static void input_options(int joy)
 		return;
 	}
 	
+	if (opt == 12) //Autofire delay
+	{
+		changed_prefs.input_autofire_framecnt = (submenus[6]+1)*3;
+		currprefs.input_autofire_framecnt = changed_prefs.input_autofire_framecnt;
+		return;
+	}
+	
 	virtualkey = virtkbd_get_key();
 	if (virtualkey == NULL)
 		return;
@@ -1478,7 +1489,7 @@ static void input_options(int joy)
 			break;
 		}
 	if (!strcmp(key,"JOY_FIRE_BUTTON"))
-			key= joy ? "JOY1_FIRE_BUTTON": "JOY2_FIRE_BUTTON";
+			key= joy ? "JOY1_FIRE_BUTTON.0": "JOY2_FIRE_BUTTON.0";
 			
 	if (!strcmp(key,"JOY_2ND_BUTTON"))
 			key= joy ? "JOY1_2ND_BUTTON": "JOY2_2ND_BUTTON";
@@ -1498,6 +1509,10 @@ static void input_options(int joy)
 	if (!strcmp(key,"JOY_DOWN"))
 			key= joy ? "JOY1_DOWN": "JOY2_DOWN";
 			
+	if (!strcmp(key,"JOY_AUTOFIRE_BUTTON"))
+	{
+			key= joy ? "JOY1_FIRE_BUTTON.1": "JOY2_FIRE_BUTTON.1";		
+	}		
 		
 	setup_joystick(joy, key, sdl_key);
 	
