@@ -25,6 +25,8 @@
 #include "sysdeps.h"
 #include "options.h"
 #include "filesys.h"
+#include "sounddep/sound.h"
+#include "audio.h"
 
 /* Uncomment for debugging output */
 //#define DEBUG_MENU
@@ -87,21 +89,24 @@ int FULL_DISPLAY_X; //640
 int FULL_DISPLAY_Y; //480
 int RATIO;
 
-static SDL_Surface *real_screen;
-
 #define IS_SUBMENU(p_msg) ( (p_msg)[0] == '^' )
 #define IS_TEXT(p_msg) ( (p_msg)[0] == '#' || (p_msg)[0] == ' ' )
 #define IS_MARKER(p_msg) ( (p_msg)[0] == '@' )
 
-static int is_inited = 0;
-static TTF_Font *menu_font16, *menu_font20,*menu_font8, *menu_font10 ;
 #if defined(GEKKO)
 #define FONT_PATH "/apps/uae/font.ttf"
+#define FONT_PATH_SMALL "/apps/uae/font_small.ttf"
 #else
-#define FONT_PATH "FreeMono.ttf"
+#define FONT_PATH "font.ttf"
+#define FONT_PATH_SMALL "font_small.ttf"
 #endif
 
+static int is_inited = 0;
+static TTF_Font *menu_font16, *menu_font20,*menu_font8, *menu_font10 ;
 static SDL_Surface *image_window, *tmp_surface ;
+static SDL_Surface *real_screen;
+static char *click_buffer_pointer[3];
+static int len_click_buffer[3];
 
 int fh, fw;
 
@@ -233,18 +238,22 @@ int msgYesNo(char *text, int default_opt, int x, int y)
 		key = menu_wait_key_press();
 		if (key & KEY_SELECT)
 		{
+			play_click(1);
 			return default_opt;
 		}
 		else if (key & KEY_ESCAPE)
 		{
+			play_click(2);
 			return 0;
 		}
 		else if (key & KEY_LEFT)
 		{
+			play_click(0);
 			default_opt = !default_opt;
 		}
 		else if (key & KEY_RIGHT)
 		{
+			play_click(0);
 			default_opt = !default_opt;
 		}
 	}
@@ -493,7 +502,7 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 	
 	if (!font_surf)
 	{
-		fprintf(stderr, "%s\n", TTF_GetError());
+		write_log("%s\n", TTF_GetError());
 		exit(1);
 	}
 
@@ -626,7 +635,7 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 							{
 								fw = w;
 								fh = h;
-								fprintf(stderr, "%s\n", TTF_GetError());
+								write_log("%s\n", TTF_GetError());
 								exit(1);
 							}
 
@@ -734,7 +743,7 @@ static void menu_init_internal(menu_t *p_menu, const char *title,
 
 		if (TTF_SizeText(p_font, p_menu->pp_msgs[p_menu->n_entries], &text_w_font, NULL) != 0)
 		{
-			fprintf(stderr, "%s\n", TTF_GetError());
+			write_log("%s\n", TTF_GetError());
 			exit(1);
 		}
 		if (text_w_font > p_menu->text_w)
@@ -924,19 +933,19 @@ static int menu_select_internal(SDL_Surface *screen,
 		keys = menu_wait_key_press();
 
 		if (keys & KEY_UP)
-			select_next(p_menu, 0, -1, 1);
+			{select_next(p_menu, 0, -1, 1);play_click(0);}
 		else if (keys & KEY_DOWN)
-			select_next(p_menu, 0, 1, 1);
+			{select_next(p_menu, 0, 1, 1);play_click(0);}
 		else if (keys & KEY_PAGEUP)
-			select_next(p_menu, 0, -20, 0);
+			{select_next(p_menu, 0, -20, 0);play_click(0);}
 		else if (keys & KEY_PAGEDOWN)
-			select_next(p_menu, 0, 20, 0);
+			{select_next(p_menu, 0, 20, 0);play_click(0);}
 		else if (keys & KEY_LEFT)
-			select_next(p_menu, -1, 0 ,1);
+			{select_next(p_menu, -1, 0 ,1);play_click(0);}
 		else if (keys & KEY_RIGHT)
-			select_next(p_menu, 1, 0 ,1);
+			{select_next(p_menu, 1, 0 ,1);play_click(0);}
 		else if (keys & KEY_ESCAPE)
-			break;
+			{play_click(2);break;}
 		else if (keys & KEY_SELECT)
 		{
 			ret = p_menu->cur_sel;
@@ -944,6 +953,7 @@ static int menu_select_internal(SDL_Surface *screen,
 
 			for (i=0; i<p_menu->n_submenus; i++)
 				p_submenus[i] = p_menu->p_submenus[i].sel;
+			play_click(1);	
 			break;
 		}
 		/* Invoke the callback when an entry is selected */
@@ -1123,24 +1133,24 @@ static TTF_Font *read_font(const char *path, int font_size)
 	FILE *fp = fopen(path, "r");
 
 	if (!data) {
-		fprintf(stderr, "Malloc failed\n");
+		write_log("Malloc failed\n");
 		exit(1);
 	}
 	if (!fp) {
-		fprintf(stderr, "Could not open font\n");
+		write_log("Could not open font\n");
 		exit(1);
 	}
 	fread(data, 1, 1 * 1024 * 1024, fp);
 	rw = SDL_RWFromMem(data, 1 * 1024 * 1024);
 	if (!rw) 
 	{
-		fprintf(stderr, "Could not create RW: %s\n", SDL_GetError());
+		write_log("Could not create RW: %s\n", SDL_GetError());
 		exit(1);
 	}
 	out = TTF_OpenFontRW(rw, 1, font_size);
 	if (!out)
 	{
-		fprintf(stderr, "Unable to open font %s\n", path);
+		write_log("Unable to open font %s\n", path);
 		exit(1);
 	}
 	fclose(fp);
@@ -1173,11 +1183,69 @@ void menu_init(SDL_Surface *screen)
 
 	menu_font16 = read_font(FONT_PATH, 16);
 	menu_font20 = read_font(FONT_PATH, 20);
-	menu_font8 = read_font(FONT_PATH, 8);
-	menu_font10 = read_font(FONT_PATH, 10);
+	menu_font8 = read_font(FONT_PATH_SMALL, 8);
+	menu_font10 = read_font(FONT_PATH_SMALL, 10);
 	
 	real_screen = screen;
 	VirtualKeyboard_init(screen);
+	
+
+	FILE *fichero;
+	int i;
+	
+	for(i=0; i<3; i++)
+	{
+		switch (i)
+		{
+#ifdef GEKKO
+			case 0:
+			fichero=fopen("/uae/wave/menu_navigation_BE.raw","rb"); //Menu up, down, left, right
+			break;
+		
+			case 1:
+			fichero=fopen("/uae/wave/select_BE.raw","rb"); //Menu select
+			break;
+			
+			case 2:
+			fichero=fopen("/uae/wave/unselect_BE.raw","rb"); //Menu unselect
+			break;
+#else
+			case 0:
+			fichero=fopen("/uae/wave/menu_navigation_LE.raw","rb"); //Menu up, down, left, right
+			break;
+		
+			case 1:
+			fichero=fopen("/uae/wave/select_LE.raw","rb"); //Menu select
+			break;
+			
+			case 2:
+			fichero=fopen("/uae/wave/unselect_LE.raw","rb"); //Menu unselect
+			break;
+#endif			
+		}
+		
+		
+		if(fichero==NULL) {
+			write_log("Can't open button click wav file: %d\n", i);
+			exit(1);
+			}
+		
+		fseek (fichero, 0, SEEK_END);
+		len_click_buffer[i]=ftell (fichero);
+		fseek (fichero, 0, SEEK_SET);
+	
+		click_buffer_pointer[i]= (char *) malloc(len_click_buffer[i]);
+	
+		if(click_buffer_pointer[i]==NULL) {
+			write_log("Can't allocate click wav buffer: %d\n",i);
+			exit(1);
+			}
+		
+		fread(click_buffer_pointer[i], 1, len_click_buffer[i], fichero); 	
+	
+		fclose(fichero);
+	}
+	
 	is_inited = 1;
 	DEBUG_LOG("Menu is inited\n");
 }
@@ -1187,6 +1255,11 @@ void menu_deinit(void)
 	if (!is_inited) return;
 	
 	is_inited = 0;
+
+	free(click_buffer_pointer[0]);
+	free(click_buffer_pointer[1]);
+	free(click_buffer_pointer[2]);
+
 	SDL_FreeSurface (image_window);
 	VirtualKeyboard_fini();
 	
@@ -1203,4 +1276,47 @@ void menu_deinit(void)
 int menu_is_inited(void)
 {
 	return is_inited;
+}
+
+inline void memcpy_volume(uae_s16* dst, uae_s16* srt, int length, uae_s16 gui_volume)
+{
+	int i;
+	int s16_len;
+	
+	s16_len = length/2;
+ 
+	for (i=0; i<length; i+=2)
+	{
+		dst[i] = srt[i]>>gui_volume; //One channel
+		dst[i+1] = srt[i+1]>>gui_volume; //The other channel
+	}
+}
+
+void play_click(int sound)
+{
+	int snd_bf_pointer;
+	uae_s16 gui_volume;
+	
+	if (!changed_prefs.gui_volume) return;
+	if (changed_prefs.sound_stereo!=1) return; //Only stereo implemented
+	
+	gui_volume = 5-changed_prefs.gui_volume;
+	
+	if (gui_volume<0) gui_volume=0;
+	if (gui_volume>5) gui_volume=5;
+	
+	audio_resume();
+	
+	for(snd_bf_pointer=0; snd_bf_pointer< (len_click_buffer[sound]-sndbufsize); snd_bf_pointer+=sndbufsize)
+	{
+		memcpy_volume((uae_s16 *)sndbuffer, (uae_s16 *)(click_buffer_pointer[sound]+snd_bf_pointer), sndbufsize, gui_volume);
+		finish_sound_buffer();
+	}
+	
+	memcpy(sndbuffer, click_buffer_pointer[sound] + snd_bf_pointer, len_click_buffer[sound] - snd_bf_pointer); //The last chunk
+	memset((char *) sndbuffer + len_click_buffer[sound]-snd_bf_pointer,0, sndbufsize -(len_click_buffer[sound]- snd_bf_pointer));
+	finish_sound_buffer();
+	clearbuffer();
+	
+	audio_pause();
 }

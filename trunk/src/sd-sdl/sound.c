@@ -29,7 +29,7 @@ static uae_sem_t data_available_sem, callback_done_sem, sound_init_sem;
 
 static int in_callback, closing_sound;
 
-static void clearbuffer (void)
+void clearbuffer (void)
 {
     memset (sndbuffer, 0, sizeof (sndbuffer));
 }
@@ -70,7 +70,7 @@ int setup_sound (void)
 	spec.freq = currprefs.sound_freq;
 	spec.format = AUDIO_S16SYS;
 	spec.channels = currprefs.sound_stereo ? 2 : 1;
-	spec.callback = dummy_callback;
+	//spec.callback = dummy_callback;
 	spec.samples  = spec.freq * currprefs.sound_latency / 1000;
 	spec.callback = sound_callback;
 	spec.userdata = 0;

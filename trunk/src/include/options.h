@@ -255,6 +255,7 @@ struct uae_prefs {
 	int Port; //SD, USB or SMB
 	int rumble[2];
 	int gfx_correct_ratio;
+	int gui_volume;
 #endif
 	
     /* input */

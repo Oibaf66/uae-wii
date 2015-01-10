@@ -158,18 +158,16 @@ static const char *emulation_messages[] = {
 static const char *audio_messages[] = {
 		/*00*/		"Sound ouput",
 		/*01*/		"^|none|normal|exact",
-		/*02*/		"  ",
-		/*03*/		"Sound stereo separation",
-		/*04*/		"^|0|20%|40%|60%|80%|100%",
-		/*05*/		"  ",
-		/*06*/		"Sound stereo delay",
-		/*07*/		"^|0|2|4|6|8|10",
-		/*08*/		"  ",
-		/*09*/		"Sound interpolation",
-		/*10*/		"^|none|rh|crux|sinc",
-		/*11*/		"  ",
-		/*12*/		"Floppy sound",
-		/*13*/		"^|on|off",
+		/*02*/		"Sound stereo separation",
+		/*03*/		"^|0|20%|40%|60%|80%|100%",
+		/*04*/		"Sound stereo delay",
+		/*05*/		"^|0|2|4|6|8|10",
+		/*06*/		"Sound interpolation",
+		/*07*/		"^|none|rh|crux|sinc",
+		/*08*/		"Floppy sound",
+		/*09*/		"^|on|off",
+		/*10*/		"Gui Volume",
+		/*11*/		"^|0|1|2|3|4|5",
 		NULL
 };
 
@@ -1213,7 +1211,7 @@ static void emulation_options(void)
 static void audio_options(void)
 {
 	
-	int submenus[5];
+	int submenus[6];
 	int opt;
 	
 	memset(submenus, 0, sizeof(submenus));
@@ -1223,6 +1221,7 @@ static void audio_options(void)
 	submenus[2] = changed_prefs.sound_mixed_stereo/2;
 	submenus[3] = changed_prefs.sound_interpol;
 	submenus[4] = !get_dfxclick();
+	submenus[5] = changed_prefs.gui_volume;
 	
 	opt = menu_select_title("Audio options menu",
 			audio_messages, submenus);
@@ -1234,8 +1233,11 @@ static void audio_options(void)
 	changed_prefs.sound_mixed_stereo = submenus[2]*2;
 	changed_prefs.sound_interpol = submenus[3];
 	set_dfxclick(!submenus[4]);
+	changed_prefs.gui_volume = submenus[5];
 	
 	fix_options_menu_sdl(1);
+	
+	currprefs.gui_volume = changed_prefs.gui_volume;
 }
 
 static void set_gfx_resolution (int res)
@@ -1386,7 +1388,7 @@ static void insert_keyboard_map(const char *key, const char *fmt, ...)
 	va_start(ap, fmt);
 	r = vsnprintf(buf, 255, fmt, ap);
 	if (r >= 255)
-		fprintf(stderr, "Too long string passed\n");
+		write_log("Too long string passed to insert keyboard map\n");
 	va_end(ap);
 
 	//printf("Mibb: %s:%s\n", buf, key);
