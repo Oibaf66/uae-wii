@@ -201,11 +201,16 @@ dist:uae.dol
 	cp meta.xml $@/apps/uae/
 	cp icon.png $@/apps/uae/
 	cp font.ttf $@/apps/uae/
+	cp font_small.ttf $@/apps/uae/
 	cp README.Cloanto-Amiga_Forever $@/apps/uae/docs/
 	cp images/kb_amiga.png $@/apps/uae/images/
 	cp images/kb_amiga_small.png $@/apps/uae/images/
 	cp images/window_bg.png $@/apps/uae/images/
 	cp images/window_bg_small.png $@/apps/uae/images/
+	cp sound/menu_navigation_BE.raw $@/uae/wave
+	cp sound/select_BE.raw $@/uae/wave
+	cp sound/unselect_BE.raw $@/uae/wave
+
 	cp uaerc.wii $@/uae/uaerc
 	cp uaerc.smb $@/uae/
 	cp docs/configuration.txt $@/apps/uae/docs/

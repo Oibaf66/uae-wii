@@ -560,6 +560,7 @@ void save_options (FILE *f, const struct uae_prefs *p, int type)
 	cfgfile_write (f, "rumble1=%s\n", p->rumble[0]? "true" : "false");
 	cfgfile_write (f, "rumble2=%s\n", p->rumble[1]? "true" : "false");
 	cfgfile_write (f, "gfx_correct_ratio=%d\n", p->gfx_correct_ratio);
+	cfgfile_write (f, "gui_volume=%d\n", p->gui_volume);
 #endif
 
 #ifdef FILESYS
@@ -890,6 +891,7 @@ static int cfgfile_parse_host (struct uae_prefs *p, char *option, char *value)
 	}
 	if (cfgfile_yesno  (option, value, "write_logfile", &p->write_logfile))
     	return 1;
+	if (cfgfile_intval (option, value, "gui_volume", &p->gui_volume, 1)) return 1;	
 #endif
 	
 #ifdef DRIVESOUND
@@ -2525,6 +2527,7 @@ void default_prefs (struct uae_prefs *p, int type)
 	p->rumble[1]= 0;
 	p->gfx_correct_ratio = 100;
 	p->write_logfile= 0;
+	p->gui_volume= 3;
 #endif	
 
 #ifdef UAE_MINI

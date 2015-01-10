@@ -65,6 +65,8 @@ void flip_screen (void);
 
 int menu_select_devices(void);
 
+void play_click(int sound);
+
 #if defined(__cplusplus)
 }
 #endif

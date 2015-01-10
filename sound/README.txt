@@ -1,0 +1,1 @@
+Raw files are 16 bits, 2 channels, 48k rate, signed integer
