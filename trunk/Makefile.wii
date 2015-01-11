@@ -34,6 +34,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/caps/*.c $(SRC_DIR)/dms/*.c $(SRC_D
 	$(SRC_DIR)/machdep/support.c \
 	$(SRC_DIR)/osdep/main.c \
 	$(SRC_DIR)/osdep/memory.c\
+	$(SRC_DIR)/osdep/fsdb_wii.c\
 	$(SRC_DIR)/sounddep/sound.c \
 	$(SRC_DIR)/threaddep/thread.c
 	
@@ -56,6 +57,7 @@ SRCS := $(filter-out \
 	src/enforcer.c \
 	src/fdi2raw.c \
 	src/filesys_bootrom.c \
+	src/fsdb_unix.c \
 	src/genblitter.c \
 	src/gencomp.c \
 	src/gencpu.c \
@@ -106,7 +108,7 @@ src/machdep:
 
 src/osdep:
 	rm -f $@
-	mkdir $@ && cd src/od-generic && find . -maxdepth 1 -type f -exec ln '{}' ../osdep/'{}' ';' 
+	mkdir $@ && cd src/od-wii && find . -maxdepth 1 -type f -exec ln '{}' ../osdep/'{}' ';' 
 
 src/gfxdep:
 	rm -f $@

@@ -544,7 +544,7 @@ void save_state (const char *filename, const char *description)
 
 #ifdef FILESYS
     if (nr_units (currprefs.mountinfo)) {
-	gui_message ("WARNING: State saves do not support hard drive emulation");
+	gui_message ("WARNING: State saves do not support HD emulation");
     }
 #endif
 
