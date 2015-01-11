@@ -67,9 +67,8 @@ static int wii_access (const char *pathname, int mode)
 
 	if (stat(pathname, &st) < 0)
 		return -1;
-	if (mode == R_OK && S_ISDIR(st.st_mode))
-		return 0;
-	return -1;
+		
+	return 0; //With Wii the file/dir is considered always accessible if it exists
 }
 #define access wii_access
 #endif
