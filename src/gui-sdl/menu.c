@@ -390,7 +390,7 @@ const char **get_file_list_devices()
 	char   *devname, *volname, *rootdir, *filesysdir;
 	const char *failure;
 	
-	device_list_menu[i+1]=malloc(80);
+	device_list_menu[i+1]=malloc(70);
 
 	
 	/* We always use currprefs.mountinfo for the GUI.  The filesystem
@@ -428,12 +428,12 @@ const char **get_file_list_devices()
 	    //strcpy (texts[HDLIST_SIZE],    "N/A");
 	    strcpy (texts[HDLIST_BLKSIZE], "N/A ");
 	}
-	strncpy  (texts[HDLIST_PATH], rootdir ,24);
-	texts[HDLIST_PATH][24]='\0';
+	strncpy  (texts[HDLIST_PATH], rootdir ,19);
+	texts[HDLIST_PATH][19]='\0';
 	strcpy  (texts[HDLIST_READONLY], readonly ? "RO " : "RW ");
 	sprintf (texts[HDLIST_BOOTPRI], "%4d", bootpri);
     
-	sprintf(device_list_menu[i+1], "%.2d %-6s %-6s %s %s %s %s %s %s %-24s",
+	sprintf(device_list_menu[i+1], "%.2d %-6s %-6s %s %s %s %s %s %s %-19s",
 	i,texts[HDLIST_DEVICE],texts[HDLIST_VOLUME],texts[HDLIST_READONLY], texts[HDLIST_SECS],
 	texts[HDLIST_HEADS],texts[HDLIST_RSRVD], texts[HDLIST_BLKSIZE] ,texts[HDLIST_BOOTPRI], texts[HDLIST_PATH]);
 	}
@@ -458,10 +458,11 @@ static submenu_t *find_submenu(menu_t *p_menu, int index)
 	return NULL;
 }
 
+#define _MAX_STRING 62
+
 void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 		int x, int y, const char *msg, int font_size)
 {
-#define _MAX_STRING 62
 	SDL_Surface *font_surf;
 	SDL_Rect dst = {x, y,  0, 0};
 	SDL_Color color = {r, g, b, 0};
@@ -510,9 +511,54 @@ void menu_print_font(SDL_Surface *screen, int r, int g, int b,
 	SDL_FreeSurface(font_surf);
 }
 
+int quit_thread;
+
+struct  
+{ 
+	SDL_Surface *screen; 
+	int x; 
+	int y; 
+	const char *msg;  
+	int font_size;
+} thread_struct;
+
+
+int menu_thread(void * data) 
+{ 
+
+	int i , a;
+	SDL_Rect r_int = {thread_struct.x, thread_struct.y,
+				620/RATIO, 20/RATIO};
+	
+	while( quit_thread == 0 )
+	{
+		for (i=0; i<=(strlen(thread_struct.msg)-_MAX_STRING);i++)
+		{
+			SDL_BlitSurface(image_window, &r_int, thread_struct.screen, &r_int);
+			menu_print_font(thread_struct.screen, 0, 128, 0, thread_struct.x, thread_struct.y, 
+				thread_struct.msg+i, thread_struct.font_size);
+			SDL_UpdateRect(thread_struct.screen, thread_struct.x, 
+				thread_struct.y, 620/RATIO, 20/RATIO);
+				for (a=0; a<10;a++)
+					{
+					if (i==0) SDL_Delay(80); else SDL_Delay(30);
+					if (quit_thread) return 0;
+					}
+		}
+		for (a=0; a<10;a++)
+		{
+			SDL_Delay(60);
+			if (quit_thread) return 0;
+		}
+	} 
+return 0;
+}
 
 static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_size)
 {
+	static SDL_Thread *thread = NULL;  
+	quit_thread = 1;
+	
 	int font_height = TTF_FontHeight(p_menu->p_font);
 	int line_height = font_height + font_height/16 +(font_height==24);
 	int x_start = p_menu->x1+6/RATIO;
@@ -578,8 +624,21 @@ static void menu_draw(SDL_Surface *screen, menu_t *p_menu, int sel, int font_siz
 				menu_print_font(screen, 0x40,0x40,0x40,
 						x_start, y_start + y, msg, font_size);
 			else if (p_menu->cur_sel == i) /* Selected - color */
-				menu_print_font(screen, 0,128,0,
+				{
+					if (strlen(msg)<=_MAX_STRING) menu_print_font(screen, 0,128,0,
 						x_start, y_start + y, msg, font_size);
+					else
+					{
+						if (thread) SDL_WaitThread(thread, NULL);
+						thread_struct.screen=screen;
+						thread_struct.x=x_start;
+						thread_struct.y=y_start + y;
+						thread_struct.msg=msg;
+						thread_struct.font_size=font_size;
+						quit_thread=0;
+						thread = SDL_CreateThread(menu_thread, NULL );
+					}
+				}
 			else if (IS_SUBMENU(msg))
 			{
 				if (p_menu->cur_sel == i-1) /* Selected - color */
@@ -892,13 +951,13 @@ uint32_t menu_wait_key_press(void)
 					break;
 
 			}
-			break;
 		}
 
 		if (keys != 0)
 			break;
 		SDL_Delay(20);
 	}
+	write_log("keys=%d\n",keys);
 	return keys;
 }
 
@@ -931,6 +990,8 @@ static int menu_select_internal(SDL_Surface *screen,
 		SDL_Flip(screen);
 
 		keys = menu_wait_key_press();
+		
+		quit_thread = 1;
 
 		if (keys & KEY_UP)
 			{select_next(p_menu, 0, -1, 1);play_click(0);}
