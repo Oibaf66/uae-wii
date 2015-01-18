@@ -41,7 +41,7 @@ void Rumble(unsigned int nr, unsigned int i, int bs)
 		Uint32 cur_ticks;
 		static bool rumble_on[2];
 		static bool fire_pressed[2];
-		static int joystickbutton_fire[2]={-1,-1,-1,-1,-1,-1};
+		static int joystickbutton_fire[2]={-1,-1};
 		int kc;
 		
 		if (nr>1) return;
