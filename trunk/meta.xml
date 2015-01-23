@@ -2,8 +2,8 @@
   <app version="1">
     <name>UAE Wii</name>
     <coder>Oibaf, Simon Kagstrom</coder>
-    <version>11</version>
-    <release_date>20141130</release_date>
+    <version>12</version>
+    <release_date>20150123</release_date>
     <short_description>Amiga emulator</short_description>
     <long_description>UAE is an Amiga emulator written by Bernd Schmidt et al, see http://amigaemulator.org. 
 The initial port to Wii was done by Simon Kagstrom, with help from Christopher Follett, "Knitax".
@@ -37,5 +37,9 @@ D-Pad:  movements
 -:   move 1 page down
 
 See http://wiibrew.org/wiki/UAE_Wii for more details.
+
+CREDITS
+--------
+Menu background is an image of Indigo69 under licence Artistic 2.0 
 </long_description>
 </app>
