@@ -1,3 +1,18 @@
+version 12:
+		* Added background image in the GUI
+		* Added sound in the GUI
+		* Horizontally scrolling menu
+		* More readable fonts in the GUI
+		* Added autofire (configurable from virtual Keyboard)
+		* Added vsync option
+		* Moved Rumble option in wiimote menu 
+		* Changed the refreshrate option
+		* Shorter bootstrap
+		* Fixed file attributes in virtual filesystem emulation
+		* Other bug fixes
+
+-- Fabio Olimpieri <fabio.olimpieri@tin.it>, Jan 23 CEST 2015
+
 version 11:
 		* Update to E-UAE 0.8.29 (more compatibility)
 		* Added 320X240 resolution (more emulation speed)
